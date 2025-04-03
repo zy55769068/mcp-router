@@ -17,8 +17,7 @@ const FeatureList: FeatureItem[] = [
     title: <Translate id="homepage.feature1.title">Easy to Use</Translate>,
     description: (
       <Translate id="homepage.feature1.description">
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Search, install, start, and stop MCP Servers easily in one place.
       </Translate>
     ),
   },
@@ -26,16 +25,15 @@ const FeatureList: FeatureItem[] = [
     title: <Translate id="homepage.feature2.title">Token based authentication</Translate>,
     description: (
       <Translate id="homepage.feature2.description">
-        Authenticate your apps with a token.
+        Issue tokens to limit which apps can access your MCP servers.
       </Translate>
     ),
   },
   {
-    title: <Translate id="homepage.feature3.title">Powered by React</Translate>,
+    title: <Translate id="homepage.feature3.title">Log storage and visualization</Translate>,
     description: (
       <Translate id="homepage.feature3.description">
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Store request logs from apps to monitor how your MCP servers are being used.
       </Translate>
     ),
   },
@@ -83,7 +81,7 @@ function HomepageHeader() {
             className="button button--secondary button--lg"
             to="/docs/intro">
             <Translate id="homepage.header.tutorial.link">
-              MCP Router Tutorial - 5min ⏱️
+              Tutorial - 5min ⏱️
             </Translate>
           </Link>
         </div>

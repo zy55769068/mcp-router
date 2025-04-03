@@ -4,7 +4,7 @@
     "description": "Title for the first feature on the homepage"
   },
   "homepage.feature1.description": {
-    "message": "Docusaurusは、ウェブサイトを迅速に立ち上げて実行できるように、最初から簡単にインストールして使用できるように設計されています。",
+    "message": "１箇所で簡単にMCP Serverを検索、インストール、起動、停止できます。",
     "description": "Description for the first feature on the homepage"
   },
   "homepage.feature2.title": {
@@ -12,15 +12,15 @@
     "description": "Title for the second feature on the homepage"
   },
   "homepage.feature2.description": {
-    "message": "トークンを使用してアプリを認証します。",
+    "message": "トークンを発行し、MCPサーバにアクセス可能なアプリを制限できます。",
     "description": "Description for the second feature on the homepage"
   },
   "homepage.feature3.title": {
-    "message": "Reactを活用",
+    "message": "ログの保存・可視化",
     "description": "Title for the third feature on the homepage"
   },
   "homepage.feature3.description": {
-    "message": "Reactを再利用してウェブサイトのレイアウトを拡張またはカスタマイズします。Docusaurusは、同じヘッダーとフッターを再利用しながら拡張できます。",
+    "message": "アプリからのリクエストログを保存することで、MCPサーバの利用状況を確認できます。",
     "description": "Description for the third feature on the homepage"
   },
   "homepage.header.title": {
