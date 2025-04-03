@@ -1,0 +1,38 @@
+{
+  "homepage.feature1.title": {
+    "message": "簡単に使える",
+    "description": "Title for the first feature on the homepage"
+  },
+  "homepage.feature1.description": {
+    "message": "Docusaurusは、ウェブサイトを迅速に立ち上げて実行できるように、最初から簡単にインストールして使用できるように設計されています。",
+    "description": "Description for the first feature on the homepage"
+  },
+  "homepage.feature2.title": {
+    "message": "トークンベースの認証",
+    "description": "Title for the second feature on the homepage"
+  },
+  "homepage.feature2.description": {
+    "message": "トークンを使用してアプリを認証します。",
+    "description": "Description for the second feature on the homepage"
+  },
+  "homepage.feature3.title": {
+    "message": "Reactを活用",
+    "description": "Title for the third feature on the homepage"
+  },
+  "homepage.feature3.description": {
+    "message": "Reactを再利用してウェブサイトのレイアウトを拡張またはカスタマイズします。Docusaurusは、同じヘッダーとフッターを再利用しながら拡張できます。",
+    "description": "Description for the third feature on the homepage"
+  },
+  "homepage.header.title": {
+    "message": "MCP Router",
+    "description": "Main title on the homepage header"
+  },
+  "homepage.header.tagline": {
+    "message": "MCPを簡単に管理しましょう",
+    "description": "Tagline on the homepage header"
+  },
+  "homepage.header.tutorial.link": {
+    "message": "チュートリアル - 5分 ⏱️",
+    "description": "Text for the tutorial link on the homepage header"
+  }
+}
