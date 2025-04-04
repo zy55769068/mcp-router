@@ -22,12 +22,12 @@ Below is a list of features we plan to implement:
 
 
 ### Q2
-Coming Soon
+*In planning phase - priorities will be determined based on community feedback*
 
 
 ### Q3
-Coming Soon
+*In planning phase - priorities will be determined based on community feedback*
 
 
 ### Q4
-Coming Soon
+*In planning phase - priorities will be determined based on community feedback*
