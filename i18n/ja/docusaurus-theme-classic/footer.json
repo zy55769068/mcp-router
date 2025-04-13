@@ -23,6 +23,10 @@
     "message": "ブログ",
     "description": "The label of footer link with label=Blog linking to /blog"
   },
+  "link.item.label.Website": {
+    "message": "ウェブサイト",
+    "description": "The label of footer link with label=Website linking to https://mcp-router.net"
+  },
   "link.item.label.App Releases": {
     "message": "アプリリリース",
     "description": "The label of footer link with label=App Releases linking to https://github.com/mcp-router/mcp-router/releases"

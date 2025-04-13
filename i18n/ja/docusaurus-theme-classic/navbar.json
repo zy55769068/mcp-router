@@ -14,5 +14,9 @@
   "item.label.Blog": {
     "message": "ブログ",
     "description": "Navbar item with label Blog"
+  },
+  "item.label.Website": {
+    "message": "ウェブサイト",
+    "description": "Navbar item with label Website"
   }
 }

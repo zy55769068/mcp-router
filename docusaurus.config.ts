@@ -84,6 +84,11 @@ const config: Config = {
       },
       items: [
         {
+          href: 'https://mcp-router.net',
+          label: 'Website',
+          position: 'left',
+        },
+        {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
@@ -124,6 +129,10 @@ const config: Config = {
         {
           title: 'More',
           items: [
+            {
+              label: 'Website',
+              href: 'https://mcp-router.net',
+            },
             {
               label: 'Blog',
               to: '/blog',
