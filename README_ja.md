@@ -1,4 +1,7 @@
 # MCP Router
+
+[[English](README.md) | 日本語]
+
 MCP Routerは、複数のMCPサーバを一つのインターフェースから管理できる、セキュアなアクセス制御とロギング機能を備えた無料かつログイン不要のWindowsおよびMacOSアプリです。
 ローカルとリモートのMCPサーバに対応しており、あらゆるレジストリ（Zapier, Smithy, etc）のあらゆるMCPサーバに接続できます。
 日本語に対応してます。
