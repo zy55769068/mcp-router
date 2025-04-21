@@ -13,12 +13,10 @@ MCP Routerは、複数のMCPサーバを一つのインターフェースから�
 **ログとリクエストの詳細が取得できます**
 ![](/static/img/readme/stats.png)
 
-**MCPサーバにアクセスできるアプリを制限できます（任意）**
+**ワンクリックでClaude, Cline, Windsurf, Cursorといったアプリと統合できます**
 ![](/static/img/readme/token.png)
 
 **どんなMCPサーバでも接続可能です**
-![](/static/img/readme/add-mcp.png)
-
 ![](/static/img/readme/add-mcp-manual.png)
 
 ## 使い方
@@ -36,6 +34,7 @@ JSONから追加することもできますし、MCP Routerが用意している
 MCPのアプリから、以下のコマンドでアクセスできます。
 
 ```bash
+set MCPR_TOKEN=<Your Token>
 npx -y mcpr-cli connect
 ```
 または
@@ -48,7 +47,10 @@ npx -y mcpr-cli connect
         "-y",
         "mcpr-cli",
         "connect"
-      ]
+      ],
+      "env": {
+        "MCPR_TOKEN": "Issued Token"
+      }
     }
   }
 }

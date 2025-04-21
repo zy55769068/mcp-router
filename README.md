@@ -13,12 +13,10 @@ English and Japanese languages are supported.
 **View detailed logs and request statistics**
 ![](/static/img/readme/stats.png)
 
-**Restrict which apps can access your MCP servers (optional)**
+**One-Click integration to Claude, Cline, Windsurf, Cursor, or your custom client**
 ![](/static/img/readme/token.png)
 
 **Connect to any MCP server**
-![](/static/img/readme/add-mcp.png)
-
 ![](/static/img/readme/add-mcp-manual.png)
 
 ## How to Use
@@ -34,6 +32,31 @@ You can add servers from a JSON file or select from the registry of MCP servers 
 
 ### Use MCP Router
 From your MCP app, access using the following command:
+
+```bash
+set MCPR_TOKEN=<Your Token>
+npx -y mcpr-cli connect
+```
+または
+```json
+{
+  "mcpServers": {
+    "mcp-router": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcpr-cli",
+        "connect"
+      ],
+      "env": {
+        "MCPR_TOKEN": "Issued Token"
+      }
+    }
+  }
+}
+```
+
+リクエストのログは自動でローカルに記録されます（外部には送信されません）。
 
 
 
