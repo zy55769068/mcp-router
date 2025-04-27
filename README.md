@@ -1,10 +1,16 @@
-# MCP Router
+# MCP Router: A Unified MCP Management App
 
 [English | [日本語](README_ja.md)]
 
+![](/static/img/readme/intro.gif)
 
-MCP Router is a free Windows and MacOS app that allows you to manage multiple MCP servers from a single interface with secure access control and logging. No login required. It supports both local and remote MCP servers and can connect to any MCP server from any registry (Zapier, Smithy, etc).
-English and Japanese languages are supported.
+MCP Router is a free Windows and MacOS app that allows you to manage MCP servers from a single interface with secure access control and logging.
+
+It supports both local and remote MCP servers and can connect to any MCP server from any registry (Zapier, Smithy, etc).
+
+No login required.
+English and Japanese are supported.
+
 
 ## Features
 **Manage multiple MCP servers with ease**
@@ -37,7 +43,7 @@ From your MCP app, access using the following command:
 set MCPR_TOKEN=<Your Token>
 npx -y mcpr-cli connect
 ```
-または
+or
 ```json
 {
   "mcpServers": {
@@ -56,7 +62,5 @@ npx -y mcpr-cli connect
 }
 ```
 
-リクエストのログは自動でローカルに記録されます（外部には送信されません）。
-
-
+Request logs are saved locally (not sent externally).
 
