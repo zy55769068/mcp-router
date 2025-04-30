@@ -1,8 +1,13 @@
-# MCP Router: 統一されたMCPサーバ管理アプリ
+<h1 align="center">MCP Router</h1>
+<h3 align="center">統一されたMCPサーバ管理アプリ</h3>
 
-[[English](README.md) | 日本語]
+![](https://raw.githubusercontent.com/mcp-router/mcp-router/main/static/img/readme/intro.gif)
 
-![](/static/img/readme/intro.gif)
+<div align="center">
+
+[[English](https://github.com/mcp-router/mcp-router/blob/main/README.md) | 日本語]
+
+</div>
 
 MCP Routerは、複数のMCPサーバを一つのインターフェースから管理できる、セキュアなアクセス制御とロギング機能を備えた無料かつログイン不要のWindowsおよびMacOSアプリです。
 ローカルとリモートのMCPサーバに対応しており、あらゆるレジストリ（Zapier, Smithy, etc）のあらゆるMCPサーバに接続できます。
@@ -11,16 +16,17 @@ MCP Routerは、複数のMCPサーバを一つのインターフェースから�
 
 ## 特徴
 **MCPサーバのオン・オフを一括管理できます**
-![](/static/img/readme/toggle.png)
+![](https://raw.githubusercontent.com/mcp-router/mcp-router/main/static/img/readme/toggle.png)
 
 **ログとリクエストの詳細が取得できます**
-![](/static/img/readme/stats.png)
+![](https://raw.githubusercontent.com/mcp-router/mcp-router/main/static/img/readme/stats.png)
 
 **ワンクリックでClaude, Cline, Windsurf, Cursorといったアプリと統合できます**
-![](/static/img/readme/token.png)
+![](https://raw.githubusercontent.com/mcp-router/mcp-router/main/static/img/readme/token.png)
 
 **どんなMCPサーバでも接続可能です**
-![](/static/img/readme/add-mcp-manual.png)
+![](https://raw.githubusercontent.com/mcp-router/mcp-router/main/static/img/readme/add-mcp-manual.png)
+
 
 ## 使い方
 
