@@ -150,6 +150,10 @@ const config: Config = {
               label: 'X',
               href: 'https://x.com/mcp_router',
             },
+            {
+              label: 'Discord',
+              href: 'https://discord.com/invite/dwG9jPrhxB',
+            },
             // {
             //   label: 'Reddit',
             //   href: 'https://www.reddit.com/r/mcp_router/',
