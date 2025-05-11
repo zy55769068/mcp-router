@@ -1,0 +1,71 @@
+---
+id: stop-mcp-server
+title: "Stop MCP server"
+description: "Stop a specific MCP server by ID"
+sidebar_label: "Stop MCP server"
+hide_title: true
+hide_table_of_contents: true
+api: eJzlVsFu2zAM/RWBpw0Q6qzrgMG3oF2BDCsWtBt6CHJQZCZW50iqRLcLDP/7QNlJ3aRdO2C35mLH5qMen55IN0BqFSGfQcRwhyHCXEKBUQfjyTgLOVyR80KJ6FGbpdHi4nQqumCx2IjJGUjwKqg1EsPzWQNWrRFyMAVIMJzCKypBQsDb2gQsIKdQo4SoS1wryBugjWdEpGDsCtp9CpMz4ZaCStwuTE5Ech7aOWeN3tmIkRMdj0Z82augAzHCYyFirTXGuKyragMStLOElhimvK+MVgzLbiJjm0OSbnGDmrjq4DwGMt3KfdZB4MK5CpWF/WquS6SSi3io517Fp+m1EtYYo1rhoUwHG9UBxRbQSoikqI4vQ0/rENCS6OIfiw1t+kk4eUrbCxOjsattIckO/0lRDMGFl8O0K14hzhdOJlLsv2jawXaKJh3IUIXbd7DV5uRZ31lHYulqW7xNaT49ZZtzZSostud467Q3qE/KSKUruE26mDhyt8whU95kfVfOGlO0WWp5ctepudXWoYIcSiKfZ1nltKpKFyn/ePz5+IAQN+5LVxMGkSJ353vOOXUdDG1S0gWqgGFcM43ZfPj6ivXvtBsG7aRgItA39tQCUxDI/ubchbUiyOHr9Q/g0o1dugTvdRlQHE8nBxWMpxOxdF3nHITel0aXYq2sWmEczKcIEvjSgT8cjY5GvcWUThbrB9Ug1bckDK/N9HhD1soOQtMwfFhhn2HzYODXzM1eNcLflPlKGcsGS1va9C6YgfJmsOcS8jRWkxXmEni3OappFiriz1C1LT++rTHwXs4l3Klg1ILVnTVQmMj3BeRLVUX8C/t3l/2wfi+enb7PFNA/VJan652qav4HEn7hpvsqaOethBJVgSGx6l6MtUZPA8hBA2An7g7L9PsVe+gPm8UC9g==
+sidebar_class_name: "post api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Stop MCP server"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/api/servers/{id}/stop"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Stop a specific MCP server by ID
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"description":"ID of the server to stop"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Server stopped successfully","content":{"application/json":{"schema":{"type":"object","properties":{"success":{"type":"boolean","description":"Whether the server was stopped successfully"},"message":{"type":"string","description":"Success message"},"status":{"type":"string","description":"Current status of the server"}}}}}},"400":{"description":"Missing server ID","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}},"404":{"description":"Server not found","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}},"500":{"description":"Failed to stop server","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

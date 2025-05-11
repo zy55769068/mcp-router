@@ -1,0 +1,71 @@
+---
+id: get-log-by-id
+title: "Get log by ID"
+description: "Retrieve a specific log entry by its ID"
+sidebar_label: "Get log by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJzlVsFu2zgQ/RViTi2gjb3ZFljoFjRp4UUXCNIWPQQ+jMmxxK5EKuQorSHo3xdDyo5ju20C9NaTJPLN4+PjjIYDMFYRyltofBVhWYChqIPt2HoHJdwQB0v3pFDFjrRdW60aXylyHDZqtVGWo1pcQgEdBmyJKQjbAA5bghKsgQKsMHXINRQQ6K63gQyUHHoqIOqaWoRyAN50EhE5WFfBeKhkcan8WnFNaX32KkzSYFwKbey8ixSF6Xw+l8fj+Pdb1VCA9o7JsYCw6xqrUUCzL1GQw7Emv/pCmmWTwXcU2OZ1rDnWfSj7k7N3PSlryLFdWwpq7cNuG1nQWADbliJj251iXPvQIkMJBpn+EOjRMp9rco9Z1VeMSgdCJiMr6MaS48UTJD84nWMU18iqRUNpUE6QIgtnpHBP4XmcOSZzdsFripHMIfH0+jFx/oxbUMI+BakXdFadFUr7tmtIMIWidkXGWFe93GO/RD55yAfsD8qUkYjxIduew5AjdhSRkft4anPk+lYKMvZazJGREHw4rs0PiWLr6557pg+YMTt217crCkfSLifkAcn2YKyrlHWqtU1jI2nvTIQxZSs3lGvqKmfwKMOv5q9O153zrNa+d+bX1V725Kcw7c0TMuhKyFTCjgW0FCNWTw7bwrMHW2vS3DT2+tT/aOGYgsNmWxB5Q7+hP4mRa2+ghIqSRGkVJcywszNpS7PBmhG2v5vcX/rQQAk1c1fOZo3X2NQ+cvnX+d/nRzr+fXOtbnzPFFRCTpanxhFJ98HyJpGuCAOFi16Wv13uT38Q27Nl+6CdAyIEpm4m3xkExfTydvsH/+fzx1RB1q19Cp/s2JN4cb042sHF9WLXN/agX2ura9Wiw4pimthaVIA8cvCfZ/Oz+ZRZqFNmTd15j+p9MkbWFnmdj9yi24O+I069ZbXJ7f6RvuEha59xY5isY/rGs65B6yS50rkOUwrcAnYWinw3KaC0Rv6CctAyNwwrjPQpNOMow3c9BTnGZQH3GCyuxNjbAYyN8m6gXGMT6QfSX9xMl5OX6vu3je/ongbRyf3iHptevqCA/2iTr0HjciygJjQUkqw8caE1dbwXclTzkoW7+nh3JenzP0SBVkY=
+sidebar_class_name: "get api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get log by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/api/logs/{id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve a specific log entry by its ID
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"description":"ID of the log to retrieve"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Log entry","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","description":"Unique identifier for the log entry"},"timestamp":{"type":"string","format":"date-time","description":"When the log entry was created"},"clientId":{"type":"string","description":"ID of the client that made the request"},"serverId":{"type":"string","description":"ID of the server that processed the request"},"requestType":{"type":"string","description":"Type of request (e.g., completion, embedding)"},"requestData":{"type":"object","description":"The request data"},"responseData":{"type":"object","description":"The response data"},"status":{"type":"string","enum":["success","error"],"description":"Status of the request"},"duration":{"type":"number","description":"Duration of the request processing in milliseconds"}},"title":"LogEntry"}}}},"404":{"description":"Log not found","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -1,0 +1,63 @@
+---
+id: list-mcp-servers
+title: "List MCP servers"
+description: "Retrieve a list of all configured MCP servers"
+sidebar_label: "List MCP servers"
+hide_title: true
+hide_table_of_contents: true
+api: eJyVVE1v2zAM/SsCz0aTZRgw+FZs3dChG4p2xQ5BDozMxOpkSZXobEHg/z7QH6mTdEh7siw9PpJPT9wB4zpBPodEcUMxwSKDgpKOJrDxDnK4I46GNqRQWZNY+ZVCa5X2bmXWdaRCff90q4bwDCKl4F2iBPkOZtOpfA4Zb3qawzjtHZNjgWMI1mgU+OQxScwOki6pQlnxNhDkgDHiFjIwTFUa7fvlI2mGDEL0gSKbrhJTjDCJo3FrOG71wZmnmpQpyLFZGYpq5aPikvoyocnAYUXnmX5gRdLiYWwd7SuKuLs5jTyAnGP4/Px3ypQYuU4vkZCrK3GCd9Y4ggz8atWvKEYfT61x33Kd5tAYcGmsGbQ/c2N9Bcdt7n0yplOpDsFHpkIttwdpmwzYsBXC+2Grkd0PL3nw2jFFh7YPV12Hb3fhf9zW0Z2FaV+8wkxXQqZabJNBRSnh+tVhA7zTYlCoPRsEqohLX0AOa2pLRC4hhwkGM3l+nsMqn+86H0PJHPLJxHqNtvSJ8/ezj7OTKuSR3/maKaoWub+vhXDqOhretqRLwkjxspbk88X4+F5E7wQbg/b9SyFSYQuDvAdB1i+++FghQw7ffv1sbWLcyrfhvRijEi9vr086uLy93s+BEfRPaXSpKnS4pnQ0y+TTBb+7mF5Me1+hbn3VTZBx1ptWGMkt5QWfuEI3grYP4TDD0UDY2/bN47rXkOkvT4JF40aDqnPCHDCYkQMWGch1y8Fut8RED9E2jWw/1RTlMhcZbDAaXIq880WTQUlYUGzv+TdtRVStKYjbNmjrdjgcvzZxwN6ZX6/k6v4Bs75MUw==
+sidebar_class_name: "get api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"List MCP servers"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/api/servers"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve a list of all configured MCP servers
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of MCP servers","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","description":"Unique identifier for the server"},"name":{"type":"string","description":"Name of the server"},"url":{"type":"string","description":"URL of the server"},"description":{"type":"string","description":"Description of the server"},"status":{"type":"string","enum":["online","offline","error"],"description":"Status of the server"},"capabilities":{"type":"array","items":{"type":"string"},"description":"List of capabilities supported by the server"}},"title":"Server"}}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

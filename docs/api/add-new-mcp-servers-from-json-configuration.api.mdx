@@ -1,0 +1,71 @@
+---
+id: add-new-mcp-servers-from-json-configuration
+title: "Add new MCP servers from JSON configuration"
+description: "Create one or more MCP server configurations from a JSON format similar to .mcpr config files"
+sidebar_label: "Add new MCP servers from JSON configuration"
+hide_title: true
+hide_table_of_contents: true
+api: eJztWN9v2zYQ/leIe1biNNuAQU/zUm9zkcVG7CAPrhEw0tliR5EsSdkxDP3vw5GSLcdOmxbbQ4DmRYp4vON9990PegueLx2kM3BoV2gdzBPI0WVWGC+0ghSuLHKPTCtk2rJSW2R/X41ZlGeZVguxrCwnaccWVpeMsw+T0Q1baFtyz5woheSWec3Oy8y0W9hCSHSQgMXPFTr/u843kG7Dv8JiDqm3FSaQaeVReVrixkiRBUu9T44OtwWXFVhyetMKRwtIZ1vwG4OQgn78hJmHBIzVBq0X6EiuzMyk8TU9luV5LsgAl+ODXc/l9secQabLkqucdttlQPDQYru+V+O8FWoJR1BHQYIKnzCrPNKrrRTzBTaIQ92Y2Wvj1vINJCA8lu7YSv3cTN8uqxKVd6TdcBeeZKE9aJ0AqtV3wPOSxYFaCasVGWUrbgV/lOiIIAeO1Ql44SUpihEalkZbfxX4AnVd18mPgL2lgM3pXE+8NDIaXQtf3FtuDNqQu1VZcrsJOHaqCCMxtk9Ttm62JLDissLjJDaVMegxat0FD5R5akOczuCMEP+t1DnKUFOevLHa60zLXvTnbK9mvsNzfDceD6aDwe3Ddf/u5uqvh9F4OhzdTCCFLfsIBfJconMfIWULLh2yGhLoX1+P7h/e92/+HNyO7kiWallgMCEtLMXmAID34dthNQ046Mqf8v8teRyctuiMVi7y4PLiHT2ekdwzidz50Gna7hJ6T85clWXo3KKScnPOpgWyVh/L0XMhXeClrnymSww8RZ4VjHuPpQkaosI2Hc7hGzrLl/uJRVdJ/5r0fkGB4iV+vdRMd3nHaEPstAd8oSxugOqoe9RaIldH+oYqJ4/RsXWBvsBuZrM1dweYE26YU/8XC8YVQ2u1ZTrLKksltU6gROf48hV+TKJa0hW1NDsZPhnJhRJq2Y3li0XmNsB+olYqFvBviPFM3Z4ap+YXZqxeiZw8etlqoF3sRvDzxcUxkYdqxaXIT1uIQ1FC7nMpdwZfGKcitzBnosHcsbwiWGkjwUiv+jtp/dqBKRj+Oo0znb8i/IMQ8yD7LawZdKnSgN/GJ6zBqdngR6L+SNR6Htnyy+lU9WgVl62R6GiTYh2Y2/xq0+4/bB9vJLvixxJ9oWnQMNqFM3JfQAo9bkSvvUAmu6sklZbKSkih8N6kvZ7UGZeFdj796fLXy6Nj0LXyVlceLQuSuzlzTjqzygq/CUofkVu0/YqMz+bd5QmhHhHrCu0AoIPQCYMYJV0QgqR5+SNUZ0jhw/00UIuiebu/oA7iMHs0gZKoUAsdLDXAdbzpj4dHzvbHw9083RFdFyIrWMkVX6LrXLQJV3rEze/OL84vGg7yOEvG4tS1eh0wJNt0PIpYyVVHtJ/nTOG6ayQWq3B7P6xYz06/3bP/f/99oIkcja+9UHiI2oFW24Z/M+BGdHg3T4BIRgvb7SN3eGdlXdPnzxXSuD2b0ygdbzWBQUkYa2manm3hH2yuJOTg2ZTM7ybv41SnvhN39LMMjf+i7LyTQuPRZErEa373KEOCg+VruqzyNaQACegAeGxf9G0LkqtlFbIaok76+xdXzUM6
+sidebar_class_name: "post api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Add new MCP servers from JSON configuration"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/api/servers"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create one or more MCP server configurations from a JSON format similar to .mcpr config files
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"oneOf":[{"type":"object","properties":{"mcpServers":{"type":"object","additionalProperties":{"type":"object","required":["command","args"],"properties":{"command":{"type":"string","description":"Command to execute to run the server"},"args":{"type":"array","items":{"type":"string"},"description":"Arguments to pass to the command"},"env":{"type":"object","additionalProperties":{"type":"string"},"description":"Environment variables for the server"}},"title":"ServerImportConfig"}}}},{"type":"object","additionalProperties":{"type":"object","required":["command","args"],"properties":{"command":{"type":"string","description":"Command to execute to run the server"},"args":{"type":"array","items":{"type":"string"},"description":"Arguments to pass to the command"},"env":{"type":"object","additionalProperties":{"type":"string"},"description":"Environment variables for the server"}},"title":"ServerImportConfig"}}]},"examples":{"withWrapper":{"summary":"Configuration with mcpServers wrapper","value":{"mcpServers":{"puppeteer":{"command":"npx","args":["-y","@modelcontextprotocol/server-puppeteer"],"env":{"PUPPETEER_LAUNCH_OPTIONS":"{ \"headless\": false }","ALLOW_DANGEROUS":"true"}}}}},"direct":{"summary":"Direct configuration without wrapper","value":{"puppeteer":{"command":"npx","args":["-y","@modelcontextprotocol/server-puppeteer"],"env":{"PUPPETEER_LAUNCH_OPTIONS":"{ \"headless\": false }","ALLOW_DANGEROUS":"true"}}}}}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"At least one server created successfully. The response details the outcome for each attempted server addition.","content":{"application/json":{"schema":{"type":"object","properties":{"results":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","description":"The server name from configuration"},"success":{"type":"boolean","description":"Indicates whether the server was successfully added or if an error occurred"},"message":{"type":"string","description":"Success or error message explaining the outcome"}},"title":"ServerImportResult"},"description":"An array detailing the outcome for each server configuration provided"}},"title":"ServerImportResponse"}}}},"400":{"description":"Invalid server configuration format, or all provided server configurations resulted in errors during processing or addition.","content":{"application/json":{"schema":{"oneOf":[{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"},{"type":"object","properties":{"results":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","description":"The server name from configuration"},"success":{"type":"boolean","description":"Indicates whether the server was successfully added or if an error occurred"},"message":{"type":"string","description":"Success or error message explaining the outcome"}},"title":"ServerImportResult"},"description":"An array detailing the outcome for each server configuration provided"}},"title":"ServerImportResponse"}]}}}},"500":{"description":"Internal server error during the server addition process.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

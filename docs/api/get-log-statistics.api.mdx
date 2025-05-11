@@ -1,0 +1,71 @@
+---
+id: get-log-statistics
+title: "Get log statistics"
+description: "Retrieve statistics about the logs"
+sidebar_label: "Get log statistics"
+hide_title: true
+hide_table_of_contents: true
+api: eJy9VcFu2zAM/RWBZ6HpOgwYfAu2rsjQAUHaYYciB8ZmbHW25Ep0tsDwvw+UnNZZ2m2HoScn1uPj09MT3QNjGSC7g9qVAdYaCgq5Ny0bZyGDFbE3tCMVGNkENnlQuHEdK65IxRoNLXpsiMkLUQ8WG4IMeN8SaDBC89CR34MGTw+d8VRAtsU6kIaQV9QgZH2CZxDYG1uCBrJdI7ry2pBl0BDI78iPJBT4VgrWw++K5bVy26lgdsoTd97CsJby0DobKEjXi/NzeRxTXLtyUg4acmdZRGQ9YNvWJkdBzu6DwPvTTbjNPeWiufWuJc8mNUtbuWHk8BwYi8IIL9bLo7IRZyxTSR5OdrxKfqjcdZaDKr3rWirUZq9SQ7X4KEXJv1fsnhqO3SeH9ooSxq4qMgyDBjZcC1fUsBqTAMMga++ey8LCMnmL9WE35L3z/y8Sie7vyXEFPXdJjrVeCpmK2EFDQyFg+c9lB3jy4uBTXIvvIiNXroAMSooSkSvIYIatmckkmIV4sIekpWHQ+RoyqJjbbDarXY515QJnby/eX5wI+fJhqVauY/IqIkfP460NlHfe8D6Sbgg9+Xkn/e/W0+Ub8T15NgU9WiBCYBw78j+BQI8/PjnfIEMGn7/dxrwYu3WxfPRjInG+XJzsYL5cqK3zcThOoD8qk1eqQYslhbhwsEiDPFLxm7Pzs/MxWpjHaI2jdEJ1HY2R3iKvdYEbtBPoFbGM5eP5dSSyf8ruv4330TqmnzxrazRW0hXPtR8zcAfYGtAwFqQcrDXIUctq328w0FdfD4O8Tl8DOcjCBNzUk+/Bi0r/ONZf0Pid9k/foR3WnUBimnbojTSO8dFQERbko6JUM89zanlSdXLHheXxPlxdSlp+AfstiZY=
+sidebar_class_name: "get api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get log statistics"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/api/logs/stats"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve statistics about the logs
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"type","in":"query","required":false,"schema":{"type":"string","enum":["client","server","requestType"]},"description":"Type of statistics to return"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Log statistics","content":{"application/json":{"schema":{"type":"object","properties":{"clientStats":{"type":"object","additionalProperties":{"type":"integer"},"description":"Request counts grouped by client ID"},"serverStats":{"type":"object","additionalProperties":{"type":"integer"},"description":"Request counts grouped by server ID"},"requestTypeStats":{"type":"object","additionalProperties":{"type":"integer"},"description":"Request counts grouped by request type"}},"title":"StatsResponse"}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

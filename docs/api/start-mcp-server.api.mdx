@@ -1,0 +1,71 @@
+---
+id: start-mcp-server
+title: "Start MCP server"
+description: "Start a specific MCP server by ID"
+sidebar_label: "Start MCP server"
+hide_title: true
+hide_table_of_contents: true
+api: eJzlVsFu2zAM/RWBpw0QmqzrgMG3oF2BDCsWtBt2CHJgZCZW50iuRLcLDP/7QNlJvaZdO2C35uLE5qMeH5/JNMC4jpDNIVK4pRBhoSGnaIKt2HoHGVwxBlaoYkXGrqxRF6cz1UWr5VZNz0BDhQE3xILP5g043BBkYHPQYCVHhVyAhkA3tQ2UQ8ahJg3RFLRByBrgbSWIyMG6NbQPOUzPlF8pLmh3MHsVhRe0C0kbK+8iRcl0PB7L5UENHSpBKFexNoZiXNVluQUNxjsmxwLDqiqtQYGNrqNgm0OWfnlNhqXs4CsKbLuT+6yDwKX3JaGDh+X8KIgLqeK+oDuMj9NrNWwoRlzToU4HreqAagdoNURGruPz0NM6BHKsuvg/1YY2fTScPKbthY3RuvWukOSH/6QoheDD82HG5y8Q55MkUyn2XzTtYHtFkw5suaTdM9hpc/Kk75xntfK1y1+nNB8es8052pLy/Yu8s9orFChl5MLnMih9TBxlXmYwwsqO+sE8amzejrqhp/fTWqZtHUrIoGCustGo9AbLwkfO3h9/PD5gJLP70tdMQaXI/Ru+kJymDpa3KemSMFCY1MJjvhg+vpIGdOINg/ZaCBHoZ3sagikIdP/l3IcNMmTw+cc3kNqtW/kE74UZUJzMpgcVTGZTtfLd7ByE3hXWFGqDDtcUBysqgga5dOB3R+Ojce8xNMlj/a4apPqShJGzhZ50ZINuENotxPsjHlJs7i38ouXZ68b0i0dVidaJx1JTm94Ic8DKDrquIUu7tXPDQoM0XMKaZomRvoeybeX2TU1B2rnQcIvB4lIEnjeQ2yjfc8hWWEb6C/83l/3Kfque3sFPlNDfRCc79hbLWn6Bhp+07f4ctItWQ0GYU0i0ugcTY6jiAeRgCogb92/M7OuV+Og3KGQGJg==
+sidebar_class_name: "post api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Start MCP server"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/api/servers/{id}/start"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Start a specific MCP server by ID
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"description":"ID of the server to start"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Server started successfully","content":{"application/json":{"schema":{"type":"object","properties":{"success":{"type":"boolean","description":"Whether the server was started successfully"},"message":{"type":"string","description":"Success message"},"status":{"type":"string","description":"Current status of the server"}}}}}},"400":{"description":"Missing server ID","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}},"404":{"description":"Server not found","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}},"500":{"description":"Failed to start server","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -1,0 +1,63 @@
+---
+id: get-available-request-types
+title: "Get available request types"
+description: "Retrieve a list of all request types that appear in the logs"
+sidebar_label: "Get available request types"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVMFq3DAQ/RUxZxNvUwrFt1CSkJJCSFN6CHuY9U7WSmVJGY23XYz/vYzsTZzdlhbak4TmzZuZpyf1ILhJUN2DC5sEywLWlGq2UWzwUMEtCVvakkHjbBITHgw6Z5ieOkpiZBcpGWlQDMZIyMZ6Iw2ZzFYAU4rBJ0pQ9XC6WOjyusD1xPqKEQqogxfyogkYo7M1akL5mDSrh1Q31KLuNAEqCKtHqgUKiBwisdix5kj3AkNm3EEBVqidnydh6zcwHM6/bw+3aB2uHB00OgwFiBWnHHd6cjtNDMOgsXe/mvnKC7FHZxLxltgQc+D/N/NI90dYHdZ0rMChAOdKZjJ2KKCllHDz12l7+KjFXqccy2eZUZqwhgo2lFtEaaCCEqMt1UPl3g+jVOrUHjp2UEEjEquydKFG14Qk1dvT96dHjXz6cGNuQyfEJiMnzWFYKmfdsZVdJl0RMvFZp/Xvl/PwZ9V91GwOepZAG9EOMwyqCQTFtLkI3KJABR+/3mW/WP8Qcvqkx6zFs5urownObq7MQ+D8rGbQ742tG9Oixw2lHNhLVIAuY/Kbk8XJYrIW1tlaHtuDqtdZGK2t7cWQpEU/g16S/PYBHHTbv5j4X/+OSV2hH1JGh9arAfPV95NN7gGjhQJmCfkLUzdotO9XmOgLu2HQ46eOWO96WcAW2eow+aoLaAjXxNkG32inmtc1RfXjFl2X/43D96gGefbu5bne7E8IAtMo
+sidebar_class_name: "get api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get available request types"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/api/logs/types"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve a list of all request types that appear in the logs
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of request types","content":{"application/json":{"schema":{"type":"object","properties":{"types":{"type":"array","items":{"type":"string"},"description":"List of available request types"}},"title":"TypesResponse"}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

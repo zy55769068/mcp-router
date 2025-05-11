@@ -1,0 +1,63 @@
+---
+id: list-mcp-apps
+title: "List MCP apps"
+description: "Retrieve a list of all MCP apps"
+sidebar_label: "List MCP apps"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVd9r2zAQ/lfEvWwD02Qdg+G30HUjox2h2+hDycNFucRqZUuTztmC8f8+TnYS9wcklD3ZSN999+m+O6kBxnWE/A7Q+wjzDJYUdTCejasghxviYGhDCpU1kZVbKbRWXV/MVArIIFD0rooUIW/gfDyWz2OOqz5wEKRdxVSxYNF7azQKdnQfJaCBqAsqUf546wlycIt70gwZ+OA8BTZdusR2QGEIuIUMDFMZj0dXWNIAFTmYag1PK/AdSxL1XNDuBNBmYKrIaC0tBwwL5yxh9YzitiAuKCQK9F6ZqA7hbarGyqxnyMVxOYJS7HZcb6LqouuQSqhWxtKBsw6vFTiIbzNg90DVcXGTJCiB1VuzUrhBY3Fh6Z2QRAobCtPlKZb1CdqnGaafo5jRUcW94AKjQq0pSvZkT7yoI7vydYdHpVN0Z7ac37AVjmvtJ53/R1p8GDTxPt70UwJtK1sfX5qTacUUKrT96RSF4ML/G5aO7ihMu+UJU3EpZCph2wxKihHXJ4ft4F0tdmVKe2ktMXLhlpDDmpLENBswQm9G/RXStwDkdw3UwUIOBbPPRyPrNNrCRc4/nH86fyZBLLpxNVNQCdlXG9q5cOo6GN4m0gVhoDCpJfPdfLj9QyreVWsI2h9ehIjCBJPOSyDI+p8vLpTIkMO325+pUUy1cil812UHiZPZ9PmUzaZq5cL+RuqhfwqjC1VihWuKaWNXogzk0wW/PxufjfumQs2He3CY9SoVRnKLPO8il1gNoKndB9f5I33NoWFPeD76kjH95ZG3aCrpp+Rn07suT5OBbP9AibWy2jQLjPQr2LaV5d81BTFunsEGg5FbJ/mWQUG4pJA8faCtFFBr8tJWG7R1uoWejpW4vW/Br5di0z/oF3KI
+sidebar_class_name: "get api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"List MCP apps"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/api/apps"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve a list of all MCP apps
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of MCP apps","content":{"application/json":{"schema":{"type":"object","properties":{"apps":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","description":"Name of the MCP app"},"installed":{"type":"boolean","description":"Whether the app is installed"},"configPath":{"type":"string","description":"Path to the app's configuration file"},"configured":{"type":"boolean","description":"Whether the app is configured"},"token":{"type":"string","description":"App's token (if available)"},"serverIds":{"type":"array","items":{"type":"string"},"description":"IDs of servers the app has access to"},"isCustom":{"type":"boolean","description":"Whether the app is a custom app"}},"title":"McpApp"},"description":"List of MCP apps"}},"title":"AppsResponse"}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

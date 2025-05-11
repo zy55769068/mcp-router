@@ -1,0 +1,71 @@
+---
+id: process-mcp-request
+title: "Process MCP request"
+description: "Process a Model Context Protocol request and forward it to the appropriate server"
+sidebar_label: "Process MCP request"
+hide_title: true
+hide_table_of_contents: true
+api: eJzlVk1v2zgQ/SvEnHYBtU7TLbDQLTVaIEWzFZwUPQQ+TKixxZYS2SGVNBD034uhJEdOjKRod4EF6osl8c0H37wZsoOI2wD5JdTawzqDkoJm46NxDeRQsNMUgkJ15kqyaumaSN+iKthFp51VTF9bClFhU6qN4xvkUpmoolOxIoXes/NsMJIKxNfEkMFo8tqVt5B36dUwlZBHbikDLSGaKEvovTUaJZfF5yAJdRB0RTXKU7z1BDm4q8+kI2QgoYijoSCrgmevZ8AQ2TRbyICatpYdHz8/erjjd+cf/nm2KpbqmjjIpz6DmmLlykOu9m0vKlJny0INeCFBo7XiwSNjHQ5lve/hbLBMcIrEQYzND4RejXUwJTXRbAwx9H0G0UQrVmfajwjoe1lgCt41YeDq+OhI/u6lsizUhIL/ZVmYQmvj06SuEk65TdLkWBypjPrDbFRotUh809o/xSkxO356H9qVNEOZJtI2qXs/9BvxphI46SgE3NLT1RzMJnifQYnxILn7ZidlaeQRrUrbUMks1fvnNKRqjLoyzTYxxzsF3RPWKJJBWX8dEtNpc43WlDsX/5qefq5cj9L+q9Xq5/yktfHbq8PMRGKp2DAfh8L9jvzM5ix4lzTiMVaQw0KOpgwGguSs6qBlCzlUMfp8sbBOo61ciPnL47+PH87UZaFWro3EKiGnk6hfi0/dsom3yekVIROftBL0cj1fPhe2B6bmoN3GJRHJMMEgH0GQjQ9vHdcYZYp9ukjdI1Vc3R2Db75h7S3tzcc0BmeU7LjdHSVjV08r8tpsXMpqas67nZ8Upw/HRXEqZ3bq7Rn0pjK6UjU2uKWQFibmM5imbw4vnh+lBEWnqJNOG6zvRX2f+JbYsmupao3NDDpdL4azZhoNe1l2d53wn9xGxgqKn4W3aNLJkuTVjfrbXY1EYvLadVcY6CPbvpfPX1tiEdA6g2tkg1fC/eW6z6AiLImTtr7QLeSwHLby7EKCCty2EvxBg/fZZHGiNfn4KHY9U0nx4fxCZDfererU1sB4I/cuvIEcIAOXqE1qTt86sNhs29TLMPiU33cj0Xw0
+sidebar_class_name: "post api-method"
+info_path: /Users/yuki/WebstormProjects/mcp-router/docs/api/mcp-router-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Process MCP request"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/mcp"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Process a Model Context Protocol request and forward it to the appropriate server
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"jsonrpc":{"type":"string","enum":["2.0"],"description":"JSON-RPC version"},"method":{"type":"string","description":"The MCP method to call"},"params":{"type":"object","description":"Method parameters"},"id":{"type":"string","description":"Request identifier"}},"title":"McpRequest"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"MCP response","content":{"application/json":{"schema":{"type":"object","properties":{"jsonrpc":{"type":"string","enum":["2.0"],"description":"JSON-RPC version"},"result":{"type":"object","description":"Result of the method call (if successful)"},"error":{"type":"object","properties":{"code":{"type":"integer","description":"Error code"},"message":{"type":"string","description":"Error message"},"data":{"type":"object","description":"Additional error data"}}},"id":{"type":"string","description":"Request identifier matching the request"}},"title":"McpResponse"}}}},"400":{"description":"Invalid request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"code":{"type":"string","description":"Error code"},"message":{"type":"string","description":"Error message"}}}},"title":"Error"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

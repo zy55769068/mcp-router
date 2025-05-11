@@ -1,6 +1,11 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import {dirname} from 'path';
+import {fileURLToPath} from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -50,6 +55,7 @@ const config: Config = {
           // Remove this to remove the "edit this page" links.
           // editUrl:
           //   'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          docItemComponent: '@theme/ApiItem', // Enables API-specific functionality
         },
         blog: {
           showReadingTime: true,
@@ -76,6 +82,24 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     image: 'img/mcp-router-social-card.png',
+    // Configure the OpenAPI code sample languages
+    languageTabs: [
+      {
+        highlight: 'bash',
+        language: 'curl',
+        logoClass: 'curl',
+      },
+      {
+        highlight: 'javascript',
+        language: 'javascript',
+        logoClass: 'javascript',
+      },
+      {
+        highlight: 'python',
+        language: 'python',
+        logoClass: 'python',
+      },
+    ],
     navbar: {
       title: 'MCP Router Docs',
       logo: {
@@ -93,6 +117,12 @@ const config: Config = {
           sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Tutorial',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'apiSidebar',
+          position: 'left',
+          label: 'API',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
@@ -151,6 +181,28 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
+
+  plugins: [
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: 'api',
+        docsPluginId: 'classic', // ターゲットとなるdocsプラグインのID
+        config: {
+          api: { // APIの識別子
+            specPath: __dirname + '/openapi/openapi.yaml', // OpenAPIスペックのパス（YAMLまたはJSON）
+            outputDir: __dirname + '/docs/api', // APIドキュメントの出力ディレクトリ
+            sidebarOptions: {
+              groupPathsBy: 'tag', // tagでグループ化
+              categoryLinkSource: 'tag',
+            },
+          },
+        }
+      },
+    ],
+  ],
+  
+  themes: ['docusaurus-theme-openapi-docs'], // テーマの追加
 };
 
 export default config;
