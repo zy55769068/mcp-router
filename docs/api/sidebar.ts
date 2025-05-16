@@ -68,6 +68,12 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "api/remove-mcp-server",
+          label: "Remove MCP server",
+          className: "api-method delete",
+        },
+        {
+          type: "doc",
           id: "api/list-mcp-servers",
           label: "List MCP servers",
           className: "api-method get",
@@ -106,8 +112,20 @@ const sidebar: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "api/process-mcp-request",
-          label: "Process MCP request",
+          id: "api/process-mcp-request-streamable-http",
+          label: "Process MCP request (Streamable HTTP)",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "api/establish-server-sent-events-connection-for-mcp",
+          label: "Establish Server-Sent Events connection for MCP",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "api/send-mcp-message-via-sse-connection",
+          label: "Send MCP message via SSE connection",
           className: "api-method post",
         },
       ],

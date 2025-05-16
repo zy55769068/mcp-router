@@ -26,7 +26,7 @@ tags:
   - name: apps
     description: Operations for managing MCP applications that interact with servers, including configuration status, installation state, and associated server access permissions
   - name: mcp
-    description: Direct Model Context Protocol operations following the JSON-RPC 2.0 specification for communicating with MCP-compatible AI models
+    description: Direct Model Context Protocol operations following the JSON-RPC 2.0 specification for communicating with MCP-compatible AI models. Supports multiple communication patterns including streamable HTTP responses, and bidirectional Server-Sent Events (SSE) connections.
 
 components:
   securitySchemes:
@@ -559,14 +559,12 @@ paths:
     post:
       tags:
         - mcp
-      summary: Process MCP request
+      summary: Process MCP request (Streamable HTTP)
       security:
         - bearerAuth: []
       description: |-
-        Primary endpoint for processing Model Context Protocol requests according to the JSON-RPC 2.0 specification.
-        This endpoint accepts MCP-compliant requests, routes them to the appropriate server based on configurations,
-        handles authentication, performs request validation, logs the interaction, and forwards the response back to the client.
-        It serves as the central communication channel between MCP clients and the various model servers managed by the router.
+        Core Streamable HTTP endpoint for Model Context Protocol requests following JSON-RPC 2.0 specification.
+        This endpoint routes MCP-compliant requests to the appropriate server, handling authentication and validation.
       requestBody:
         required: true
         content:
@@ -575,9 +573,13 @@ paths:
               $ref: '#/components/schemas/McpRequest'
       responses:
         '200':
-          description: Successfully processed MCP request and received valid response from the target server
+          description: Successfully processed MCP request with streaming response
           content:
-            application/json:
+            application/octet-stream:
+              description: |-
+                Streaming response format with transfer-encoding chunked.
+                Each chunk contains a complete JSON-RPC response object or a partial update
+                formatted according to the MCP streaming protocol.
               schema:
                 $ref: '#/components/schemas/McpResponse'
         '400':
@@ -588,6 +590,95 @@ paths:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Server-side error occurred during request processing, such as target server unavailability, timeout, or internal router error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mcp/sse:
+    get:
+      tags:
+        - mcp
+      summary: Establish Server-Sent Events connection for MCP
+      security:
+        - bearerAuth: []
+      description: |-
+        Establishes a Server-Sent Events (SSE) connection for bi-directional MCP communication.
+        This endpoint creates a persistent connection that allows the server to push real-time updates to the client.
+        The client receives a unique session ID that must be used when sending messages back to the server.
+        This connection model is particularly useful for streaming responses, progress updates,
+        and maintaining state across multiple interactions without requiring repeated connection establishment.
+      responses:
+        '200':
+          description: SSE connection established successfully
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  sessionId:
+                    type: string
+                    description: Unique identifier for this SSE session, required for sending messages back to the server
+        '401':
+          description: Unauthorized, authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error occurred while establishing SSE connection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mcp/messages:
+    post:
+      tags:
+        - mcp
+      summary: Send MCP message via SSE connection
+      security:
+        - bearerAuth: []
+      description: |-
+        Processes MCP messages sent by the client as part of an established SSE connection.
+        This endpoint is the client-to-server counterpart of the SSE stream, completing the bi-directional
+        communication channel. Clients must include their session ID (received when establishing the SSE connection)
+        either as a query parameter or in the 'mcp-session-id' header.
+        Messages follow the standard MCP/JSON-RPC 2.0 format and are processed similarly to the regular /mcp endpoint.
+      parameters:
+        - name: sessionId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The unique session ID received when establishing the SSE connection (alternative to mcp-session-id header)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpRequest'
+      responses:
+        '200':
+          description: Message processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpResponse'
+        '400':
+          description: Bad request, missing session ID or invalid message format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Session not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error occurred while processing the message
           content:
             application/json:
               schema:
@@ -726,6 +817,59 @@ paths:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Failed to stop server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v0/servers/{id}:
+    delete:
+      tags:
+        - servers
+      security:
+        - bearerAuth: []
+      summary: Remove MCP server
+      description: |-
+        Permanently removes an MCP server configuration from the MCP Router.
+        This endpoint deletes all server configuration data from the system.
+        If the server is currently running, it will be stopped before removal.
+        This operation is irreversible - after deletion, the server would need to be re-added
+        using the server import endpoint if access to it is required again in the future.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the server to remove
+      responses:
+        '200':
+          description: Server removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Whether the server was removed successfully
+                  message:
+                    type: string
+                    description: Success message
+        '400':
+          description: Missing server ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to remove server
           content:
             application/json:
               schema:
