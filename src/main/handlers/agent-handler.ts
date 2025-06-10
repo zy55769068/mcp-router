@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, Notification } from 'electron';
 import { AgentConfig } from '../../types';
 import { 
   getDevelopmentAgentService, 
@@ -50,7 +50,8 @@ export function setupAgentHandlers(): void {
   ipcMain.handle('agent:import', async (_, shareCode: string) => {
     const sharedData = await agentSharingService.getSharedAgentData(shareCode);
     const deployedAgentData = agentSharingService.convertToDeployedAgent(sharedData);
-    return deployedAgentService.createDeployedAgent(deployedAgentData);
+    const result = deployedAgentService.createDeployedAgent(deployedAgentData);
+    return result;
   });
 
   // エージェントのセットアップ関連のIPC通信ハンドラ
@@ -64,7 +65,8 @@ export function setupAgentHandlers(): void {
     if (!developmentAgent) {
       throw new Error(`開発中エージェントが見つかりません (ID: ${id})`);
     }
-    return deployedAgentService.deployFromDevelopmentAgent(developmentAgent);
+    const result = deployedAgentService.deployFromDevelopmentAgent(developmentAgent);
+    return result;
   });
 
   ipcMain.handle('agent:deployed-list', () => {
@@ -76,11 +78,13 @@ export function setupAgentHandlers(): void {
   });
 
   ipcMain.handle('agent:deployed-update', (_, id: string, config: any) => {
-    return deployedAgentService.updateDeployedAgent(id, config);
+    const result = deployedAgentService.updateDeployedAgent(id, config);
+    return result;
   });
 
   ipcMain.handle('agent:deployed-delete', (_, id: string) => {
-    return deployedAgentService.deleteDeployedAgent(id);
+    const result = deployedAgentService.deleteDeployedAgent(id);
+    return result;
   });
 
   // エージェント固有のツール関連のIPC通信ハンドラ（共有版）
@@ -241,6 +245,35 @@ export function setupAgentHandlers(): void {
         mainWindow.webContents.send('chat-stream:end', endData);
       }
       
+      // notificationTypeが'finish'の場合のみ通知を表示
+      if (endData.agentId && endData.notificationType === 'finish') {
+        const agent = deployedAgentService.getDeployedAgentById(endData.agentId);
+        if (agent && Notification.isSupported()) {
+          // MCPからの呼び出しかどうかでメッセージを変える
+          const isMcpCall = endData.source === 'mcp';
+          const title = isMcpCall ? 'MCP Agent Complete' : 'Agent Complete';
+          const body = isMcpCall 
+            ? `MCP Agent "${agent.name}" has completed processing the request.`
+            : `Agent "${agent.name}" has completed processing your request.`;
+          
+          const notification = new Notification({
+            title: `MCP Router - ${title}`,
+            body,
+            icon: undefined, // アイコンが必要な場合は後で追加
+          });
+          
+          // 通知をクリックしたときにメインウィンドウにフォーカス
+          notification.on('click', () => {
+            if (mainWindow) {
+              if (mainWindow.isMinimized()) mainWindow.restore();
+              mainWindow.focus();
+            }
+          });
+          
+          notification.show();
+        }
+      }
+      
       return { success: true };
     } catch (error) {
       console.error('Chat stream end failed:', error);
@@ -253,6 +286,35 @@ export function setupAgentHandlers(): void {
       // メインウィンドウにストリームエラーを通知
       if (mainWindow) {
         mainWindow.webContents.send('chat-stream:error', errorData);
+      }
+      
+      // notificationTypeが'error'の場合は通知を表示
+      if (errorData.agentId && errorData.notificationType === 'error') {
+        const agent = deployedAgentService.getDeployedAgentById(errorData.agentId);
+        if (agent && Notification.isSupported()) {
+          // MCPからの呼び出しかどうかでメッセージを変える
+          const isMcpCall = errorData.source === 'mcp';
+          const title = isMcpCall ? 'MCP Agent Error' : 'Agent Error';
+          const body = isMcpCall 
+            ? `MCP Agent "${agent.name}" encountered an error: ${errorData.error}`
+            : `Agent "${agent.name}" encountered an error: ${errorData.error}`;
+          
+          const notification = new Notification({
+            title: `MCP Router - ${title}`,
+            body,
+            icon: undefined, // アイコンが必要な場合は後で追加
+          });
+          
+          // 通知をクリックしたときにメインウィンドウにフォーカス
+          notification.on('click', () => {
+            if (mainWindow) {
+              if (mainWindow.isMinimized()) mainWindow.restore();
+              mainWindow.focus();
+            }
+          });
+          
+          notification.show();
+        }
       }
       
       return { success: true };

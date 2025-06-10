@@ -74,19 +74,6 @@ export interface APIMCPServer {
   version: string;
 }
 
-export interface APIMCPServerVersion {
-  id: string;
-  version: string;
-  command: string;
-  args: string[];
-  envs: Record<string, string>;
-  inputParams: Record<string, { default: string; description: string }>;
-  verificationStatus: 'verified' | 'unverified';
-  publishedAt: number;
-  createdAt: number;
-  updatedAt: number;
-}
-
 export interface LocalMCPServer {
   id: string;
   displayId?: string;
@@ -131,6 +118,7 @@ export interface AgentConfig {
   mcpServers: MCPServerConfig[];
   toolPermissions?: Record<string, MCPAgentToolPermission[]>; // サーバーIDをキーとしたツール権限の配列
   autoExecuteTool: boolean;
+  mcpServerEnabled?: boolean; // MCPサーバとして利用可能にするかどうか
   createdAt?: number;
   updatedAt?: number;
 }
@@ -153,6 +141,7 @@ export interface DeployedAgent {
   instructions: string;
   autoExecuteTool: boolean;
   toolPermissions?: Record<string, MCPAgentToolPermission[]>; // サーバーIDをキーとしたツール権限の配列
+  mcpServerEnabled?: boolean; // MCPサーバとして利用可能にするかどうか
   userId?: string; // エージェントの作成者ID
   originalId: string; // インポート元のオリジナルID
   createdAt: number;
