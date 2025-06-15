@@ -291,6 +291,7 @@
     "importAgent": "Import Agent",
     "importDescription": "Import an agent using a share code",
     "importCodePlaceholder": "Paste share code here",
+    "importSampleAgents": "Import Sample Agents",
     "update": "Update",
     "share": "Share",
     "deploy": "Deploy",
@@ -308,8 +309,8 @@
     "serverSetup": "Server Setup",
     "settings": "Settings",
     "tabs": {
-      "basic": "Basic",
-      "advanced": "Advanced Settings"
+      "basic": "General",
+      "advanced": "Advanced"
     },
     "instructions": "Agent Instructions",
     "instructionsDesc": "Enter instructions to guide the agent's behavior",
@@ -367,7 +368,10 @@
       "serverCreated": "MCP server \"{{name}}\" has been added",
       "serverUpdated": "MCP server \"{{name}}\" has been updated",
       "serverCreateFailed": "Failed to create MCP server",
-      "serverUpdateFailed": "Failed to update MCP server"
+      "serverUpdateFailed": "Failed to update MCP server",
+      "checkingForUpdates": "Checking for updates...",
+      "updateApplied": "Update applied successfully",
+      "applyUpdate": "Apply Update"
     },
     "serverVariables": {
       "parameters": "Parameters",
@@ -413,7 +417,9 @@
       "toolExecutionRequest": "Tool execution request",
       "executeToolConfirm": "Execute tool \"{{toolName}}\"?",
       "enterMessage": "Enter message...",
-      "send": "Send"
+      "send": "Send",
+      "configurationIncomplete": "Configuration incomplete",
+      "configurationIncompleteDescription": "This agent cannot be used because its configuration is not complete. Please complete the configuration before using it."
     }
   },
   "mcpApps": {

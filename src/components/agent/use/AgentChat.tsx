@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AgentConfig, DeployedAgent } from '../../../types';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '../../../lib/utils/tailwind-utils';
 import { Message } from '@ai-sdk/react';
 import ChatInterface from '../build/ChatInterface';
 import ChatSessions from './ChatSessions';
-import { isAgentConfigured, getServerAgentId } from '../../../lib/utils/agent-utils';
+import { isAgentConfigured } from '../../../lib/utils/agent-utils';
 import { useAgentStore } from '../../../lib/stores';
 
 
@@ -20,6 +21,7 @@ const AgentChat: React.FC = () => {
     }>();
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation();
     
     // Zustand store
     const {
@@ -98,7 +100,7 @@ const AgentChat: React.FC = () => {
     // 初回ロード時とagentIdが変更された時にセッション一覧を取得（認証がある場合のみ）
     useEffect(() => {
         if (agent?.id && authToken) {
-            fetchChatSessions(getServerAgentId(agent));
+            fetchChatSessions(agent.id);
         }
         // If no auth token, sessions will not be loaded but chat can still work
     }, [agent?.id, authToken, fetchChatSessions]);
@@ -127,7 +129,7 @@ const AgentChat: React.FC = () => {
             
             // セッション一覧を再取得して最新状態にする（認証がある場合のみ）
             if (agent?.id && authToken) {
-                await fetchChatSessions(getServerAgentId(agent));
+                await fetchChatSessions(agent.id);
             }
         } catch (err) {
             console.error('Failed to delete session:', err);
@@ -292,7 +294,7 @@ const AgentChat: React.FC = () => {
                     if (authToken) {
                         const wasNewSession = !currentSessionId;
                         setTimeout(async () => {
-                            await fetchChatSessions(getServerAgentId(agent));
+                            await fetchChatSessions(agent.id);
                             
                             // If this was a new session, auto-select the most recent session
                             if (wasNewSession) {
@@ -564,10 +566,9 @@ const AgentChat: React.FC = () => {
                         className="max-w-md text-center p-6 bg-card border rounded-lg shadow-lg cursor-pointer hover:bg-card/80 transition-colors"
                     >
                         <AlertCircle className="h-16 w-16 text-warning mx-auto mb-4" />
-                        <h3 className="text-xl font-bold mb-2">設定が未完了です</h3>
+                        <h3 className="text-xl font-bold mb-2">{t('agents.chat.configurationIncomplete')}</h3>
                         <p className="text-muted-foreground mb-4">
-                            このエージェントは設定が完了していないため、使用できません。
-                            設定を完了してからご利用ください。
+                            {t('agents.chat.configurationIncompleteDescription')}
                         </p>
                     </div>
                 </div>

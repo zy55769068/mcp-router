@@ -298,6 +298,7 @@
     "importAgent": "エージェントのインポート",
     "importDescription": "共有コードを入力して、エージェントをインポートします",
     "importCodePlaceholder": "共有コードを貼り付けてください",
+    "importSampleAgents": "サンプルエージェントをインポート",
     "update": "更新",
     "autoSave": "自動保存",
     "autoSaving": "自動保存中...",
@@ -313,8 +314,8 @@
     "serverSetup": "サーバー設定",
     "settings": "設定",
     "tabs": {
-      "basic": "基本設定",
-      "advanced": "詳細設定"
+      "basic": "一般",
+      "advanced": "詳細"
     },
     "instructions": "エージェント指示",
     "instructionsDesc": "エージェントの動作を指示する内容を入力してください",
@@ -377,7 +378,10 @@
       "serverCreated": "MCPサーバ \"{{name}}\" が追加されました",
       "serverUpdated": "MCPサーバ \"{{name}}\" が更新されました",
       "serverCreateFailed": "MCPサーバの作成に失敗しました",
-      "serverUpdateFailed": "MCPサーバの更新に失敗しました"
+      "serverUpdateFailed": "MCPサーバの更新に失敗しました",
+      "checkingForUpdates": "アップデートを確認中...",
+      "updateApplied": "アップデートが適用されました",
+      "applyUpdate": "アップデートを適用"
     },
     "errors": {
       "fetchFailed": "エージェント一覧の取得に失敗しました",
@@ -417,7 +421,9 @@
       "toolExecutionRequest": "ツール実行リクエスト",
       "executeToolConfirm": "ツール \"{{toolName}}\" を実行しますか？",
       "enterMessage": "メッセージを入力...",
-      "send": "送信"
+      "send": "送信",
+      "configurationIncomplete": "設定が未完了です",
+      "configurationIncompleteDescription": "このエージェントは設定が完了していないため、使用できません。設定を完了してからご利用ください。"
     }
   },
   "mcpApps": {
