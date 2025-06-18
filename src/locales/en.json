@@ -6,6 +6,8 @@
     "back": "Back",
     "save": "Save",
     "saving": "Saving...",
+    "saved": "Saved",
+    "noChanges": "No changes",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -358,15 +360,12 @@
       "addButtonText": "Add",
       "saveButtonText": "Save",
       "toolPermissionsUpdateFailed": "Failed to update tool permissions",
-      "toolPermissionsUpdateSuccess": "Tool permissions updated successfully",
       "serverNameRequired": "Please enter a server name",
       "updateFound": "Update found for {{name}}",
       "noUpdateAvailable": "{{name}} is up to date",
       "updateCheckFailed": "Failed to check for package updates",
       "updateInfoFetchFailed": "Failed to fetch update information for {{name}}",
       "updateFailed": "Failed to update {{name}}",
-      "serverCreated": "MCP server \"{{name}}\" has been added",
-      "serverUpdated": "MCP server \"{{name}}\" has been updated",
       "serverCreateFailed": "Failed to create MCP server",
       "serverUpdateFailed": "Failed to update MCP server",
       "checkingForUpdates": "Checking for updates...",
@@ -420,6 +419,11 @@
       "send": "Send",
       "configurationIncomplete": "Configuration incomplete",
       "configurationIncompleteDescription": "This agent cannot be used because its configuration is not complete. Please complete the configuration before using it."
+    },
+    "sessions": {
+      "newSession": "Start new session",
+      "loading": "Loading",
+      "loadMore": "Load more"
     }
   },
   "mcpApps": {

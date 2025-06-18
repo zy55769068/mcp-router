@@ -18,6 +18,8 @@
     "back": "戻る",
     "save": "保存",
     "saving": "保存中...",
+    "saved": "保存完了",
+    "noChanges": "変更なし",
     "cancel": "キャンセル",
     "delete": "削除",
     "edit": "編集",
@@ -368,15 +370,12 @@
       "addButtonText": "追加",
       "saveButtonText": "保存",
       "toolPermissionsUpdateFailed": "ツール権限の更新に失敗しました",
-      "toolPermissionsUpdateSuccess": "ツール権限を更新しました",
       "serverNameRequired": "サーバ名を入力してください",
       "updateFound": "{{name}}の更新が見つかりました",
       "noUpdateAvailable": "{{name}}は最新です",
       "updateCheckFailed": "パッケージのアップデート確認に失敗しました",
       "updateInfoFetchFailed": "{{name}} のアップデート情報を取得できませんでした",
       "updateFailed": "{{name}} の更新に失敗しました",
-      "serverCreated": "MCPサーバ \"{{name}}\" が追加されました",
-      "serverUpdated": "MCPサーバ \"{{name}}\" が更新されました",
       "serverCreateFailed": "MCPサーバの作成に失敗しました",
       "serverUpdateFailed": "MCPサーバの更新に失敗しました",
       "checkingForUpdates": "アップデートを確認中...",
@@ -424,6 +423,11 @@
       "send": "送信",
       "configurationIncomplete": "設定が未完了です",
       "configurationIncompleteDescription": "このエージェントは設定が完了していないため、使用できません。設定を完了してからご利用ください。"
+    },
+    "sessions": {
+      "newSession": "新しいセッションを開始",
+      "loading": "読み込み中",
+      "loadMore": "もっと見る"
     }
   },
   "mcpApps": {
