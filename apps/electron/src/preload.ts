@@ -65,7 +65,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     limit?: number;
   }) => ipcRenderer.invoke("requestLogs:get", options),
 
-
   // Settings Management
   getSettings: () => ipcRenderer.invoke("settings:get"),
   saveSettings: (settings: any) =>
@@ -234,6 +233,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
       ipcRenderer.removeListener("protocol:url", listener);
     };
   },
+
+  // System
+  getPlatform: () => ipcRenderer.invoke("system:getPlatform"),
 
   // Workspace Management
   listWorkspaces: () => ipcRenderer.invoke("workspace:list"),
