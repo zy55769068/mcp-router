@@ -1,0 +1,2 @@
+/* Import centralized CSS variables from tailwind-config package */
+@import "@mcp-router/tailwind-config/base.css";

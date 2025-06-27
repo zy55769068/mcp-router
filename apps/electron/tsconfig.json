@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "composite": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@mcp-router/shared": ["../../packages/shared/src"],
+      "@mcp-router/ui": ["../../packages/ui/src"],
+      "@mcp-router/ui/*": ["../../packages/ui/src/*"],
+      "@mcp-router/platform-api": ["../../packages/platform-api/src"]
+    }
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/platform-api" }
+  ]
+}
