@@ -118,7 +118,7 @@ const DiscoverWrapper: React.FC = () => {
     setIsLoadingVerifiedServers(true);
     try {
       const verifiedResponse: PaginatedResponse<APIMCPServer> =
-        await platformAPI.fetchMcpServersFromIndex(page, limit, search, true);
+        await platformAPI.servers.fetchFromIndex(page, limit, search, true);
       // Convert API servers to LocalMCPServer format
       const localServers = verifiedResponse.data.map(
         convertApiServerToLocalServer,
@@ -146,7 +146,7 @@ const DiscoverWrapper: React.FC = () => {
     setIsLoadingCommunityServers(true);
     try {
       const communityResponse: PaginatedResponse<APIMCPServer> =
-        await platformAPI.fetchMcpServersFromIndex(page, limit, search, false);
+        await platformAPI.servers.fetchFromIndex(page, limit, search, false);
       // Convert API servers to LocalMCPServer format
       const localServers = communityResponse.data.map(
         convertApiServerToLocalServer,
@@ -179,7 +179,7 @@ const DiscoverWrapper: React.FC = () => {
 
   const fetchInstalledServers = async () => {
     try {
-      const servers = await platformAPI.listMcpServers();
+      const servers = await platformAPI.servers.list();
       setInstalledServerIds(
         new Set(servers.map((server: MCPServer) => server.id)),
       );
@@ -232,7 +232,7 @@ const DiscoverWrapper: React.FC = () => {
       // First, fetch the server version details to get command and args
       let versionDetails = null;
       if (server.displayId && server.latestVersion) {
-        versionDetails = await platformAPI.fetchMcpServerVersionDetails(
+        versionDetails = await platformAPI.servers.fetchVersionDetails(
           server.displayId,
           server.latestVersion,
         );
@@ -288,7 +288,7 @@ const DiscoverWrapper: React.FC = () => {
           serverConfig.verificationStatus = server.verificationStatus;
         if (server.inputParams) serverConfig.inputParams = server.inputParams;
       }
-      await platformAPI.addMcpServer(serverConfig);
+      await platformAPI.servers.create({ config: serverConfig });
       // Update installed servers list after successful installation
       await fetchInstalledServers();
     } catch (error) {

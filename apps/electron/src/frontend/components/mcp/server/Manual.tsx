@@ -22,7 +22,7 @@ import {
 import {
   validateMcpServerJson,
   processMcpServerConfigs,
-} from "@mcp-router/shared";
+} from "../../../../lib/utils/mcp-server-utils";
 import { toast } from "sonner";
 import { Textarea } from "@mcp-router/ui";
 import { Alert, AlertDescription, AlertTitle } from "@mcp-router/ui";
@@ -174,7 +174,7 @@ const Manual: React.FC = () => {
       }
 
       // Get existing servers to prevent duplicates
-      const existingServers = await platformAPI.listMcpServers();
+      const existingServers = await platformAPI.servers.list();
       const existingServerNames = new Set<string>(
         existingServers.map((server: any) => server.name as string),
       );
@@ -190,9 +190,9 @@ const Manual: React.FC = () => {
         if (result.success && result.server) {
           try {
             // Add the server
-            const serverResponse = await platformAPI.addMcpServer(
-              result.server,
-            );
+            const serverResponse = await platformAPI.servers.create({
+              config: result.server,
+            });
             result.server = serverResponse;
           } catch (error: any) {
             result.success = false;
@@ -329,7 +329,7 @@ const Manual: React.FC = () => {
       };
 
       // Add server directly
-      const result = await platformAPI.addMcpServer(serverConfig);
+      const result = await platformAPI.servers.create({ config: serverConfig });
 
       if (result && !result.error) {
         toast.success(t("manual.successCreate", { name: serverName }));
@@ -365,7 +365,7 @@ const Manual: React.FC = () => {
         disabled: false,
       };
 
-      const result = await platformAPI.addMcpServer(config);
+      const result = await platformAPI.servers.create({ config });
 
       if (result && result.success) {
         toast.success(

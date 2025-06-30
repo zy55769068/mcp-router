@@ -47,14 +47,18 @@ const SidebarComponent: React.FC = () => {
 
   useEffect(() => {
     // Check if an update is available on mount
-    platformAPI.checkForUpdates().then(({ updateAvailable }) => {
-      setUpdateAvailable(updateAvailable);
-    });
+    platformAPI.packages.system
+      .checkForUpdates()
+      .then(({ updateAvailable }) => {
+        setUpdateAvailable(updateAvailable);
+      });
 
     // Listen for future update availability
-    const unsubscribe = platformAPI.onUpdateAvailable((available) => {
-      setUpdateAvailable(available);
-    });
+    const unsubscribe = platformAPI.packages.system.onUpdateAvailable(
+      (available) => {
+        setUpdateAvailable(available);
+      },
+    );
 
     return () => {
       unsubscribe();
@@ -62,14 +66,16 @@ const SidebarComponent: React.FC = () => {
   }, []);
 
   const handleInstallUpdate = () => {
-    platformAPI.installUpdate();
+    platformAPI.packages.system.installUpdate();
   };
 
   const handleSubmitFeedback = async () => {
     if (!feedback.trim()) return;
     setIsSendingFeedback(true);
     try {
-      const success = await platformAPI.submitFeedback(feedback.trim());
+      const success = await platformAPI.settings.submitFeedback(
+        feedback.trim(),
+      );
       if (success) {
         setFeedback("");
         toast.success(t("feedback.sent"));

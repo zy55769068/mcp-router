@@ -28,15 +28,11 @@ import {
   deleteCustomApp,
 } from "@/main/services/mcp-apps-service";
 import { updateElectronApp } from "update-electron-app";
-import { machineIdSync } from "node-machine-id";
-import { getDatabaseMigration } from "./lib/database";
-// Invitation code functionality has been removed
 import { setApplicationMenu } from "./main/menu";
 import { createTray, updateTrayContextMenu } from "./main/tray";
 import { importExistingServerConfigurations } from "./main/mcp-config-importer";
 import { commandExists } from "./lib/get-env";
 import { handleAuthToken, logout, startAuthFlow, status } from "./main/auth";
-import { fetchWithToken } from "./lib/utils/backend/fetch-utils";
 import { registerPackageVersionHandlers } from "./main/handlers/package-version-handler";
 import { registerPackageManagerHandlers } from "./main/handlers/package-manager-handler";
 import { setupAgentHandlers } from "./main/handlers/agent-handler";
@@ -391,8 +387,6 @@ async function initApplication(): Promise<void> {
   // データベース初期化
   await initDatabase();
 
-  // アクティベーションとインビテーションのハンドラをセットアップ
-  setupViralHandlers();
 
   // IPC通信ハンドラの初期化
   setupIpcHandlers();
@@ -885,9 +879,4 @@ function setupFeedbackHandlers(): void {
       return false;
     }
   });
-}
-
-function setupViralHandlers() {
-  // Invitation code functionality has been removed
-  // All activation-related handlers have been deleted
 }

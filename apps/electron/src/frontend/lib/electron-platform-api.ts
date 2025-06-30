@@ -3,186 +3,279 @@
  */
 
 import { PlatformAPI } from "@mcp-router/platform-api";
+import type {
+  AuthAPI,
+  ServerAPI,
+  AgentAPI,
+  AppAPI,
+  PackageAPI,
+  SettingsAPI,
+  LogAPI,
+  WorkspaceAPI,
+  Workspace,
+} from "@mcp-router/platform-api";
 
-// Electron implementation
+// Electron implementation of the Platform API
 export class ElectronPlatformAPI implements PlatformAPI {
-  // Authentication
-  login = (idp?: string) => window.electronAPI.login(idp);
-  logout = () => window.electronAPI.logout();
-  getAuthStatus = (forceRefresh?: boolean) =>
-    window.electronAPI.getAuthStatus(forceRefresh);
-  handleAuthToken = (token: string, state?: string) =>
-    window.electronAPI.handleAuthToken(token, state);
-  onAuthStatusChanged = (
-    callback: (status: {
-      loggedIn: boolean;
-      userId?: string;
-      user?: any;
-    }) => void,
-  ) => window.electronAPI.onAuthStatusChanged(callback);
+  auth: AuthAPI;
+  servers: ServerAPI;
+  agents: AgentAPI;
+  apps: AppAPI;
+  packages: PackageAPI;
+  settings: SettingsAPI;
+  logs: LogAPI;
+  workspaces: WorkspaceAPI;
 
-  // MCP Server Management
-  listMcpServers = () => window.electronAPI.listMcpServers();
-  startMcpServer = (id: string) => window.electronAPI.startMcpServer(id);
-  stopMcpServer = (id: string) => window.electronAPI.stopMcpServer(id);
-  addMcpServer = (serverConfig: any) =>
-    window.electronAPI.addMcpServer(serverConfig);
-  removeMcpServer = (id: string) => window.electronAPI.removeMcpServer(id);
-  updateMcpServerConfig = (id: string, config: any) =>
-    window.electronAPI.updateMcpServerConfig(id, config);
-  fetchMcpServersFromIndex = (
-    page?: number,
-    limit?: number,
-    search?: string,
-    isVerified?: boolean,
-  ) =>
-    window.electronAPI.fetchMcpServersFromIndex(
-      page,
-      limit,
-      search,
-      isVerified,
-    );
-  fetchMcpServerVersionDetails = (displayId: string, version: string) =>
-    window.electronAPI.fetchMcpServerVersionDetails(displayId, version);
+  constructor() {
+    // Initialize auth domain
+    this.auth = {
+      signIn: (provider) => window.electronAPI.login(provider),
+      signOut: () => window.electronAPI.logout(),
+      getStatus: (forceRefresh) =>
+        window.electronAPI.getAuthStatus(forceRefresh).then((status) => ({
+          authenticated: status.authenticated ?? status.loggedIn ?? false,
+          userId: status.userId,
+          user: status.user,
+        })),
+      handleToken: (token, state) =>
+        window.electronAPI.handleAuthToken(token, state),
+      onChange: (callback) =>
+        window.electronAPI.onAuthStatusChanged((status) =>
+          callback({
+            authenticated: status.loggedIn,
+            userId: status.userId,
+            user: status.user,
+          }),
+        ),
+    };
 
-  // Logging
-  getRequestLogs = (options?: any) =>
-    window.electronAPI.getRequestLogs(options);
+    // Initialize servers domain
+    this.servers = {
+      list: () => window.electronAPI.listMcpServers(),
+      get: async (id) => {
+        const servers = await window.electronAPI.listMcpServers();
+        return servers.find((s: any) => s.id === id) || null;
+      },
+      create: (input) => window.electronAPI.addMcpServer(input.config),
+      update: (id, updates) =>
+        window.electronAPI.updateMcpServerConfig(id, updates),
+      delete: (id) => window.electronAPI.removeMcpServer(id),
+      start: (id) => window.electronAPI.startMcpServer(id),
+      stop: (id) => window.electronAPI.stopMcpServer(id),
+      getStatus: async (id) => {
+        const servers = await window.electronAPI.listMcpServers();
+        const server = servers.find((s: any) => s.id === id);
+        return server?.status || { type: "stopped" };
+      },
+      fetchFromIndex: (page, limit, search, isVerified) =>
+        window.electronAPI.fetchMcpServersFromIndex(
+          page,
+          limit,
+          search,
+          isVerified,
+        ),
+      fetchVersionDetails: (displayId, version) =>
+        window.electronAPI.fetchMcpServerVersionDetails(displayId, version),
+    };
 
-  // Settings
-  getSettings = () => window.electronAPI.getSettings();
-  saveSettings = (settings: any) => window.electronAPI.saveSettings(settings);
-  incrementPackageManagerOverlayCount = () =>
-    window.electronAPI.incrementPackageManagerOverlayCount();
+    // Initialize agents domain (with chat functionality)
+    this.agents = {
+      // Agent management
+      list: () => window.electronAPI.listAgents(),
+      get: async (id) => {
+        const agent = await window.electronAPI.getAgent(id);
+        return agent || null;
+      },
+      create: (input) => window.electronAPI.createAgent(input),
+      update: async (id, updates) => {
+        const agent = await window.electronAPI.updateAgent(id, updates);
+        if (!agent) throw new Error("Agent not found");
+        return agent;
+      },
+      delete: (id) => window.electronAPI.deleteAgent(id),
+      share: (id) => window.electronAPI.shareAgent(id),
+      import: (shareCode) => window.electronAPI.importAgent(shareCode),
 
-  // MCP Apps
-  listMcpApps = () => window.electronAPI.listMcpApps();
-  addMcpAppConfig = (appName: string) =>
-    window.electronAPI.addMcpAppConfig(appName);
-  deleteMcpApp = (appName: string) => window.electronAPI.deleteMcpApp(appName);
-  updateAppServerAccess = (appName: string, serverIds: string[]) =>
-    window.electronAPI.updateAppServerAccess(appName, serverIds);
-  unifyAppConfig = (appName: string) =>
-    window.electronAPI.unifyAppConfig(appName);
+      // Deployment
+      deploy: async (id) => {
+        const deployedAgent = await window.electronAPI.deployAgent(id);
+        return {
+          success: !!deployedAgent,
+          deployedAgent,
+          error: deployedAgent ? undefined : "Deployment failed",
+        };
+      },
+      getDeployed: async () => {
+        const deployed = await window.electronAPI.getDeployedAgents();
+        return deployed || [];
+      },
+      updateDeployed: (id, config) =>
+        window.electronAPI.updateDeployedAgent(id, config),
+      deleteDeployed: (id) => window.electronAPI.deleteDeployedAgent(id),
 
-  // Command utilities
-  checkCommandExists = (command: string) =>
-    window.electronAPI.checkCommandExists(command);
+      // Tool management
+      tools: {
+        execute: async (agentId, toolName, args) => {
+          const result = await window.electronAPI.executeAgentTool(
+            agentId,
+            toolName,
+            args,
+          );
+          return result;
+        },
+        list: async (agentId, serverId, isDev) => {
+          const result = await window.electronAPI.getAgentMCPServerTools(
+            agentId,
+            serverId,
+            isDev,
+          );
+          return result.tools || [];
+        },
+      },
 
-  // Agent Management
-  listAgents = () => window.electronAPI.listAgents();
-  getAgent = (id: string) => window.electronAPI.getAgent(id);
-  createAgent = (agentConfig: any) =>
-    window.electronAPI.createAgent(agentConfig);
-  updateAgent = (id: string, config: any) =>
-    window.electronAPI.updateAgent(id, config);
-  deleteAgent = (id: string) => window.electronAPI.deleteAgent(id);
-  shareAgent = (id: string) => window.electronAPI.shareAgent(id);
-  importAgent = (shareCode: string) =>
-    window.electronAPI.importAgent(shareCode);
+      // Session management
+      sessions: {
+        create: (agentId, initialMessages) =>
+          window.electronAPI.createSession(agentId, initialMessages),
+        get: async (sessionId) => {
+          const messages =
+            await window.electronAPI.fetchSessionMessages(sessionId);
+          return messages
+            ? {
+                id: sessionId,
+                agentId: "",
+                messages,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              }
+            : null;
+        },
+        list: (agentId, options) =>
+          window.electronAPI.getSessions(agentId, options),
+        delete: (sessionId) => window.electronAPI.deleteSession(sessionId),
+        update: async (sessionId, messages) => {
+          await window.electronAPI.updateSessionMessages(sessionId, messages);
+          return {
+            id: sessionId,
+            agentId: "",
+            messages,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        },
+      },
 
-  // Agent Deployment
-  deployAgent = (id: string) => window.electronAPI.deployAgent(id);
-  getDeployedAgents = () => window.electronAPI.getDeployedAgents();
-  updateDeployedAgent = (id: string, config: any) =>
-    window.electronAPI.updateDeployedAgent(id, config);
-  deleteDeployedAgent = (id: string) =>
-    window.electronAPI.deleteDeployedAgent(id);
+      // Streaming chat
+      stream: {
+        start: (data) => window.electronAPI.sendChatStreamStart(data),
+        send: (data) => window.electronAPI.sendChatStreamChunk(data),
+        end: (data) => window.electronAPI.sendChatStreamEnd(data),
+        error: (data) => window.electronAPI.sendChatStreamError(data),
+        onStart: (callback) => window.electronAPI.onChatStreamStart(callback),
+        onChunk: (callback) => window.electronAPI.onChatStreamChunk(callback),
+        onEnd: (callback) => window.electronAPI.onChatStreamEnd(callback),
+        onError: (callback) => window.electronAPI.onChatStreamError(callback),
+      },
 
-  // Package Management
-  resolvePackageVersionsInArgs = (
-    argsString: string,
-    packageManager: "pnpm" | "uvx",
-  ) =>
-    window.electronAPI.resolvePackageVersionsInArgs(argsString, packageManager);
-  checkMcpServerPackageUpdates = (
-    args: string[],
-    packageManager: "pnpm" | "uvx",
-  ) => window.electronAPI.checkMcpServerPackageUpdates(args, packageManager);
+      // Background chat
+      background: {
+        start: (sessionId, agentId, query) =>
+          window.electronAPI.startBackgroundChat(sessionId, agentId, query),
+        stop: (agentId) => window.electronAPI.stopBackgroundChat(agentId),
+        onStart: (callback) =>
+          window.electronAPI.onBackgroundChatStart(callback),
+        onStop: (callback) => window.electronAPI.onBackgroundChatStop(callback),
+      },
+    };
 
-  // Agent Tools
-  getAgentMCPServerTools = (
-    agentId: string,
-    serverId: string,
-    isDev?: boolean,
-  ) => window.electronAPI.getAgentMCPServerTools(agentId, serverId, isDev);
-  executeAgentTool = (
-    agentId: string,
-    toolName: string,
-    args: Record<string, any>,
-  ) => window.electronAPI.executeAgentTool(agentId, toolName, args);
+    // Initialize apps domain (with token management)
+    this.apps = {
+      list: () => window.electronAPI.listMcpApps(),
+      create: (appName) => window.electronAPI.addMcpAppConfig(appName),
+      delete: (appName) => window.electronAPI.deleteMcpApp(appName),
+      updateServerAccess: (appName, serverIds) =>
+        window.electronAPI.updateAppServerAccess(appName, serverIds),
+      unifyConfig: (appName) => window.electronAPI.unifyAppConfig(appName),
 
-  // Background Chat
-  startBackgroundChat = (
-    sessionId: string | undefined,
-    agentId: string,
-    query: string,
-  ) => window.electronAPI.startBackgroundChat(sessionId, agentId, query);
-  stopBackgroundChat = (agentId: string) =>
-    window.electronAPI.stopBackgroundChat(agentId);
-  onBackgroundChatStart = (callback: (data: any) => void) =>
-    window.electronAPI.onBackgroundChatStart(callback);
-  onBackgroundChatStop = (callback: (data: any) => void) =>
-    window.electronAPI.onBackgroundChatStop(callback);
+      // Token management
+      tokens: {
+        updateScopes: (tokenId, scopes) =>
+          window.electronAPI.updateTokenScopes(tokenId, scopes),
+        generate: async () => {
+          throw new Error("Token generation not available in Electron");
+        },
+        revoke: async () => {
+          throw new Error("Token revocation not available in Electron");
+        },
+        list: async () => {
+          throw new Error("Token listing not available in Electron");
+        },
+      },
+    };
 
-  // Session Management
-  fetchSessionMessages = (sessionId: string) =>
-    window.electronAPI.fetchSessionMessages(sessionId);
-  getSessions = (agentId: string, options?: any) =>
-    window.electronAPI.getSessions(agentId, options);
-  createSession = (agentId: string, initialMessages?: any[]) =>
-    window.electronAPI.createSession(agentId, initialMessages);
-  updateSessionMessages = (sessionId: string, messages: any[]) =>
-    window.electronAPI.updateSessionMessages(sessionId, messages);
-  deleteSession = (sessionId: string) =>
-    window.electronAPI.deleteSession(sessionId);
+    // Initialize packages domain (with system utilities)
+    this.packages = {
+      resolveVersions: (argsString, manager) =>
+        window.electronAPI.resolvePackageVersionsInArgs(argsString, manager),
+      checkUpdates: (args, manager) =>
+        window.electronAPI.checkMcpServerPackageUpdates(args, manager),
+      checkManagers: () => window.electronAPI.checkPackageManagers(),
+      installManagers: () => window.electronAPI.installPackageManagers(),
 
-  // Chat Stream Communication
-  sendChatStreamStart = (streamData: any) =>
-    window.electronAPI.sendChatStreamStart(streamData);
-  sendChatStreamChunk = (chunkData: any) =>
-    window.electronAPI.sendChatStreamChunk(chunkData);
-  sendChatStreamEnd = (endData: any) =>
-    window.electronAPI.sendChatStreamEnd(endData);
-  sendChatStreamError = (errorData: any) =>
-    window.electronAPI.sendChatStreamError(errorData);
+      // System utilities
+      system: {
+        getPlatform: () => window.electronAPI.getPlatform(),
+        checkCommand: (command) =>
+          window.electronAPI.checkCommandExists(command),
+        restartApp: () => window.electronAPI.restartApp(),
+        checkForUpdates: () => window.electronAPI.checkForUpdates(),
+        installUpdate: () => window.electronAPI.installUpdate(),
+        onUpdateAvailable: (callback) =>
+          window.electronAPI.onUpdateAvailable(callback),
+        onProtocolUrl: (callback) => window.electronAPI.onProtocolUrl(callback),
+      },
+    };
 
-  // Chat Stream Listeners
-  onChatStreamStart = (callback: (data: any) => void) =>
-    window.electronAPI.onChatStreamStart(callback);
-  onChatStreamChunk = (callback: (data: any) => void) =>
-    window.electronAPI.onChatStreamChunk(callback);
-  onChatStreamEnd = (callback: (data: any) => void) =>
-    window.electronAPI.onChatStreamEnd(callback);
-  onChatStreamError = (callback: (data: any) => void) =>
-    window.electronAPI.onChatStreamError(callback);
+    // Initialize settings domain
+    this.settings = {
+      get: () => window.electronAPI.getSettings(),
+      save: (settings) => window.electronAPI.saveSettings(settings),
+      incrementOverlayCount: () =>
+        window.electronAPI.incrementPackageManagerOverlayCount(),
+      submitFeedback: (feedback) => window.electronAPI.submitFeedback(feedback),
+    };
 
-  // Token Management
-  updateTokenScopes = (tokenId: string, scopes: any[]) =>
-    window.electronAPI.updateTokenScopes(tokenId, scopes);
+    // Initialize logs domain
+    this.logs = {
+      query: (options) => window.electronAPI.getRequestLogs(options),
+    };
 
-  // Feedback
-  submitFeedback = (feedback: string) =>
-    window.electronAPI.submitFeedback(feedback);
-
-  // Updates
-  checkForUpdates = () => window.electronAPI.checkForUpdates();
-  installUpdate = () => window.electronAPI.installUpdate();
-  onUpdateAvailable = (callback: (available: boolean) => void) =>
-    window.electronAPI.onUpdateAvailable(callback);
-
-  // Protocol handling
-  onProtocolUrl = (callback: (url: string) => void) =>
-    window.electronAPI.onProtocolUrl(callback);
-
-  // Package Manager utilities
-  checkPackageManagers = () => window.electronAPI.checkPackageManagers();
-  installPackageManagers = () => window.electronAPI.installPackageManagers();
-  restartApp = () => window.electronAPI.restartApp();
-
-  // System utilities
-  getPlatform = () => window.electronAPI.getPlatform();
+    // Initialize workspaces domain
+    this.workspaces = {
+      list: () => window.electronAPI.listWorkspaces(),
+      get: async (id) => {
+        const workspaces = await window.electronAPI.listWorkspaces();
+        return workspaces.find((w: Workspace) => w.id === id) || null;
+      },
+      create: (input) => window.electronAPI.createWorkspace(input),
+      update: async (id, updates) => {
+        await window.electronAPI.updateWorkspace(id, updates);
+        // Return the updated workspace
+        const workspaces = await window.electronAPI.listWorkspaces();
+        const updated = workspaces.find((w: Workspace) => w.id === id);
+        if (!updated) throw new Error("Workspace not found");
+        return updated;
+      },
+      delete: async (id) => {
+        await window.electronAPI.deleteWorkspace(id);
+      },
+      setActive: async (id) => {
+        await window.electronAPI.switchWorkspace(id);
+      },
+      getActive: () => window.electronAPI.getCurrentWorkspace(),
+    };
+  }
 }
 
-// Create and export the Electron platform API instance
+// Create the Platform API instance
 export const electronPlatformAPI = new ElectronPlatformAPI();
