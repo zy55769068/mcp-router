@@ -193,7 +193,8 @@
     "serverStopped": "Server stopped successfully",
     "activeNow": "Active Now",
     "start": "Start",
-    "stop": "Stop"
+    "stop": "Stop",
+    "errorDetails": "Error Details"
   },
   "settings": {
     "title": "Settings",
@@ -530,7 +531,9 @@
     "exportConfigDescription": "Export server configuration as JSON file",
     "itemsCount": "items",
     "serverStopped": "Server stopped",
-    "commandNotFound": "Command is not installed. Server startup may fail."
+    "commandNotFound": "Command is not installed. Server startup may fail.",
+    "autoStart": "Auto Start",
+    "autoStartToggleLabel": "Enable auto-start"
   },
   "server": {
     "status": {

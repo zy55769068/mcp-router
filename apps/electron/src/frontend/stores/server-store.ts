@@ -1,6 +1,6 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
 import { MCPServer, MCPServerConfig } from "@mcp-router/shared";
-import { PlatformAPI } from "@mcp-router/platform-api";
+import { PlatformAPI } from "@/lib/platform-api";
 
 interface ServerState {
   // Server data
@@ -201,7 +201,7 @@ export const createServerStore = (
         setUpdating(id, true);
         setError(null);
 
-        const updatedServer = await platformAPI.servers.update(id, { config });
+        const updatedServer = await platformAPI.servers.update(id, config);
         updateServer(id, updatedServer);
       } catch (error) {
         setError(

@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@mcp-router/ui";
 import { v4 as uuidv4 } from "uuid";
-import { usePlatformAPI } from "@mcp-router/platform-api";
+import { usePlatformAPI } from "@/lib/platform-api";
 
 // Setup Settings Component
 interface McpSettingsProps {
@@ -129,15 +129,19 @@ export const McpSettings: React.FC<McpSettingsProps> = ({
         serverId,
         isDev,
       );
-      if (response && response.success) {
+
+      if (!response) {
+        setErrorMessage("Failed to connect to server");
+        setIsErrorModalOpen(true);
+      } else if (response.success && response.tools) {
         setServerTools((prev) => ({ ...prev, [serverId]: response.tools }));
         setIsToolDialogOpen(true);
-      } else if (response && response.error) {
+      } else if (response.error) {
         // Display error in modal
         setErrorMessage(response.error);
         setIsErrorModalOpen(true);
       } else {
-        setErrorMessage("Error fetching tools");
+        setErrorMessage("Failed to fetch tools from server");
         setIsErrorModalOpen(true);
       }
     } catch (error) {
