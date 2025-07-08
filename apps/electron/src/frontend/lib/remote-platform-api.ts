@@ -1,8 +1,8 @@
-/* eslint-disable no-undef */
 import type { PlatformAPI } from "@/lib/platform-api/types/platform-api";
-import type {
-  MCPServerConfig,
-} from "@mcp-router/shared";
+import {
+  createRemoteAPIClient,
+  type RemoteAPIClient,
+} from "@mcp-router/remote-api-client";
 import type {
   Server,
   ServerStatus,
@@ -20,166 +20,119 @@ interface RemoteWorkspaceConfig {
   authToken: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
 /**
- * Remote Platform API implementation that communicates with a remote API server
+ * Remote Platform API implementation that communicates with a remote API server using tRPC
  * Only servers and logs are handled remotely, all other operations are delegated to local Electron API
  */
 export class RemotePlatformAPI implements PlatformAPI {
-  private config: RemoteWorkspaceConfig;
-  private baseUrl: string;
+  private client: RemoteAPIClient;
 
   constructor(config: RemoteWorkspaceConfig) {
-    this.config = config;
-    this.baseUrl = config.apiUrl.replace(/\/$/, ""); // Remove trailing slash
+    this.client = createRemoteAPIClient({
+      url: config.apiUrl.replace(/\/$/, ""), // Remove trailing slash
+      token: config.authToken,
+    });
   }
 
-  private async fetch<T = any>(
-    endpoint: string,
-    options: RequestInit = {},
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.config.authToken}`,
-          ...options.headers,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || `HTTP ${response.status}: ${response.statusText}`,
-        );
-      }
-
-      const result: ApiResponse<T> = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || "Unknown error");
-      }
-
-      return result.data!;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error("Network error");
-    }
-  }
-
-  // Server API implementation - CRUD remote, execution local
+  // Server API implementation - All operations remote via tRPC
   readonly servers = {
     list: async (): Promise<Server[]> => {
-      const configs = await this.fetch<MCPServerConfig[]>("/api/servers");
-      return configs.map((config) => ({
-        id: config.id!,
-        name: config.name,
-        config,
-        status: { type: "stopped" as const },
-      }));
+      const servers = await this.client.servers.list.query();
+      // Type conversion to ensure compatibility
+      return servers as unknown as Server[];
     },
 
     get: async (id: string): Promise<Server | null> => {
-      try {
-        const config = await this.fetch<MCPServerConfig>(`/api/servers/${id}`);
-        return {
-          id: config.id!,
-          name: config.name,
-          config,
-          status: { type: "stopped" as const },
-        };
-      } catch {
-        return null;
-      }
+      const server = await this.client.servers.get.query({ id });
+      return server as unknown as Server | null;
     },
 
     create: async (input: CreateServerInput): Promise<Server> => {
-      const config = await this.fetch<MCPServerConfig>("/api/servers", {
-        method: "POST",
-        body: JSON.stringify(input.config),
-      });
-      return {
-        id: config.id!,
-        name: input.name,
-        config,
-        status: { type: "stopped" as const },
-      };
+      const server = await this.client.servers.create.mutate(input);
+      return server as unknown as Server;
     },
 
     update: async (id: string, updates: UpdateServerInput): Promise<Server> => {
-      const config = await this.fetch<MCPServerConfig>(`/api/servers/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(updates.config || {}),
+      const server = await this.client.servers.update.mutate({
+        id,
+        ...updates,
       });
-      return {
-        id: config.id!,
-        name: updates.name || config.name,
-        config,
-        status: { type: "stopped" as const },
-      };
+      return server as unknown as Server;
     },
 
     delete: async (id: string): Promise<void> => {
-      await this.fetch(`/api/servers/${id}`, {
-        method: "DELETE",
-      });
+      await this.client.servers.delete.mutate({ id });
     },
 
-    // Server execution operations - Delegate to local implementation
+    // Server execution operations - Remote only
     start: async (id: string): Promise<boolean> => {
-      return electronPlatformAPI.servers.start(id);
+      await this.client.servers.start.mutate({ id });
+      return true;
     },
 
     stop: async (id: string): Promise<boolean> => {
-      return electronPlatformAPI.servers.stop(id);
+      await this.client.servers.stop.mutate({ id });
+      return true;
     },
 
     getStatus: async (id: string): Promise<ServerStatus> => {
-      return electronPlatformAPI.servers.getStatus(id);
+      const status = await this.client.servers.getStatus.query({ id });
+      return status as unknown as ServerStatus;
     },
 
     fetchFromIndex: async (
-      page?: number,
-      limit?: number,
-      search?: string,
-      isVerified?: boolean,
+      _page?: number,
+      _limit?: number,
+      _search?: string,
+      _isVerified?: boolean,
     ) => {
-      return electronPlatformAPI.servers.fetchFromIndex(page, limit, search, isVerified);
+      // This operation is specific to the MCP index and might not be available remotely
+      throw new Error("fetchFromIndex is not supported in remote workspaces");
     },
 
-    fetchVersionDetails: async (displayId: string, version: string) => {
-      return electronPlatformAPI.servers.fetchVersionDetails(displayId, version);
+    fetchVersionDetails: async (_displayId: string, _version: string) => {
+      // This operation is specific to the MCP index and might not be available remotely
+      throw new Error(
+        "fetchVersionDetails is not supported in remote workspaces",
+      );
     },
   };
 
-  // Log API implementation
+  // Log API implementation via tRPC
   logs = {
     query: async (options?: LogQueryOptions): Promise<LogQueryResult> => {
-      const params = new URLSearchParams();
-      if (options?.clientId) params.append("clientId", options.clientId);
-      if (options?.serverId) params.append("serverId", options.serverId);
-      if (options?.requestType)
-        params.append("requestType", options.requestType);
-      if (options?.responseStatus)
-        params.append("responseStatus", options.responseStatus);
-      if (options?.limit) params.append("limit", options.limit.toString());
-      if (options?.offset) params.append("offset", options.offset.toString());
+      const result = await this.client.logs.list.query({
+        clientId: options?.clientId,
+        serverId: options?.serverId,
+        requestType: options?.requestType,
+        responseStatus: options?.responseStatus,
+        limit: options?.limit,
+        offset: options?.offset,
+        startDate: options?.startDate?.toISOString(),
+        endDate: options?.endDate?.toISOString(),
+      });
 
-      const logs = await this.fetch<LogEntry[]>(`/api/logs?${params}`);
+      // Convert RequestLogEntry to LogEntry format
+      const logs: LogEntry[] = result.logs.map((log) => ({
+        id: log.id,
+        timestamp: new Date(log.timestamp),
+        clientId: log.clientId,
+        serverId: log.serverId,
+        requestType: log.requestType,
+        responseStatus: log.responseStatus,
+        duration: log.duration,
+        error: log.errorMessage,
+        details: {
+          clientName: log.clientName,
+          serverName: log.serverName,
+          requestParams: log.requestParams,
+          responseData: log.responseData,
+        },
+      }));
+
       return {
         logs,
-        total: logs.length, // Remote API should ideally return total count
+        total: result.total,
       };
     },
   };

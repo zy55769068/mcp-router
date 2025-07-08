@@ -1,5 +1,6 @@
 import { BrowserWindow } from "electron";
-import { getWorkspaceService, Workspace } from "./services/workspace-service";
+import { getWorkspaceService } from "./services/workspace-service";
+import type { Workspace } from "@mcp-router/shared";
 import {
   SqliteManager,
   setWorkspaceDatabase,
@@ -7,6 +8,7 @@ import {
 import { WorkspaceDatabaseMigration } from "../lib/database/workspace-database-migration";
 import { getDatabaseContext } from "../lib/database/database-context";
 import {
+  getDatabaseMigration,
   resetAgentRepository,
   resetDeployedAgentRepository,
   resetLogRepository,
@@ -100,75 +102,28 @@ export class PlatformAPIManager {
       setWorkspaceDatabase(null);
     }
 
-    // すべてのワークスペースに対してデータベースを作成（ローカル、リモート両方）
-    this.currentDatabase = await getWorkspaceService().getWorkspaceDatabase(
+    // 新しいデータベースを取得して設定
+    const newDatabase = await getWorkspaceService().getWorkspaceDatabase(
       workspace.id,
     );
-    console.log(`[PlatformAPIManager] Got workspace DB for ${workspace.id}`);
+    this.currentDatabase = newDatabase;
 
-    // データベースコンテキストに設定
-    getDatabaseContext().setCurrentDatabase(this.currentDatabase);
+    getDatabaseContext().setCurrentDatabase(newDatabase);
 
-    // グローバルなワークスペースデータベース参照を更新
-    setWorkspaceDatabase(this.currentDatabase);
-    console.log(`[PlatformAPIManager] Set workspace DB globally`);
+    // グローバルなワークスペースデータベース参照を設定
+    setWorkspaceDatabase(newDatabase);
 
-    // データベースマイグレーションを実行
-    // ただし、既存のmcprouter.dbを使用している場合はスキップ
+    // マイグレーションを実行
+    // デフォルトのワークスペースだけ特別なマイグレーションを使用する
     if (workspace.localConfig?.databasePath !== "mcprouter.db") {
-      const migration = new WorkspaceDatabaseMigration(this.currentDatabase);
+      const migration = new WorkspaceDatabaseMigration(newDatabase);
       migration.runMigrations();
     } else {
-      console.log(
-        "[PlatformAPIManager] Using existing mcprouter.db, skipping workspace migration",
-      );
-
-      // 既存のDBのマイグレーションを実行
-      const { getDatabaseMigration } = await import(
-        "../lib/database/database-migration"
-      );
       const migration = getDatabaseMigration();
       migration.runMigrations();
     }
 
-    // ワークスペース設定を送信（ローカル・リモート両方）
-    if (this.mainWindow) {
-      const configData: any = {
-        workspace,
-      };
-
-      if (workspace.type === "remote") {
-        const credentials = await getWorkspaceService().getWorkspaceCredentials(
-          workspace.id,
-        );
-        configData.apiUrl = workspace.remoteConfig?.apiUrl;
-        configData.hasCredentials = !!credentials;
-      }
-
-      this.mainWindow.webContents.send("workspace:config-changed", configData);
-    }
-
-    // グローバルイベントも発行（Hybrid APIがリッスンできるように）
-    if (workspace.type === "remote" && workspace.remoteConfig) {
-      // IPCイベントをエミュレート
-      process.emit("workspace:config-changed" as any, {
-        workspace,
-      });
-    }
-
-    // 全サービスにデータベース変更を通知
-    await this.notifyDatabaseChange();
-  }
-
-  /**
-   * データベース変更を全サービスに通知
-   */
-  private async notifyDatabaseChange(): Promise<void> {
-    // Reset database context
-    getDatabaseContext().reset();
-
-    // 全リポジトリのシングルトンインスタンスをリセット
-    // これにより、次回のアクセス時に新しいワークスペースDBが使用される
+    // リポジトリをリセット（新しいデータベースを使用するように）
     resetAgentRepository();
     resetDeployedAgentRepository();
     resetLogRepository();

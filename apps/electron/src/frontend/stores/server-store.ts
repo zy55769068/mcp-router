@@ -50,7 +50,7 @@ interface ServerState {
 }
 
 export const createServerStore = (
-  platformAPI: PlatformAPI,
+  getPlatformAPI: () => PlatformAPI
 ): UseBoundStore<StoreApi<ServerState>> =>
   create<ServerState>((set, get) => ({
     // Initial state
@@ -119,6 +119,7 @@ export const createServerStore = (
         setServerStatus(id, "starting");
 
         // Call Platform API
+        const platformAPI = getPlatformAPI();
         await platformAPI.servers.start(id);
 
         // The actual status will be updated via server status polling
@@ -144,6 +145,7 @@ export const createServerStore = (
         setServerStatus(id, "stopping");
 
         // Call Platform API
+        const platformAPI = getPlatformAPI();
         await platformAPI.servers.stop(id);
 
         // The actual status will be updated via server status polling
@@ -164,6 +166,7 @@ export const createServerStore = (
         setLoading(true);
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         const servers = await platformAPI.servers.list();
         setServers(servers);
       } catch (error) {
@@ -181,6 +184,7 @@ export const createServerStore = (
       try {
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         const newServer = await platformAPI.servers.create({
           name: config.name || "",
           config,
@@ -201,6 +205,7 @@ export const createServerStore = (
         setUpdating(id, true);
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         const updatedServer = await platformAPI.servers.update(id, config);
         updateServer(id, updatedServer);
       } catch (error) {
@@ -220,6 +225,7 @@ export const createServerStore = (
         setUpdating(id, true);
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         await platformAPI.servers.delete(id);
         removeServer(id);
       } catch (error) {
