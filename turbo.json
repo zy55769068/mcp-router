@@ -9,7 +9,8 @@
     },
     "dev": {
       "persistent": true,
-      "cache": false
+      "cache": false,
+      "dependsOn": ["@mcp-router/remote-api-client#build"]
     },
     "lint": {
       "dependsOn": ["^lint"],
