@@ -351,13 +351,10 @@ const Settings: React.FC = () => {
         </CardContent>
       </Card>
 
-
       {/* External Applications Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">
-            {t("settings.advanced")}
-          </CardTitle>
+          <CardTitle className="text-xl">{t("settings.advanced")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -371,9 +368,9 @@ const Settings: React.FC = () => {
                 </p>
               </div>
               <Switch
-                  checked={loadExternalMCPConfigs}
-                  onCheckedChange={handleExternalMCPConfigsToggle}
-                  disabled={isSavingSettings}
+                checked={loadExternalMCPConfigs}
+                onCheckedChange={handleExternalMCPConfigsToggle}
+                disabled={isSavingSettings}
               />
             </div>
           </div>

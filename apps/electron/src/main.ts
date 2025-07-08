@@ -380,7 +380,6 @@ async function initApplication(): Promise<void> {
     });
   }
 
-
   // データベース初期化
   await initDatabase();
 

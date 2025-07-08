@@ -2,40 +2,17 @@
  * Workspace management domain API
  */
 
-export interface Workspace {
-  id: string;
-  name: string;
-  description?: string;
-  settings?: WorkspaceSettings;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { Workspace, WorkspaceCreateConfig, WorkspaceUpdateConfig } from "@mcp-router/shared";
 
-export interface WorkspaceSettings {
-  defaultAgentId?: string;
-  defaultServerIds?: string[];
-  theme?: "light" | "dark" | "system";
-  customConfig?: any;
-}
-
-export interface CreateWorkspaceInput {
-  name: string;
-  description?: string;
-  settings?: WorkspaceSettings;
-}
-
-export interface UpdateWorkspaceInput {
-  name?: string;
-  description?: string;
-  settings?: Partial<WorkspaceSettings>;
-}
+// Re-export the shared types for convenience
+export type { Workspace, WorkspaceCreateConfig, WorkspaceUpdateConfig };
 
 export interface WorkspaceAPI {
   list(): Promise<Workspace[]>;
   get(id: string): Promise<Workspace | null>;
-  create(input: CreateWorkspaceInput): Promise<Workspace>;
-  update(id: string, updates: UpdateWorkspaceInput): Promise<Workspace>;
+  create(config: WorkspaceCreateConfig): Promise<Workspace>;
+  update(id: string, updates: Partial<WorkspaceUpdateConfig>): Promise<Workspace>;
   delete(id: string): Promise<void>;
-  setActive(id: string): Promise<void>;
+  switch(id: string): Promise<void>;
   getActive(): Promise<Workspace | null>;
 }

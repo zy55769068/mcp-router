@@ -63,7 +63,6 @@ export class ServerRepository extends BaseRepository<MCPServer> {
     }
   }
 
-
   /**
    * JSON文字列を安全にパース
    * @param jsonString JSON文字列
@@ -146,7 +145,9 @@ export class ServerRepository extends BaseRepository<MCPServer> {
     return {
       bearerToken: entity.bearerToken || null,
       env: JSON.stringify(entity.env || {}),
-      inputParams: entity.inputParams ? JSON.stringify(entity.inputParams) : null,
+      inputParams: entity.inputParams
+        ? JSON.stringify(entity.inputParams)
+        : null,
       command: entity.command || null,
       args: JSON.stringify(entity.args || []),
       remoteUrl: entity.remoteUrl || null,
@@ -161,14 +162,8 @@ export class ServerRepository extends BaseRepository<MCPServer> {
       const now = Date.now();
 
       // データをシリアライズ
-      const {
-        bearerToken,
-        env,
-        inputParams,
-        command,
-        args,
-        remoteUrl,
-      } = this.serializeEntityData(entity);
+      const { bearerToken, env, inputParams, command, args, remoteUrl } =
+        this.serializeEntityData(entity);
 
       // DB行オブジェクトを構築
       return {
@@ -264,14 +259,8 @@ export class ServerRepository extends BaseRepository<MCPServer> {
   ): Record<string, any> {
     try {
       // データをシリアライズ
-      const {
-        bearerToken,
-        env,
-        inputParams,
-        command,
-        args,
-        remoteUrl,
-      } = this.serializeEntityData(entity);
+      const { bearerToken, env, inputParams, command, args, remoteUrl } =
+        this.serializeEntityData(entity);
 
       // DB行オブジェクトを構築
       return {

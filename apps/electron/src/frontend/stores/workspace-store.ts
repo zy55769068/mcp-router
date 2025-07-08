@@ -118,7 +118,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   switchWorkspace: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await electronPlatformAPI.workspaces.setActive(id);
+      await electronPlatformAPI.workspaces.switch(id);
       const workspace = get().workspaces.find((w) => w.id === id);
       if (workspace) {
         set({ currentWorkspace: workspace, isLoading: false });

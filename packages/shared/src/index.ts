@@ -7,6 +7,7 @@ export * from "./types/rule-types";
 export * from "./types/settings-types";
 export * from "./types/agent-api";
 export * from "./types/mcp-app-types";
+export * from "./types/workspace";
 
 // Export locales
 export { default as enTranslation } from "./locales/en.json";

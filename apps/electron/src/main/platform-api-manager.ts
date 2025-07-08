@@ -100,51 +100,60 @@ export class PlatformAPIManager {
       setWorkspaceDatabase(null);
     }
 
-    if (workspace.type === "local") {
-      // ローカルワークスペースの場合、ワークスペース固有のDBを取得
-      this.currentDatabase = await getWorkspaceService().getWorkspaceDatabase(
-        workspace.id,
-      );
-      console.log(`[PlatformAPIManager] Got workspace DB for ${workspace.id}`);
+    // すべてのワークスペースに対してデータベースを作成（ローカル、リモート両方）
+    this.currentDatabase = await getWorkspaceService().getWorkspaceDatabase(
+      workspace.id,
+    );
+    console.log(`[PlatformAPIManager] Got workspace DB for ${workspace.id}`);
 
-      // データベースコンテキストに設定
-      getDatabaseContext().setCurrentDatabase(this.currentDatabase);
+    // データベースコンテキストに設定
+    getDatabaseContext().setCurrentDatabase(this.currentDatabase);
 
-      // グローバルなワークスペースデータベース参照を更新
-      setWorkspaceDatabase(this.currentDatabase);
-      console.log(`[PlatformAPIManager] Set workspace DB globally`);
+    // グローバルなワークスペースデータベース参照を更新
+    setWorkspaceDatabase(this.currentDatabase);
+    console.log(`[PlatformAPIManager] Set workspace DB globally`);
 
-      // データベースマイグレーションを実行
-      // ただし、既存のmcprouter.dbを使用している場合はスキップ
-      if (workspace.localConfig?.databasePath !== "mcprouter.db") {
-        const migration = new WorkspaceDatabaseMigration(this.currentDatabase);
-        migration.runMigrations();
-      } else {
-        console.log(
-          "[PlatformAPIManager] Using existing mcprouter.db, skipping workspace migration",
-        );
-
-        // 既存のDBのマイグレーションを実行
-        const { getDatabaseMigration } = await import(
-          "../lib/database/database-migration"
-        );
-        const migration = getDatabaseMigration();
-        migration.runMigrations();
-      }
+    // データベースマイグレーションを実行
+    // ただし、既存のmcprouter.dbを使用している場合はスキップ
+    if (workspace.localConfig?.databasePath !== "mcprouter.db") {
+      const migration = new WorkspaceDatabaseMigration(this.currentDatabase);
+      migration.runMigrations();
     } else {
-      // リモートワークスペースの場合
-      const credentials = await getWorkspaceService().getWorkspaceCredentials(
-        workspace.id,
+      console.log(
+        "[PlatformAPIManager] Using existing mcprouter.db, skipping workspace migration",
       );
 
-      // レンダラープロセスにワークスペース情報を送信
-      if (this.mainWindow) {
-        this.mainWindow.webContents.send("workspace:config-changed", {
-          workspace,
-          apiUrl: workspace.remoteConfig?.apiUrl,
-          hasCredentials: !!credentials,
-        });
+      // 既存のDBのマイグレーションを実行
+      const { getDatabaseMigration } = await import(
+        "../lib/database/database-migration"
+      );
+      const migration = getDatabaseMigration();
+      migration.runMigrations();
+    }
+
+    // ワークスペース設定を送信（ローカル・リモート両方）
+    if (this.mainWindow) {
+      const configData: any = {
+        workspace,
+      };
+
+      if (workspace.type === "remote") {
+        const credentials = await getWorkspaceService().getWorkspaceCredentials(
+          workspace.id,
+        );
+        configData.apiUrl = workspace.remoteConfig?.apiUrl;
+        configData.hasCredentials = !!credentials;
       }
+
+      this.mainWindow.webContents.send("workspace:config-changed", configData);
+    }
+
+    // グローバルイベントも発行（Hybrid APIがリッスンできるように）
+    if (workspace.type === "remote" && workspace.remoteConfig) {
+      // IPCイベントをエミュレート
+      process.emit("workspace:config-changed" as any, {
+        workspace,
+      });
     }
 
     // 全サービスにデータベース変更を通知

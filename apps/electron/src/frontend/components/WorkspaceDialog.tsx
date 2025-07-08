@@ -11,13 +11,23 @@ import {
   Label,
   Alert,
   AlertDescription,
+  RadioGroup,
+  RadioGroupItem,
 } from "@mcp-router/ui";
 import { useWorkspaceStore } from "@/frontend/stores/workspace-store";
 import { AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface WorkspaceDialogProps {
-  workspace?: any;
+  workspace?: {
+    id: string;
+    name: string;
+    type: "local" | "remote";
+    remoteConfig?: {
+      apiUrl?: string;
+      authToken?: string;
+    };
+  };
   onClose: () => void;
 }
 
@@ -29,10 +39,15 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
 
   const [formData, setFormData] = useState({
     name: workspace?.name || "",
+    type: workspace?.type || ("local" as "local" | "remote"),
+    apiUrl: workspace?.remoteConfig?.apiUrl || "",
+    authToken: workspace?.remoteConfig?.authToken || "",
   });
 
   const [validationErrors, setValidationErrors] = useState<{
     name?: string;
+    apiUrl?: string;
+    authToken?: string;
   }>({});
 
   useEffect(() => {
@@ -45,6 +60,18 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
 
     if (!formData.name.trim()) {
       errors.name = "Workspace name is required";
+    }
+
+    if (formData.type === "remote") {
+      if (!formData.apiUrl.trim()) {
+        errors.apiUrl = "API URL is required for remote workspaces";
+      } else if (!formData.apiUrl.match(/^https?:\/\/.+/)) {
+        errors.apiUrl = "Please enter a valid URL";
+      }
+
+      if (!formData.authToken.trim()) {
+        errors.authToken = "Auth token is required for remote workspaces";
+      }
     }
 
     setValidationErrors(errors);
@@ -62,10 +89,24 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
     setError(null);
 
     try {
-      const config = {
+      const config: {
+        name: string;
+        type: "local" | "remote";
+        remoteConfig?: {
+          apiUrl: string;
+          authToken: string;
+        };
+      } = {
         name: formData.name,
-        type: "local" as const,
+        type: formData.type,
       };
+
+      if (formData.type === "remote") {
+        config.remoteConfig = {
+          apiUrl: formData.apiUrl,
+          authToken: formData.authToken,
+        };
+      }
 
       if (workspace) {
         await updateWorkspace(workspace.id, config);
@@ -76,7 +117,7 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
         // Switch to the newly created workspace
         await switchWorkspace(newWorkspace.id);
       }
-    } catch (err) {
+    } catch {
       // エラーは store で設定される
     } finally {
       setIsSubmitting(false);
@@ -92,7 +133,11 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
               ? t("workspace.editWorkspace")
               : t("workspace.createWorkspace")}
           </DialogTitle>
-          <DialogDescription>Configure your local workspace</DialogDescription>
+          <DialogDescription>
+            {workspace
+              ? "Update workspace configuration"
+              : "Create a new workspace for organizing your MCP servers"}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
@@ -114,6 +159,77 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
                 </p>
               )}
             </div>
+
+            {!workspace && (
+              <div className="space-y-2">
+                <Label>Workspace Type</Label>
+                <RadioGroup
+                  value={formData.type}
+                  onValueChange={(value: "local" | "remote") =>
+                    setFormData({ ...formData, type: value })
+                  }
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="local" id="local" />
+                    <Label htmlFor="local" className="font-normal">
+                      Local workspace
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="remote" id="remote" />
+                    <Label htmlFor="remote" className="font-normal">
+                      Remote workspace (Connect to team API)
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+
+            {formData.type === "remote" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="apiUrl">API URL</Label>
+                  <Input
+                    id="apiUrl"
+                    type="url"
+                    value={formData.apiUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, apiUrl: e.target.value })
+                    }
+                    placeholder="https://api.example.com"
+                    className={
+                      validationErrors.apiUrl ? "border-destructive" : ""
+                    }
+                  />
+                  {validationErrors.apiUrl && (
+                    <p className="text-sm text-destructive">
+                      {validationErrors.apiUrl}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="authToken">Auth Token</Label>
+                  <Input
+                    id="authToken"
+                    type="password"
+                    value={formData.authToken}
+                    onChange={(e) =>
+                      setFormData({ ...formData, authToken: e.target.value })
+                    }
+                    placeholder="Your authentication token"
+                    className={
+                      validationErrors.authToken ? "border-destructive" : ""
+                    }
+                  />
+                  {validationErrors.authToken && (
+                    <p className="text-sm text-destructive">
+                      {validationErrors.authToken}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
 
             {error && (
               <Alert variant="destructive">
