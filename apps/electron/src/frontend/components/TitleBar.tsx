@@ -4,17 +4,16 @@ import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { usePlatformAPI } from "@/lib/platform-api";
 
 export function TitleBar() {
-  const { loadCurrentWorkspace, loadWorkspaces } = useWorkspaceStore();
+  const { loadWorkspaces } = useWorkspaceStore();
   const platformAPI = usePlatformAPI();
   const [platform, setPlatform] = useState<"darwin" | "win32" | "linux">(
     "darwin",
   );
 
   useEffect(() => {
-    // 初期データの読み込み
-    loadCurrentWorkspace();
+    // ワークスペース一覧のみ読み込み（現在のワークスペースはApp.tsxで読み込まれる）
     loadWorkspaces();
-  }, [loadCurrentWorkspace, loadWorkspaces]);
+  }, [loadWorkspaces]);
 
   useEffect(() => {
     // プラットフォーム情報の取得
