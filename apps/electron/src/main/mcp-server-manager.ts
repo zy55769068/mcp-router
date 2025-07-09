@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { app } from "electron";
-import { MCPServer, MCPServerConfig, MCPTool } from "@mcp-router/shared";
+import { MCPServer, MCPServerConfig, MCPTool } from "@mcp_router/shared";
 import {
   getServerService,
   ServerService,

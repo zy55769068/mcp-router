@@ -1,6 +1,6 @@
 import { getSqliteManager, SqliteManager } from "./sqlite-manager";
 import { getServerRepository } from "./server-repository";
-import { TokenScope } from "@mcp-router/shared";
+import { TokenScope } from "@mcp_router/shared";
 import { safeStorage } from "electron";
 
 /**

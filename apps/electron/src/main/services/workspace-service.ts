@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs/promises";
 import { v4 as uuidv4 } from "uuid";
 import * as fsSync from "fs";
-import type { Workspace, WorkspaceCreateConfig } from "@mcp-router/shared";
+import type { Workspace, WorkspaceCreateConfig } from "@mcp_router/shared";
 
 export class WorkspaceService
   extends BaseService<Workspace, string>

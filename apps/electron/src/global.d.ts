@@ -2,14 +2,14 @@
  * Augment the global Window interface so TypeScript knows about "window.electronAPI".
  */
 
-import { TokenScope } from "@mcp-router/shared";
-import { AppSettings } from "@mcp-router/shared";
+import { TokenScope } from "@mcp_router/shared";
+import { AppSettings } from "@mcp_router/shared";
 import {
   Agent,
   AgentConfig,
   DeployedAgent,
   MCPServerConfig,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
 import { McpAppsManagerResult, McpApp } from "@/main/services/mcp-apps-service";
 import { ServerPackageUpdates } from "./lib/utils/backend/package-version-resolver";
 

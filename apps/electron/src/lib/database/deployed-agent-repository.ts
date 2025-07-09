@@ -1,4 +1,4 @@
-import { DeployedAgent } from "@mcp-router/shared";
+import { DeployedAgent } from "@mcp_router/shared";
 import { BaseRepository } from "./base-repository";
 import { SqliteManager, getSqliteManager } from "./sqlite-manager";
 import { v4 as uuidv4 } from "uuid";

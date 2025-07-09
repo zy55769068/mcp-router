@@ -1,5 +1,5 @@
 import { SingletonService } from "./singleton-service";
-import { MCPServer, MCPServerConfig } from "@mcp-router/shared";
+import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import { logInfo } from "../../lib/utils/backend/error-handler";
 import { getServerRepository } from "../../lib/database";
 import { getTokenService } from "./token-service";

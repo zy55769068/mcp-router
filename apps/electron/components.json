@@ -12,8 +12,8 @@
   },
   "aliases": {
     "components": "@/components",
-    "utils": "@mcp-router/ui/lib/utils",
-    "ui": "@mcp-router/ui/components",
+    "utils": "@mcp_router/ui/lib/utils",
+    "ui": "@mcp_router/ui/components",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

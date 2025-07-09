@@ -100,17 +100,17 @@ Located in `apps/electron/`:
 
 ### Shared Packages
 
-#### `@mcp-router/shared`
+#### `@mcp_router/shared`
 - Common types and interfaces
 - Internationalization (i18n) resources
 - Shared utilities
 
-#### `@mcp-router/ui`
+#### `@mcp_router/ui`
 - Reusable React components built with Radix UI
 - Tailwind CSS styling
 - Component primitives for consistent UI
 
-#### `@mcp-router/tailwind-config`
+#### `@mcp_router/tailwind-config`
 - Shared Tailwind CSS configuration
 - Common theme and design tokens
 
@@ -204,9 +204,9 @@ When a workspace is configured as remote, server operations are routed through a
 
 2. **State Management**: Use Zustand stores consistently. Avoid direct IPC calls in components - use store actions instead.
 
-3. **UI Components**: Prefer using components from `@mcp-router/ui` package. Create new shared components when needed.
+3. **UI Components**: Prefer using components from `@mcp_router/ui` package. Create new shared components when needed.
 
-4. **Type Safety**: Always use TypeScript types from `@mcp-router/shared`. Never use `any` type.
+4. **Type Safety**: Always use TypeScript types from `@mcp_router/shared`. Never use `any` type.
 
 5. **Error Handling**: Implement proper error boundaries and user-friendly error messages.
 

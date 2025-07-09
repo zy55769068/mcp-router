@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { RequestLogEntry, EMPTY_CURSOR, isEmptyCursor } from "@mcp-router/shared";
+import { RequestLogEntry, EMPTY_CURSOR, isEmptyCursor } from "@mcp_router/shared";
 import { useFilterState } from "./hooks/useFilterState";
 import { useRequestLogs } from "./hooks/useRequestLogs";
 import LogTable from "./components/LogTable";
 import LogDetailModal from "./components/LogDetailModal";
 import ToolCallTimeline from "./components/ToolCallTimeline";
-import { Card } from "@mcp-router/ui";
+import { Card } from "@mcp_router/ui";
 import { useWorkspaceStore } from "../../../stores";
 
 interface LogViewerProps {

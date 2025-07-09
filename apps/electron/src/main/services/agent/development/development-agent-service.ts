@@ -3,7 +3,7 @@ import {
   MCPServerConfig,
   MCPTool,
   MCPAgentToolPermission,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
 import { getAgentRepository } from "../../../../lib/database";
 import { getServerService } from "../../server-service";
 import { DevelopmentAgent } from "./development-agent";

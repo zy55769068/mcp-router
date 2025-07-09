@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 
 const LanguageSelector: React.FC = () => {
   const { i18n, t } = useTranslation();

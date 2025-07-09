@@ -20,11 +20,11 @@ export const mainConfig: Configuration = {
     modules: ["node_modules", path.resolve(__dirname, "../../node_modules")],
     alias: {
       "@": path.resolve(__dirname, "src"),
-      "@mcp-router/shared": path.resolve(
+      "@mcp_router/shared": path.resolve(
         __dirname,
         "../../packages/shared/src",
       ),
-      "@mcp-router/platform-api": path.resolve(
+      "@mcp_router/platform-api": path.resolve(
         __dirname,
         "../../packages/platform-api/src",
       ),

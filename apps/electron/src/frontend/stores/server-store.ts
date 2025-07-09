@@ -1,5 +1,5 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { MCPServer, MCPServerConfig } from "@mcp-router/shared";
+import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import { PlatformAPI } from "@/lib/platform-api";
 
 interface ServerState {

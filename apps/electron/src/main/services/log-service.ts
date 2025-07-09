@@ -7,7 +7,7 @@ import {
   ClientStats,
   ServerStats,
   RequestTypeStats,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
 import { getLogRepository } from "../../lib/database";
 
 /**

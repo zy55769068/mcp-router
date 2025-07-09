@@ -65,16 +65,16 @@ importers:
       '@ai-sdk/react':
         specifier: ^1.2.12
         version: 1.2.12(react@19.1.0)(zod@3.25.67)
-      '@mcp-router/remote-api-types':
+      '@mcp_router/remote-api-types':
         specifier: workspace:*
         version: link:../../packages/remote-api-types
-      '@mcp-router/shared':
+      '@mcp_router/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@mcp-router/tailwind-config':
+      '@mcp_router/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/tailwind-config
-      '@mcp-router/ui':
+      '@mcp_router/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@modelcontextprotocol/sdk':
@@ -343,7 +343,7 @@ importers:
         specifier: ^3.22.4
         version: 3.25.67
     devDependencies:
-      '@mcp-router/shared':
+      '@mcp_router/shared':
         specifier: workspace:*
         version: link:../shared
       '@types/node':
@@ -417,7 +417,7 @@ importers:
 
   packages/ui:
     dependencies:
-      '@mcp-router/shared':
+      '@mcp_router/shared':
         specifier: workspace:*
         version: link:../shared
       '@radix-ui/react-accordion':
@@ -517,7 +517,7 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
     devDependencies:
-      '@mcp-router/tailwind-config':
+      '@mcp_router/tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
       '@types/react':

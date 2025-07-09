@@ -2,7 +2,7 @@ import type { PlatformAPI } from "@/lib/platform-api/types/platform-api";
 import {
   createRemoteAPIClient,
   type RemoteAPIClient,
-} from "@mcp-router/remote-api-types";
+} from "@mcp_router/remote-api-types";
 import type {
   Server,
   ServerStatus,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useChat, Message } from "@ai-sdk/react";
-import { AgentConfig } from "@mcp-router/shared";
+import { AgentConfig } from "@mcp_router/shared";
 import { getServerAgentId } from "@/lib/utils/agent-utils";
 import { usePlatformAPI } from "@/lib/platform-api";
 

@@ -1,6 +1,6 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { AgentConfig, DeployedAgent } from "@mcp-router/shared";
-import { AgentChatMessage } from "@mcp-router/shared";
+import { AgentConfig, DeployedAgent } from "@mcp_router/shared";
+import { AgentChatMessage } from "@mcp_router/shared";
 import { Message } from "@ai-sdk/react";
 import { PlatformAPI } from "@/lib/platform-api";
 

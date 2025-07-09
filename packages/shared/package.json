@@ -1,5 +1,5 @@
 {
-  "name": "@mcp-router/shared",
+  "name": "@mcp_router/shared",
   "version": "0.5.2",
   "private": true,
   "main": "dist/index.js",

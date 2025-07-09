@@ -14,8 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@mcp-router/shared": ["packages/shared/src"],
-      "@mcp-router/shared/*": ["packages/shared/src/*"]
+      "@mcp_router/shared": ["packages/shared/src"],
+      "@mcp_router/shared/*": ["packages/shared/src/*"]
     }
   },
   "references": [

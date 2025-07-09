@@ -7,14 +7,14 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 
 interface CustomPaginationProps {
   currentPage: number;

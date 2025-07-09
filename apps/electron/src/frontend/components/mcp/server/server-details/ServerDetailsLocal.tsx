@@ -10,11 +10,11 @@ import {
   Trash,
   AlertTriangle,
 } from "lucide-react";
-import { Label } from "@mcp-router/ui";
-import { Input } from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
-import { Badge } from "@mcp-router/ui";
-import { ScrollArea } from "@mcp-router/ui";
+import { Label } from "@mcp_router/ui";
+import { Input } from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
+import { Badge } from "@mcp_router/ui";
+import { ScrollArea } from "@mcp_router/ui";
 
 interface ServerDetailsLocalProps {
   server: MCPServer;

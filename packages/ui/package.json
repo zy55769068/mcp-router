@@ -1,5 +1,5 @@
 {
-  "name": "@mcp-router/ui",
+  "name": "@mcp_router/ui",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -18,7 +18,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mcp-router/shared": "workspace:*",
+    "@mcp_router/shared": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -55,7 +55,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@mcp-router/tailwind-config": "workspace:*",
+    "@mcp_router/tailwind-config": "workspace:*",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.3",
     "autoprefixer": "^10.4.20",

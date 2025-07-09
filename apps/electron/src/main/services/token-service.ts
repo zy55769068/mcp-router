@@ -3,7 +3,7 @@ import {
   TokenGenerateOptions,
   TokenValidationResult,
   TokenScope,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
 import { SingletonService } from "./singleton-service";
 import { getTokenRepository } from "../../lib/database";
 import crypto from "crypto";

@@ -1,17 +1,17 @@
 import React from "react";
-import { MCPServerConfig } from "@mcp-router/shared";
+import { MCPServerConfig } from "@mcp_router/shared";
 import {
   extractServerVariables,
   ServerVariable,
 } from "../../../lib/utils/server-variable-utils";
-import { Badge } from "@mcp-router/ui";
+import { Badge } from "@mcp_router/ui";
 import { Database, Server } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import { useTranslation } from "react-i18next";
 
 interface ServerVariableDisplayProps {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { RequestLogEntry, TimeSeriesDataPoint } from "@mcp-router/shared";
+import { RequestLogEntry, TimeSeriesDataPoint } from "@mcp_router/shared";
 import { usePlatformAPI } from "@/lib/platform-api";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";

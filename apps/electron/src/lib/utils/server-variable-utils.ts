@@ -1,4 +1,4 @@
-import { MCPServerConfig } from "@mcp-router/shared";
+import { MCPServerConfig } from "@mcp_router/shared";
 
 export interface ServerVariable {
   name: string;

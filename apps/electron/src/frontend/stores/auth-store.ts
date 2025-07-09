@@ -1,5 +1,5 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { AppSettings } from "@mcp-router/shared";
+import { AppSettings } from "@mcp_router/shared";
 import { PlatformAPI } from "@/lib/platform-api";
 
 interface UserInfo {

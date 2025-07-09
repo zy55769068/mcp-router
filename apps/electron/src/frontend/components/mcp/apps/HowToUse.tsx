@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { TokenScope } from "@mcp-router/shared";
+import { TokenScope } from "@mcp_router/shared";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -7,9 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
-import { ScrollArea } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
+import { ScrollArea } from "@mcp_router/ui";
 
 interface HowToUseProps {
   token?: string;

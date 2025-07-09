@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { RequestLogEntry } from "@mcp-router/shared";
+import { RequestLogEntry } from "@mcp_router/shared";
 import { formatDateI18n } from "@/lib/utils/date-utils";
 import {
   Table,
@@ -9,16 +9,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@mcp-router/ui";
-import { Card } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Card } from "@mcp_router/ui";
 
 interface LogTableProps {
   logs: RequestLogEntry[];

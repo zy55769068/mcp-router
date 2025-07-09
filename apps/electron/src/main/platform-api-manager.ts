@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron";
 import { getWorkspaceService } from "./services/workspace-service";
-import type { Workspace } from "@mcp-router/shared";
+import type { Workspace } from "@mcp_router/shared";
 import {
   SqliteManager,
   setWorkspaceDatabase,
