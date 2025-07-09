@@ -51,23 +51,36 @@ export const useFilterState = (initialFilters?: Partial<FilterState>) => {
 
   // Set request type
   const setRequestType = useCallback((requestType: string) => {
-    setState((prev) => ({ ...prev, requestType, cursor: undefined, currentPage: 1 }));
+    setState((prev) => ({
+      ...prev,
+      requestType,
+      cursor: undefined,
+      currentPage: 1,
+    }));
   }, []);
 
   // Set response status
   const setResponseStatus = useCallback((responseStatus: string) => {
-    setState((prev) => ({ ...prev, responseStatus, cursor: undefined, currentPage: 1 }));
+    setState((prev) => ({
+      ...prev,
+      responseStatus,
+      cursor: undefined,
+      currentPage: 1,
+    }));
   }, []);
 
   // Set pagination
-  const setPagination = useCallback((cursor?: string, limit?: number, page?: number) => {
-    setState((prev) => ({
-      ...prev,
-      cursor,
-      limit: limit !== undefined ? limit : prev.limit,
-      currentPage: page !== undefined ? page : prev.currentPage,
-    }));
-  }, []);
+  const setPagination = useCallback(
+    (cursor?: string, limit?: number, page?: number) => {
+      setState((prev) => ({
+        ...prev,
+        cursor,
+        limit: limit !== undefined ? limit : prev.limit,
+        currentPage: page !== undefined ? page : prev.currentPage,
+      }));
+    },
+    [],
+  );
 
   // Set client selection
   const setSelectedClient = useCallback(

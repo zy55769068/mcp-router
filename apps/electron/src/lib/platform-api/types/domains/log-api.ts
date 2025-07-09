@@ -2,7 +2,10 @@
  * Log management domain API
  */
 
-import { CursorPaginationOptions, CursorPaginationResult } from '@mcp_router/shared';
+import {
+  CursorPaginationOptions,
+  CursorPaginationResult,
+} from "@mcp_router/shared";
 
 /**
  * Platform API用のログフィルター

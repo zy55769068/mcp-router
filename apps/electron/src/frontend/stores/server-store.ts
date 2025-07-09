@@ -47,7 +47,7 @@ interface ServerState {
     config: Partial<MCPServerConfig>,
   ) => Promise<void>;
   deleteServer: (id: string) => Promise<void>;
-  
+
   // Store management
   clearStore: () => void;
 }
@@ -194,7 +194,7 @@ export const createServerStore = (
           config,
         });
         addServer(newServer);
-        
+
         // Refresh the server list to ensure consistency with remote state
         await refreshServers();
       } catch (error) {
@@ -215,7 +215,7 @@ export const createServerStore = (
         const platformAPI = getPlatformAPI();
         const updatedServer = await platformAPI.servers.update(id, config);
         updateServer(id, updatedServer);
-        
+
         // Refresh the server list to ensure consistency with remote state
         await refreshServers();
       } catch (error) {
@@ -238,7 +238,7 @@ export const createServerStore = (
         const platformAPI = getPlatformAPI();
         await platformAPI.servers.delete(id);
         removeServer(id);
-        
+
         // Refresh the server list to ensure consistency with remote state
         await refreshServers();
       } catch (error) {
@@ -250,7 +250,7 @@ export const createServerStore = (
         setUpdating(id, false);
       }
     },
-    
+
     clearStore: () => {
       set({
         servers: [],

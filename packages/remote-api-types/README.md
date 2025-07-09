@@ -199,6 +199,7 @@ export type AppRouter = typeof appRouter;
 - `delete({ id })` - サーバーを削除
 - `start({ id })` - サーバーを起動
 - `stop({ id })` - サーバーを停止
+- `getStatus({ id })` - サーバーのステータスを取得
 
 ### Logs API
 
@@ -206,3 +207,67 @@ export type AppRouter = typeof appRouter;
 - `get({ id })` - 特定のログを取得
 - `delete({ id })` - ログを削除
 - `clear({ serverId? })` - ログをクリア
+
+### Agents API
+
+- `list()` - エージェント一覧を取得
+- `get({ id })` - 特定のエージェントを取得
+- `create(input)` - エージェントを作成
+- `update(input)` - エージェントを更新
+- `delete({ id })` - エージェントを削除
+- `chat(input)` - エージェントとチャット
+- `listMessages({ conversationId })` - チャットメッセージ一覧を取得
+- `use(input)` - エージェントを使用
+- `setup(input)` - エージェントをセットアップ
+- `getDeployedAgents({ agentId })` - デプロイ済みエージェントを取得
+
+### Auth API
+
+- `getCurrentUser()` - 現在のユーザーを取得
+- `getAppState()` - アプリケーションの状態を取得
+- `signIn(input)` - サインイン
+- `signUp(input)` - サインアップ
+- `signOut()` - サインアウト
+- `requestPasswordReset(input)` - パスワードリセットをリクエスト
+- `resetPassword(input)` - パスワードをリセット
+- `refreshToken()` - トークンをリフレッシュ
+
+### Workspaces API
+
+- `list()` - ワークスペース一覧を取得
+- `get({ id })` - 特定のワークスペースを取得
+- `getCurrent()` - 現在のワークスペースを取得
+- `create(input)` - ワークスペースを作成
+- `update(input)` - ワークスペースを更新
+- `delete({ id })` - ワークスペースを削除
+- `setActive({ id })` - アクティブなワークスペースを設定
+- `connectRemote(input)` - リモートワークスペースに接続
+- `disconnect({ id })` - ワークスペースから切断
+- `validateRemoteConnection(input)` - リモート接続を検証
+
+### Apps API
+
+- `list()` - アプリ一覧を取得
+- `get({ id })` - 特定のアプリを取得
+- `create(input)` - アプリを作成
+- `update(input)` - アプリを更新
+- `delete({ id })` - アプリを削除
+- `listTokens({ clientId? })` - トークン一覧を取得
+- `generateToken(input)` - トークンを生成
+- `validateToken(input)` - トークンを検証
+- `revokeToken({ tokenId })` - トークンを無効化
+- `checkUpdates()` - アップデートをチェック
+- `updatePackage(input)` - パッケージを更新
+
+### Settings API
+
+- `get()` - 設定を取得
+- `update(input)` - 設定を更新
+- `reset()` - 設定をリセット
+- `getDisplayRules()` - 表示ルールを取得
+- `createDisplayRule(input)` - 表示ルールを作成
+- `updateDisplayRule(input)` - 表示ルールを更新
+- `deleteDisplayRule({ id })` - 表示ルールを削除
+- `reorderDisplayRules({ ruleIds })` - 表示ルールを並び替え
+- `exportSettings()` - 設定をエクスポート
+- `importSettings(input)` - 設定をインポート

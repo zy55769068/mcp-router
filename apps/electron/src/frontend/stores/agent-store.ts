@@ -122,7 +122,7 @@ interface AgentState {
   sendMessage: (message: string, sessionId?: string) => Promise<void>;
 
   refreshAgents: () => Promise<void>;
-  
+
   // Store management
   clearStore: () => void;
 }
@@ -651,7 +651,7 @@ export const createAgentStore = (
         setLoading(false);
       }
     },
-    
+
     clearStore: () => {
       set({
         developmentAgents: [],

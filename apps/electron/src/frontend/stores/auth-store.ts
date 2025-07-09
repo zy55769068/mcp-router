@@ -49,7 +49,7 @@ interface AuthState {
 
   // Initialize from settings
   initializeFromSettings: (settings: AppSettings) => void;
-  
+
   // Store management
   clearStore: () => void;
 }
@@ -215,7 +215,7 @@ export const createAuthStore = (
         authToken: settings.authToken || null,
       });
     },
-    
+
     clearStore: () => {
       set({
         isAuthenticated: false,

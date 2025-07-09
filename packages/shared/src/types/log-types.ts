@@ -2,7 +2,7 @@
  * リクエストログ関連の型定義
  */
 
-import { CursorPaginationOptions, CursorPaginationResult } from './pagination';
+import { CursorPaginationOptions, CursorPaginationResult } from "./pagination";
 
 /**
  * リクエストログエントリのインターフェース
@@ -56,12 +56,15 @@ export interface RequestLogFilters {
 /**
  * リクエストログクエリのオプション
  */
-export interface RequestLogQueryOptions extends RequestLogFilters, CursorPaginationOptions {}
+export interface RequestLogQueryOptions
+  extends RequestLogFilters,
+    CursorPaginationOptions {}
 
 /**
  * リクエストログクエリの結果
  */
-export interface RequestLogQueryResult extends CursorPaginationResult<RequestLogEntry> {
+export interface RequestLogQueryResult
+  extends CursorPaginationResult<RequestLogEntry> {
   logs: RequestLogEntry[]; // 互換性のため残す
 }
 

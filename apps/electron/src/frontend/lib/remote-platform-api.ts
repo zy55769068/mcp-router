@@ -43,20 +43,20 @@ export class RemotePlatformAPI implements PlatformAPI {
     if (response && (typeof response !== 'object' || Array.isArray(response))) {
       return response as T;
     }
-    
+
     // Check for nested structures
     if (response?.result?.data?.json !== undefined) {
       return response.result.data.json as T;
     }
-    
+
     if (response?.data?.json !== undefined) {
       return response.data.json as T;
     }
-    
+
     if (response?.json !== undefined) {
       return response.json as T;
     }
-    
+
     // If the response has expected properties directly, return it
     // This handles cases where the response is already unwrapped
     return response as T;

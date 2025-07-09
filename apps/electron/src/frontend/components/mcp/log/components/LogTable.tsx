@@ -29,7 +29,7 @@ interface LogTableProps {
   hasPrevious: boolean;
   limit: number;
   onSelectLog: (log: RequestLogEntry) => void;
-  onPageChange: (direction: 'next' | 'previous') => void;
+  onPageChange: (direction: "next" | "previous") => void;
   onLimitChange: (newLimit: number) => void;
 }
 
@@ -159,7 +159,7 @@ const LogTable: React.FC<LogTableProps> = ({
           <div className="mt-4 flex justify-end items-center text-sm">
             <div className="flex gap-2">
               <Button
-                onClick={() => onPageChange('previous')}
+                onClick={() => onPageChange("previous")}
                 disabled={!hasPrevious}
                 variant="outline"
                 size="sm"
@@ -167,7 +167,7 @@ const LogTable: React.FC<LogTableProps> = ({
                 {t("logs.viewer.table.previous")}
               </Button>
               <Button
-                onClick={() => onPageChange('next')}
+                onClick={() => onPageChange("next")}
                 disabled={!hasMore}
                 variant="outline"
                 size="sm"

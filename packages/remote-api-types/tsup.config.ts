@@ -7,14 +7,14 @@ export default defineConfig({
   },
   format: ['cjs', 'esm'],
   dts: {
-    resolve: true,
-    compilerOptions: {
-      composite: false,
-      incremental: false,
-    },
+    resolve: false,
+    entry: {
+      index: 'src/index.ts',
+      'schema/index': 'src/schema/index.ts'
+    }
   },
   splitting: false,
   sourcemap: true,
   clean: true,
-  external: [],
+  external: ['@mcp_router/shared'],
 });

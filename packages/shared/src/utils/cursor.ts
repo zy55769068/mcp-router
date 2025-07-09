@@ -2,14 +2,14 @@
  * カーソルのエンコード・デコードユーティリティ
  */
 
-import { CursorData } from '../types/pagination';
+import { CursorData } from "../types/pagination";
 
 /**
  * カーソルデータをBase64エンコード
  */
 export function encodeCursor(data: CursorData): string {
   const cursorString = `${data.timestamp}:${data.id}`;
-  return Buffer.from(cursorString).toString('base64');
+  return Buffer.from(cursorString).toString("base64");
 }
 
 /**
@@ -17,21 +17,21 @@ export function encodeCursor(data: CursorData): string {
  */
 export function decodeCursor(cursor: string): CursorData | null {
   try {
-    const decoded = Buffer.from(cursor, 'base64').toString('utf-8');
-    const [timestampStr, id] = decoded.split(':');
-    
+    const decoded = Buffer.from(cursor, "base64").toString("utf-8");
+    const [timestampStr, id] = decoded.split(":");
+
     if (!timestampStr || !id) {
       return null;
     }
-    
+
     const timestamp = parseInt(timestampStr, 10);
     if (isNaN(timestamp)) {
       return null;
     }
-    
+
     return { timestamp, id };
   } catch (error) {
-    console.warn('Failed to decode cursor:', cursor, error);
+    console.warn("Failed to decode cursor:", cursor, error);
     return null;
   }
 }
@@ -39,7 +39,7 @@ export function decodeCursor(cursor: string): CursorData | null {
 /**
  * 空のカーソルを表す定数
  */
-export const EMPTY_CURSOR = '';
+export const EMPTY_CURSOR = "";
 
 /**
  * カーソルが空かどうかを判定

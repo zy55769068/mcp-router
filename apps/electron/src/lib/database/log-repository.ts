@@ -276,7 +276,8 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
 
       // カーソル条件を追加
       if (cursorTimestamp && cursorId) {
-        sql += " AND (timestamp < :cursorTimestamp OR (timestamp = :cursorTimestamp AND id < :cursorId))";
+        sql +=
+          " AND (timestamp < :cursorTimestamp OR (timestamp = :cursorTimestamp AND id < :cursorId))";
         params.cursorTimestamp = cursorTimestamp;
         params.cursorId = cursorId;
       }
@@ -324,7 +325,7 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
         // カーソル条件を除外してカウント
         countSql = countSql.replace(
           / AND \(timestamp < :cursorTimestamp OR \(timestamp = :cursorTimestamp AND id < :cursorId\)\)/,
-          ""
+          "",
         );
         delete countParams.cursorTimestamp;
         delete countParams.cursorId;
@@ -354,7 +355,7 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
         const lastLog = logs[logs.length - 1];
         nextCursor = encodeCursor({
           timestamp: lastLog.timestamp,
-          id: lastLog.id
+          id: lastLog.id,
         });
       }
 

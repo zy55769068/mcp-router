@@ -73,7 +73,11 @@ export class LogService extends SingletonService<
     try {
       return await getLogRepository().getRequestLogs(options);
     } catch (error) {
-      return this.handleError("取得", error, { logs: [], total: 0, hasMore: false });
+      return this.handleError("取得", error, {
+        logs: [],
+        total: 0,
+        hasMore: false,
+      });
     }
   }
 
