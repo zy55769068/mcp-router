@@ -108,7 +108,7 @@ const ServerDetails: React.FC<ServerDetailsProps> = ({ server }) => {
         args: server.args,
       };
 
-      await updateServerConfig(server.id, updatedConfig);
+      await updateServerConfig(server.id, { config: updatedConfig });
       setInitialInputParamValues(inputParamValues); // 保存後に初期値を更新
       setIsDirty(false);
       toast.success(t("serverDetails.updateSuccess"));
@@ -145,7 +145,7 @@ const ServerDetails: React.FC<ServerDetailsProps> = ({ server }) => {
         updatedConfig.bearerToken = editedBearerToken;
       }
 
-      await updateServerConfig(server.id, updatedConfig);
+      await updateServerConfig(server.id, { config: updatedConfig });
       setIsAdvancedEditing(false);
       toast.success(t("serverDetails.updateSuccess"));
     } catch (error) {

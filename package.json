@@ -17,6 +17,7 @@
     "dev:electron": "turbo run dev --filter=@mcp_router/shared --filter=@mcp_router/ui --filter=@mcp_router/electron",
     "make": "turbo run make",
     "publish": "turbo run publish",
+    "publish:remote-api": "pnpm --filter @mcp_router/remote-api-types run publish:npm",
     "build": "turbo run build",
     "start": "pnpm --filter @mcp_router/electron run start",
     "lint": "turbo run lint",

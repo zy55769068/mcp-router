@@ -190,7 +190,6 @@ export const createServerStore = (
 
         const platformAPI = getPlatformAPI();
         const newServer = await platformAPI.servers.create({
-          name: config.name || "",
           config,
         });
         addServer(newServer);

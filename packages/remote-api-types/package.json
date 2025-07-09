@@ -1,15 +1,15 @@
 {
   "name": "@mcp_router/remote-api-types",
-  "version": "0.0.1",
+  "version": "0.5.2",
   "description": "tRPC type definitions and schemas for MCP Router remote API",
   "keywords": ["mcp", "mcp-router", "trpc", "types", "schema", "api"],
-  "homepage": "https://github.com/yourusername/mcp-router#readme",
+  "homepage": "https://github.com/mcp-router/mcp-router#readme",
   "bugs": {
-    "url": "https://github.com/yourusername/mcp-router/issues"
+    "url": "https://github.com/mcp-router/mcp-router/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/mcp-router.git",
+    "url": "git+https://github.com/mcp-router/mcp-router.git",
     "directory": "packages/remote-api-types"
   },
   "license": "Apache-2.0",

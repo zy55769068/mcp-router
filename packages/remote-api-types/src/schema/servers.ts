@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MCPServer } from "@mcp_router/shared";
 
 // MCPServerConfig Zodスキーマ
 export const mcpServerConfigSchema = z.object({
@@ -31,15 +32,13 @@ export const mcpServerConfigSchema = z.object({
 
 // CreateServerInput Zodスキーマ
 export const createServerSchema = z.object({
-  name: z.string(),
   config: mcpServerConfigSchema,
 });
 
 // UpdateServerInput Zodスキーマ
 export const updateServerSchema = z.object({
   id: z.string(),
-  name: z.string().optional(),
-  config: mcpServerConfigSchema.partial().optional(),
+  config: mcpServerConfigSchema.partial(),
 });
 
 // 削除用スキーマ
@@ -59,29 +58,23 @@ export interface ServerStatus {
   };
 }
 
-export interface Server {
-  id: string;
-  name: string;
-  config: z.infer<typeof mcpServerConfigSchema>;
-  status?: ServerStatus;
-}
-
+// Serverインターフェースを削除し、MCPServerを直接使用
 export type CreateServerInput = z.infer<typeof createServerSchema>;
 export type UpdateServerInput = z.infer<typeof updateServerSchema>;
 
 // tRPC Router型定義
 export type ServersRouter = {
   list: {
-    query: () => Promise<Server[]>;
+    query: () => Promise<MCPServer[]>;
   };
   get: {
-    query: (input: { id: string }) => Promise<Server | null>;
+    query: (input: { id: string }) => Promise<MCPServer | null>;
   };
   create: {
-    mutate: (input: CreateServerInput) => Promise<Server>;
+    mutate: (input: CreateServerInput) => Promise<MCPServer>;
   };
   update: {
-    mutate: (input: UpdateServerInput & { id: string }) => Promise<Server>;
+    mutate: (input: UpdateServerInput & { id: string }) => Promise<MCPServer>;
   };
   delete: {
     mutate: (input: { id: string }) => Promise<void>;

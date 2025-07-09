@@ -604,23 +604,18 @@ function setupMcpServerHandlers(): void {
       if (serverConfig.serverType !== "local") {
         // Start the server
         const success = await mcpServerManager.startServer(server.id);
-        return {
-          success,
-          server,
-          message: success
-            ? "Remote server connected successfully"
-            : "Failed to connect to remote server",
-        };
+        if (!success) {
+          // If failed to start, remove the server and throw error
+          mcpServerManager.removeServer(server.id);
+          throw new Error("Failed to connect to remote server");
+        }
       }
 
-      // For local servers, just return the added server without starting
+      // Return the server for both local and remote
       return server;
     } catch (error: any) {
       console.error("Error adding server:", error);
-      return {
-        success: false,
-        message: `Error adding server: ${error.message}`,
-      };
+      throw error; // Let the client handle the error
     }
   });
 

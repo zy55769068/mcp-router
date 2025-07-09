@@ -3,8 +3,8 @@ import {
   createRemoteAPIClient,
   type RemoteAPIClient,
 } from "@mcp_router/remote-api-types";
+import { MCPServer } from "@mcp_router/shared";
 import type {
-  Server,
   ServerStatus,
   CreateServerInput,
   UpdateServerInput,
@@ -64,28 +64,28 @@ export class RemotePlatformAPI implements PlatformAPI {
 
   // Server API implementation - All operations remote via tRPC
   readonly servers = {
-    list: async (): Promise<Server[]> => {
+    list: async (): Promise<MCPServer[]> => {
       const response = await this.client.servers.list.query();
-      const servers = this.unwrapResponse<Server[]>(response);
+      const servers = this.unwrapResponse<MCPServer[]>(response);
       return servers;
     },
 
-    get: async (id: string): Promise<Server | null> => {
+    get: async (id: string): Promise<MCPServer | null> => {
       const response = await this.client.servers.get.query({ id });
-      return this.unwrapResponse<Server | null>(response);
+      return this.unwrapResponse<MCPServer | null>(response);
     },
 
-    create: async (input: CreateServerInput): Promise<Server> => {
+    create: async (input: CreateServerInput): Promise<MCPServer> => {
       const response = await this.client.servers.create.mutate(input);
-      return this.unwrapResponse<Server>(response);
+      return this.unwrapResponse<MCPServer>(response);
     },
 
-    update: async (id: string, updates: UpdateServerInput): Promise<Server> => {
+    update: async (id: string, updates: UpdateServerInput): Promise<MCPServer> => {
       const response = await this.client.servers.update.mutate({
         id,
         ...updates,
       });
-      return this.unwrapResponse<Server>(response);
+      return this.unwrapResponse<MCPServer>(response);
     },
 
     delete: async (id: string): Promise<void> => {

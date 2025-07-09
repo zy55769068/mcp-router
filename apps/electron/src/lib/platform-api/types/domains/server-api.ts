@@ -2,14 +2,7 @@
  * Server management domain API
  */
 
-import { MCPServerConfig } from "@mcp_router/shared";
-
-export interface Server {
-  id: string;
-  name: string;
-  config: MCPServerConfig;
-  status?: ServerStatus;
-}
+import { MCPServerConfig, MCPServer } from "@mcp_router/shared";
 
 export interface ServerStatus {
   type: "stopped" | "starting" | "running" | "stopping" | "error";
@@ -25,20 +18,18 @@ export interface ServerStats {
 }
 
 export interface CreateServerInput {
-  name: string;
   config: MCPServerConfig;
 }
 
 export interface UpdateServerInput {
-  name?: string;
-  config?: Partial<MCPServerConfig>;
+  config: Partial<MCPServerConfig>;
 }
 
 export interface ServerAPI {
-  list(): Promise<Server[]>;
-  get(id: string): Promise<Server | null>;
-  create(input: CreateServerInput): Promise<Server>;
-  update(id: string, updates: UpdateServerInput): Promise<Server>;
+  list(): Promise<MCPServer[]>;
+  get(id: string): Promise<MCPServer | null>;
+  create(input: CreateServerInput): Promise<MCPServer>;
+  update(id: string, updates: UpdateServerInput): Promise<MCPServer>;
   delete(id: string): Promise<void>;
   start(id: string): Promise<boolean>;
   stop(id: string): Promise<boolean>;

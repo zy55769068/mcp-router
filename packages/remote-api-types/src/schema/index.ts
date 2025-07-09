@@ -23,7 +23,6 @@ export { logQueryOptionsSchema } from "./logs";
 
 // 型のエクスポート
 export type {
-  Server,
   ServerStatus,
   CreateServerInput,
   UpdateServerInput,

@@ -3,8 +3,8 @@ import {
   httpBatchLink,
   TRPCClientError,
 } from "@trpc/client";
+import { MCPServer } from "@mcp_router/shared";
 import type {
-  Server,
   ServerStatus,
   CreateServerInput,
   UpdateServerInput,
@@ -55,16 +55,16 @@ export function createRemoteAPIClient(
 export interface RemoteAPIClient {
   servers: {
     list: {
-      query: () => Promise<Server[]>;
+      query: () => Promise<MCPServer[]>;
     };
     get: {
-      query: (input: { id: string }) => Promise<Server | null>;
+      query: (input: { id: string }) => Promise<MCPServer | null>;
     };
     create: {
-      mutate: (input: CreateServerInput) => Promise<Server>;
+      mutate: (input: CreateServerInput) => Promise<MCPServer>;
     };
     update: {
-      mutate: (input: UpdateServerInput & { id: string }) => Promise<Server>;
+      mutate: (input: UpdateServerInput & { id: string }) => Promise<MCPServer>;
     };
     delete: {
       mutate: (input: { id: string }) => Promise<void>;
