@@ -2,7 +2,7 @@ import type { PlatformAPI } from "@/lib/platform-api/types/platform-api";
 import {
   createRemoteAPIClient,
   type RemoteAPIClient,
-} from "@mcp-router/remote-api-client";
+} from "@mcp-router/remote-api-types";
 import type {
   Server,
   ServerStatus,
@@ -107,7 +107,7 @@ export class RemotePlatformAPI implements PlatformAPI {
         requestType: options?.requestType,
         responseStatus: options?.responseStatus,
         limit: options?.limit,
-        offset: options?.offset,
+        cursor: options?.cursor,
         startDate: options?.startDate?.toISOString(),
         endDate: options?.endDate?.toISOString(),
       });
@@ -133,6 +133,8 @@ export class RemotePlatformAPI implements PlatformAPI {
       return {
         logs,
         total: result.total,
+        nextCursor: result.nextCursor,
+        hasMore: result.hasMore,
       };
     },
   };

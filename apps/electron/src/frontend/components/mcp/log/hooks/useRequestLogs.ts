@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { RequestLogEntry } from "@mcp-router/shared";
+import { RequestLogEntry, normalizeToRequestLogEntry } from "@mcp-router/shared";
 import { usePlatformAPI } from "@/lib/platform-api";
 
 interface RequestLogsParams {
@@ -9,7 +9,7 @@ interface RequestLogsParams {
   endDate?: Date;
   requestType?: string;
   responseStatus?: string;
-  offset?: number;
+  cursor?: string;
   limit?: number;
   refreshTrigger?: number;
 }
@@ -17,6 +17,8 @@ interface RequestLogsParams {
 interface RequestLogsResult {
   logs: RequestLogEntry[];
   total: number;
+  nextCursor?: string;
+  hasMore: boolean;
   loading: boolean;
   error: string | null;
   fetchLogs: () => Promise<void>;
@@ -31,6 +33,8 @@ export const useRequestLogs = (
   const platformAPI = usePlatformAPI();
   const [logs, setLogs] = useState<RequestLogEntry[]>([]);
   const [total, setTotal] = useState<number>(0);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [hasMore, setHasMore] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,17 +58,24 @@ export const useRequestLogs = (
             : params.responseStatus === "error"
               ? "error"
               : undefined,
-        offset: params.offset || 0,
+        cursor: params.cursor,
         limit: params.limit || 50,
       });
 
       if (Array.isArray(result.logs)) {
-        setLogs(result.logs);
+        // 型変換ユーティリティを使用して正規化
+        const requestLogs: RequestLogEntry[] = result.logs.map(normalizeToRequestLogEntry);
+        
+        setLogs(requestLogs);
         setTotal(result.total);
+        setNextCursor(result.nextCursor);
+        setHasMore(result.hasMore);
       } else {
         console.error("Expected log to be an array but got:", result.logs);
         setLogs([]);
         setTotal(0);
+        setNextCursor(undefined);
+        setHasMore(false);
         setError("Invalid response format");
       }
     } catch (error) {
@@ -72,6 +83,8 @@ export const useRequestLogs = (
       setError("Failed to fetch request log");
       setLogs([]);
       setTotal(0);
+      setNextCursor(undefined);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -82,7 +95,7 @@ export const useRequestLogs = (
     params.endDate,
     params.requestType,
     params.responseStatus,
-    params.offset,
+    params.cursor,
     params.limit,
     params.refreshTrigger,
   ]);
@@ -95,6 +108,8 @@ export const useRequestLogs = (
   return {
     logs,
     total,
+    nextCursor,
+    hasMore,
     loading,
     error,
     fetchLogs,

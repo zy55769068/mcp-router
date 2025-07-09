@@ -24,10 +24,12 @@ interface LogTableProps {
   logs: RequestLogEntry[];
   total: number;
   loading: boolean;
-  offset: number;
+  currentPage: number;
+  hasMore: boolean;
+  hasPrevious: boolean;
   limit: number;
   onSelectLog: (log: RequestLogEntry) => void;
-  onPageChange: (newOffset: number) => void;
+  onPageChange: (direction: 'next' | 'previous') => void;
   onLimitChange: (newLimit: number) => void;
 }
 
@@ -35,7 +37,9 @@ const LogTable: React.FC<LogTableProps> = ({
   logs,
   total,
   loading,
-  offset,
+  currentPage,
+  hasMore,
+  hasPrevious,
   limit,
   onSelectLog,
   onPageChange,
@@ -69,8 +73,8 @@ const LogTable: React.FC<LogTableProps> = ({
         <div className="text-sm text-muted-foreground">
           {t("logs.viewer.table.showing", {
             total: total,
-            start: total > 0 ? offset + 1 : 0,
-            end: Math.min(offset + logs.length, total),
+            start: total > 0 ? (currentPage - 1) * limit + 1 : 0,
+            end: Math.min((currentPage - 1) * limit + logs.length, total),
           })}
         </div>
       </div>
@@ -155,16 +159,16 @@ const LogTable: React.FC<LogTableProps> = ({
           <div className="mt-4 flex justify-end items-center text-sm">
             <div className="flex gap-2">
               <Button
-                onClick={() => onPageChange(Math.max(0, offset - limit))}
-                disabled={offset === 0}
+                onClick={() => onPageChange('previous')}
+                disabled={!hasPrevious}
                 variant="outline"
                 size="sm"
               >
                 {t("logs.viewer.table.previous")}
               </Button>
               <Button
-                onClick={() => onPageChange(offset + limit)}
-                disabled={offset + logs.length >= total}
+                onClick={() => onPageChange('next')}
+                disabled={!hasMore}
                 variant="outline"
                 size="sm"
               >

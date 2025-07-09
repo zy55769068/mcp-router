@@ -673,7 +673,7 @@ function setupLogHandlers(): void {
         startDate?: Date;
         endDate?: Date;
         responseStatus?: "success" | "error";
-        offset?: number;
+        cursor?: string;
         limit?: number;
       },
     ) => {

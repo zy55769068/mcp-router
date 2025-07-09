@@ -346,7 +346,7 @@ export class MCPHttpServer {
             responseStatus?: "success" | "error";
             startDate?: Date;
             endDate?: Date;
-            offset?: number;
+            cursor?: string;
             limit?: number;
           } = {
             clientId: req.query.clientId as string | undefined,
@@ -356,9 +356,7 @@ export class MCPHttpServer {
               | "success"
               | "error"
               | undefined,
-            offset: req.query.offset
-              ? parseInt(req.query.offset as string)
-              : undefined,
+            cursor: req.query.cursor as string | undefined,
             limit: req.query.limit
               ? parseInt(req.query.limit as string)
               : undefined,
@@ -377,7 +375,8 @@ export class MCPHttpServer {
           res.json({
             logs: result.logs,
             total: result.total,
-            offset: options.offset || 0,
+            nextCursor: result.nextCursor,
+            hasMore: result.hasMore,
             limit: options.limit || 50,
           });
         } catch (error: any) {

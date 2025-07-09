@@ -8,7 +8,7 @@ export const logQueryOptionsSchema = z.object({
   startDate: z.string().optional(), // ISO string
   endDate: z.string().optional(), // ISO string
   responseStatus: z.enum(["success", "error"]).optional(),
-  offset: z.number().optional(),
+  cursor: z.string().optional(),
   limit: z.number().optional(),
 });
 
@@ -36,6 +36,8 @@ export type LogsRouter = {
     query: (input?: LogQueryOptions) => Promise<{
       logs: RequestLogEntry[];
       total: number;
+      nextCursor?: string;
+      hasMore: boolean;
     }>;
   };
   get: {

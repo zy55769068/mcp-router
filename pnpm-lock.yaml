@@ -65,9 +65,9 @@ importers:
       '@ai-sdk/react':
         specifier: ^1.2.12
         version: 1.2.12(react@19.1.0)(zod@3.25.67)
-      '@mcp-router/remote-api-client':
+      '@mcp-router/remote-api-types':
         specifier: workspace:*
-        version: link:../../packages/remote-api-client
+        version: link:../../packages/remote-api-types
       '@mcp-router/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -334,7 +334,7 @@ importers:
         specifier: ^5.99.9
         version: 5.99.9
 
-  packages/remote-api-client:
+  packages/remote-api-types:
     dependencies:
       '@trpc/client':
         specifier: ^10.45.0

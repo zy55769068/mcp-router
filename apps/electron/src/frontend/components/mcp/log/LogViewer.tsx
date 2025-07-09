@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { RequestLogEntry } from "@mcp-router/shared";
+import { RequestLogEntry, EMPTY_CURSOR, isEmptyCursor } from "@mcp-router/shared";
 import { useFilterState } from "./hooks/useFilterState";
 import { useRequestLogs } from "./hooks/useRequestLogs";
 import LogTable from "./components/LogTable";
@@ -37,14 +37,14 @@ const LogViewer: React.FC<LogViewerProps> = ({
   });
 
   // Request log data
-  const { logs, total, loading, fetchLogs } = useRequestLogs({
+  const { logs, total, nextCursor, hasMore, loading, fetchLogs } = useRequestLogs({
     serverId: serverId,
     clientId: filters.selectedClientId,
     startDate: filters.startDate,
     endDate: filters.endDate,
     requestType: filters.requestType,
     responseStatus: filters.responseStatus,
-    offset: filters.offset,
+    cursor: filters.cursor,
     limit: filters.limit,
     refreshTrigger: filters.refreshTrigger, // Add refreshTrigger to dependencies
   });
@@ -52,14 +52,37 @@ const LogViewer: React.FC<LogViewerProps> = ({
   // State for selected log, available request types, background refresh, and data tracking
   const [selectedLog, setSelectedLog] = useState<RequestLogEntry | null>(null);
   const [lastDataUpdate, setLastDataUpdate] = useState<Date>(new Date());
+  
+  // State for cursor history to enable previous/next navigation
+  const [cursorHistory, setCursorHistory] = useState<string[]>([]);
 
   // Button to manually refresh data
   const handleManualRefresh = useCallback(() => {
     // Update the last refresh time indicator
     setLastDataUpdate(new Date());
+    // Reset cursor and history when manually refreshing
+    setPagination(undefined, filters.limit, 1);
+    setCursorHistory([]);
     // Trigger data refresh by incrementing the refreshTrigger counter
     refresh();
-  }, [refresh]);
+  }, [refresh, setPagination, filters.limit]);
+  
+  // Handle page navigation
+  const handlePageChange = useCallback((direction: 'next' | 'previous') => {
+    if (direction === 'next' && nextCursor) {
+      // Save current cursor to history before moving forward
+      // For the first page, cursor is undefined, but we still need to save it
+      setCursorHistory(prev => [...prev, filters.cursor || EMPTY_CURSOR]);
+      setPagination(nextCursor, filters.limit, filters.currentPage + 1);
+    } else if (direction === 'previous' && cursorHistory.length > 0) {
+      // Pop the last cursor from history
+      const newHistory = [...cursorHistory];
+      const previousCursor = newHistory.pop();
+      setCursorHistory(newHistory);
+      // If previousCursor is empty, it means go back to first page (no cursor)
+      setPagination(isEmptyCursor(previousCursor) ? undefined : previousCursor, filters.limit, filters.currentPage - 1);
+    }
+  }, [nextCursor, filters.cursor, filters.limit, filters.currentPage, setPagination, cursorHistory]);
 
   // Update last refresh time whenever logs change
   useEffect(() => {
@@ -119,13 +142,16 @@ const LogViewer: React.FC<LogViewerProps> = ({
             logs={logs}
             total={total}
             loading={loading}
-            offset={filters.offset}
+            currentPage={filters.currentPage}
+            hasMore={hasMore}
+            hasPrevious={cursorHistory.length > 0}
             limit={filters.limit}
             onSelectLog={setSelectedLog}
-            onPageChange={(newOffset) => setPagination(newOffset)}
-            onLimitChange={(newLimit) =>
-              setPagination(filters.offset, newLimit)
-            }
+            onPageChange={handlePageChange}
+            onLimitChange={(newLimit) => {
+              setPagination(undefined, newLimit, 1);
+              setCursorHistory([]);
+            }}
           />
         </div>
       )}

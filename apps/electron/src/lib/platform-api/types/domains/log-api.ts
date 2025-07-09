@@ -2,16 +2,24 @@
  * Log management domain API
  */
 
-export interface LogQueryOptions {
+import { CursorPaginationOptions, CursorPaginationResult } from '@mcp-router/shared';
+
+/**
+ * Platform API用のログフィルター
+ */
+export interface LogFilters {
   clientId?: string;
   serverId?: string;
   requestType?: string;
   startDate?: Date;
   endDate?: Date;
   responseStatus?: "success" | "error";
-  offset?: number;
-  limit?: number;
 }
+
+/**
+ * Platform API用のログクエリオプション
+ */
+export interface LogQueryOptions extends LogFilters, CursorPaginationOptions {}
 
 export interface LogEntry {
   id: string;
@@ -25,9 +33,11 @@ export interface LogEntry {
   details?: any;
 }
 
-export interface LogQueryResult {
-  logs: LogEntry[];
-  total: number;
+/**
+ * Platform API用のログクエリ結果
+ */
+export interface LogQueryResult extends CursorPaginationResult<LogEntry> {
+  logs: LogEntry[]; // 互換性のため残す
 }
 
 export interface LogAPI {

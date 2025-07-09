@@ -58,11 +58,13 @@ declare global {
         startDate?: Date;
         endDate?: Date;
         responseStatus?: "success" | "error";
-        offset?: number;
+        cursor?: string;
         limit?: number;
       }) => Promise<{
         logs: any[];
         total: number;
+        nextCursor?: string;
+        hasMore: boolean;
       }>;
 
       // Settings Management

@@ -7,11 +7,12 @@ export interface FilterState {
   endDate?: Date;
   requestType: string;
   responseStatus: string;
-  offset: number;
+  cursor?: string;
   limit: number;
   selectedClientId?: string;
   selectedClientName?: string;
   refreshTrigger: number;
+  currentPage: number; // Track current page for UI
 }
 
 // Default filter values
@@ -21,11 +22,12 @@ const defaultFilters: FilterState = {
   endDate: new Date(),
   requestType: "",
   responseStatus: "",
-  offset: 0,
+  cursor: undefined,
   limit: 50,
   selectedClientId: undefined,
   selectedClientName: undefined,
   refreshTrigger: 0,
+  currentPage: 1,
 };
 
 /**
@@ -49,20 +51,21 @@ export const useFilterState = (initialFilters?: Partial<FilterState>) => {
 
   // Set request type
   const setRequestType = useCallback((requestType: string) => {
-    setState((prev) => ({ ...prev, requestType, offset: 0 }));
+    setState((prev) => ({ ...prev, requestType, cursor: undefined, currentPage: 1 }));
   }, []);
 
   // Set response status
   const setResponseStatus = useCallback((responseStatus: string) => {
-    setState((prev) => ({ ...prev, responseStatus, offset: 0 }));
+    setState((prev) => ({ ...prev, responseStatus, cursor: undefined, currentPage: 1 }));
   }, []);
 
   // Set pagination
-  const setPagination = useCallback((offset: number, limit?: number) => {
+  const setPagination = useCallback((cursor?: string, limit?: number, page?: number) => {
     setState((prev) => ({
       ...prev,
-      offset,
+      cursor,
       limit: limit !== undefined ? limit : prev.limit,
+      currentPage: page !== undefined ? page : prev.currentPage,
     }));
   }, []);
 
@@ -73,7 +76,8 @@ export const useFilterState = (initialFilters?: Partial<FilterState>) => {
         ...prev,
         selectedClientId: clientId,
         selectedClientName: clientName,
-        offset: 0,
+        cursor: undefined,
+        currentPage: 1,
       }));
     },
     [],
@@ -87,7 +91,8 @@ export const useFilterState = (initialFilters?: Partial<FilterState>) => {
       responseStatus: "",
       startDate: new Date(Date.now() - 24 * 60 * 60 * 1000),
       endDate: new Date(),
-      offset: 0,
+      cursor: undefined,
+      currentPage: 1,
     }));
   }, []);
 

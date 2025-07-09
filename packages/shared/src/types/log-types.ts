@@ -2,6 +2,8 @@
  * リクエストログ関連の型定義
  */
 
+import { CursorPaginationOptions, CursorPaginationResult } from './pagination';
+
 /**
  * リクエストログエントリのインターフェース
  */
@@ -40,17 +42,27 @@ export interface TimeSeriesDataPoint {
 }
 
 /**
- * リクエストログクエリのオプション
+ * リクエストログクエリのフィルターオプション
  */
-export interface RequestLogQueryOptions {
+export interface RequestLogFilters {
   clientId?: string;
   serverId?: string;
   requestType?: string;
   startDate?: Date;
   endDate?: Date;
   responseStatus?: "success" | "error";
-  offset?: number;
-  limit?: number;
+}
+
+/**
+ * リクエストログクエリのオプション
+ */
+export interface RequestLogQueryOptions extends RequestLogFilters, CursorPaginationOptions {}
+
+/**
+ * リクエストログクエリの結果
+ */
+export interface RequestLogQueryResult extends CursorPaginationResult<RequestLogEntry> {
+  logs: RequestLogEntry[]; // 互換性のため残す
 }
 
 /**

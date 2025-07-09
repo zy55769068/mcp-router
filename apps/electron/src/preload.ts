@@ -61,7 +61,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     startDate?: Date;
     endDate?: Date;
     responseStatus?: "success" | "error";
-    offset?: number;
+    cursor?: string;
     limit?: number;
   }) => ipcRenderer.invoke("requestLogs:get", options),
 

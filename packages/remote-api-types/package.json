@@ -1,10 +1,28 @@
 {
-  "name": "@mcp-router/remote-api-client",
+  "name": "@mcp-router/remote-api-types",
   "version": "0.0.1",
-  "private": true,
+  "description": "tRPC type definitions and schemas for MCP Router remote API",
+  "keywords": ["mcp", "mcp-router", "trpc", "types", "schema", "api"],
+  "homepage": "https://github.com/yourusername/mcp-router#readme",
+  "bugs": {
+    "url": "https://github.com/yourusername/mcp-router/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/mcp-router.git",
+    "directory": "packages/remote-api-types"
+  },
+  "license": "Apache-2.0",
+  "author": "fjm2u",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -23,7 +41,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "prepublishOnly": "pnpm run build",
+    "publish:npm": "pnpm publish --access public"
   },
   "dependencies": {
     "@trpc/client": "^10.45.0",

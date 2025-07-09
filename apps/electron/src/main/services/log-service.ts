@@ -3,6 +3,7 @@ import {
   RequestLogEntry,
   RequestLogEntryInput,
   RequestLogQueryOptions,
+  RequestLogQueryResult,
   ClientStats,
   ServerStats,
   RequestTypeStats,
@@ -64,15 +65,15 @@ export class LogService extends SingletonService<
   }
 
   /**
-   * リクエストログを取得（ページネーション、フィルタリング対応）
+   * リクエストログを取得（カーソルベースページネーション、フィルタリング対応）
    */
   public async getRequestLogs(
     options: RequestLogQueryOptions = {},
-  ): Promise<{ logs: RequestLogEntry[]; total: number }> {
+  ): Promise<RequestLogQueryResult> {
     try {
       return await getLogRepository().getRequestLogs(options);
     } catch (error) {
-      return this.handleError("取得", error, { logs: [], total: 0 });
+      return this.handleError("取得", error, { logs: [], total: 0, hasMore: false });
     }
   }
 
