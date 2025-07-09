@@ -850,16 +850,16 @@ export class MCPServerManager {
     this.addAgentsAsTools(allTools);
 
     // Collect all tools without duplicate detection
-    for (const [serverName, client] of this.clients.entries()) {
+    for (const [serverId, client] of this.clients.entries()) {
       try {
-        const server = this.servers.get(serverName);
+        const server = this.servers.get(serverId);
         if (!server || !this.serverStatusMap.get(server.name)) {
           continue;
         }
 
         if (token) {
           // Check token access using server's ID
-          if (!this.tokenService.hasServerAccess(token, serverName)) {
+          if (!this.tokenService.hasServerAccess(token, serverId)) {
             continue;
           }
         }
@@ -936,16 +936,16 @@ export class MCPServerManager {
   private async getAllResourcesInternal(token?: string): Promise<any[]> {
     const allResources: any[] = [];
 
-    for (const [serverName, client] of this.clients.entries()) {
+    for (const [serverId, client] of this.clients.entries()) {
       try {
-        const server = this.servers.get(serverName);
+        const server = this.servers.get(serverId);
         if (!server || !this.serverStatusMap.get(server.name)) {
           continue; // Skip servers that are not connected
         }
 
         // Skip servers the token doesn't have access to
         if (token) {
-          if (!this.tokenService.hasServerAccess(token, serverName)) {
+          if (!this.tokenService.hasServerAccess(token, serverId)) {
             continue;
           }
         }
