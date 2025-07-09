@@ -133,9 +133,14 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         set({ currentWorkspace: workspace, isLoading: false });
 
         // ストアの再作成をトリガー（新しいPlatform APIを使用）
-        const { useServerStore, useAgentStore } = await import("../stores");
+        const { useServerStore, useAgentStore, useAuthStore } = await import("../stores");
 
-        // Only refresh data, don't reload workspace
+        // Clear all stores before switching
+        useServerStore.getState().clearStore();
+        useAgentStore.getState().clearStore();
+        useAuthStore.getState().clearStore();
+
+        // Refresh data with new workspace
         try {
           await useServerStore.getState().refreshServers();
         } catch (error) {
@@ -146,6 +151,16 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
           await useAgentStore.getState().refreshAgents();
         } catch (error) {
           console.error("Failed to refresh agents:", error);
+        }
+        
+        // Re-initialize auth from settings
+        try {
+          const platformAPI = get().getPlatformAPI();
+          const settings = await platformAPI.settings.get();
+          await useAuthStore.getState().initializeFromSettings(settings);
+          await useAuthStore.getState().checkAuthStatus();
+        } catch (error) {
+          console.error("Failed to initialize auth:", error);
         }
       }
     } catch (error) {

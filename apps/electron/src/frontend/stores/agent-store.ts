@@ -122,6 +122,9 @@ interface AgentState {
   sendMessage: (message: string, sessionId?: string) => Promise<void>;
 
   refreshAgents: () => Promise<void>;
+  
+  // Store management
+  clearStore: () => void;
 }
 
 export const createAgentStore = (
@@ -647,6 +650,31 @@ export const createAgentStore = (
       } finally {
         setLoading(false);
       }
+    },
+    
+    clearStore: () => {
+      set({
+        developmentAgents: [],
+        currentDevelopmentAgent: null,
+        deployedAgents: [],
+        currentDeployedAgent: null,
+        chatSessions: [],
+        currentSessionId: null,
+        hasMoreSessions: true,
+        nextCursor: undefined,
+        messages: [],
+        currentStreamMessage: null,
+        isStreaming: false,
+        isLoading: false,
+        isLoadingSessions: false,
+        isLoadingMoreSessions: false,
+        isProcessingMessage: false,
+        deletingSessions: new Set<string>(),
+        error: null,
+        chatError: null,
+        sessionsError: null,
+        authToken: null,
+      });
     },
   }));
 

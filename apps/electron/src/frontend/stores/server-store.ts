@@ -47,6 +47,9 @@ interface ServerState {
     config: Partial<MCPServerConfig>,
   ) => Promise<void>;
   deleteServer: (id: string) => Promise<void>;
+  
+  // Store management
+  clearStore: () => void;
 }
 
 export const createServerStore = (
@@ -236,6 +239,18 @@ export const createServerStore = (
       } finally {
         setUpdating(id, false);
       }
+    },
+    
+    clearStore: () => {
+      set({
+        servers: [],
+        isLoading: false,
+        isUpdating: [],
+        error: null,
+        searchQuery: "",
+        expandedServerId: null,
+        selectedServerId: null,
+      });
     },
   }));
 

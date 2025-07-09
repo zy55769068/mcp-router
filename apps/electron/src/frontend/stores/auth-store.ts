@@ -49,6 +49,9 @@ interface AuthState {
 
   // Initialize from settings
   initializeFromSettings: (settings: AppSettings) => void;
+  
+  // Store management
+  clearStore: () => void;
 }
 
 export const createAuthStore = (
@@ -210,6 +213,18 @@ export const createAuthStore = (
       setUserData({
         userId: settings.userId || null,
         authToken: settings.authToken || null,
+      });
+    },
+    
+    clearStore: () => {
+      set({
+        isAuthenticated: false,
+        userId: null,
+        authToken: null,
+        userInfo: null,
+        isLoggingIn: false,
+        loginError: null,
+        credits: null,
       });
     },
   }));
