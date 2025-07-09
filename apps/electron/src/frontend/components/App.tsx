@@ -171,14 +171,9 @@ const App: React.FC = () => {
     [navigate, t],
   );
 
-  // Set up a timer to refresh the server list every 2 seconds
+  // Refresh servers on initial load only
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      refreshServers();
-    }, 2000);
-
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    refreshServers();
   }, [refreshServers]);
 
   // Loading indicator component to reuse

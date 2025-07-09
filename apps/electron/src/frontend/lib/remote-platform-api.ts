@@ -34,30 +34,58 @@ export class RemotePlatformAPI implements PlatformAPI {
     });
   }
 
+  /**
+   * Unwrap nested response structure from tRPC
+   * The response might be wrapped in { result: { data: { json: ... } } }
+   */
+  private unwrapResponse<T>(response: any): T {
+    // Direct response
+    if (response && (typeof response !== 'object' || Array.isArray(response))) {
+      return response as T;
+    }
+    
+    // Check for nested structures
+    if (response?.result?.data?.json !== undefined) {
+      return response.result.data.json as T;
+    }
+    
+    if (response?.data?.json !== undefined) {
+      return response.data.json as T;
+    }
+    
+    if (response?.json !== undefined) {
+      return response.json as T;
+    }
+    
+    // If the response has expected properties directly, return it
+    // This handles cases where the response is already unwrapped
+    return response as T;
+  }
+
   // Server API implementation - All operations remote via tRPC
   readonly servers = {
     list: async (): Promise<Server[]> => {
-      const servers = await this.client.servers.list.query();
-      // Type conversion to ensure compatibility
-      return servers as unknown as Server[];
+      const response = await this.client.servers.list.query();
+      const servers = this.unwrapResponse<Server[]>(response);
+      return servers;
     },
 
     get: async (id: string): Promise<Server | null> => {
-      const server = await this.client.servers.get.query({ id });
-      return server as unknown as Server | null;
+      const response = await this.client.servers.get.query({ id });
+      return this.unwrapResponse<Server | null>(response);
     },
 
     create: async (input: CreateServerInput): Promise<Server> => {
-      const server = await this.client.servers.create.mutate(input);
-      return server as unknown as Server;
+      const response = await this.client.servers.create.mutate(input);
+      return this.unwrapResponse<Server>(response);
     },
 
     update: async (id: string, updates: UpdateServerInput): Promise<Server> => {
-      const server = await this.client.servers.update.mutate({
+      const response = await this.client.servers.update.mutate({
         id,
         ...updates,
       });
-      return server as unknown as Server;
+      return this.unwrapResponse<Server>(response);
     },
 
     delete: async (id: string): Promise<void> => {
@@ -76,8 +104,8 @@ export class RemotePlatformAPI implements PlatformAPI {
     },
 
     getStatus: async (id: string): Promise<ServerStatus> => {
-      const status = await this.client.servers.getStatus.query({ id });
-      return status as unknown as ServerStatus;
+      const response = await this.client.servers.getStatus.query({ id });
+      return this.unwrapResponse<ServerStatus>(response);
     },
 
     fetchFromIndex: async (
@@ -101,7 +129,7 @@ export class RemotePlatformAPI implements PlatformAPI {
   // Log API implementation via tRPC
   logs = {
     query: async (options?: LogQueryOptions): Promise<LogQueryResult> => {
-      const result = await this.client.logs.list.query({
+      const response = await this.client.logs.list.query({
         clientId: options?.clientId,
         serverId: options?.serverId,
         requestType: options?.requestType,
@@ -111,6 +139,13 @@ export class RemotePlatformAPI implements PlatformAPI {
         startDate: options?.startDate?.toISOString(),
         endDate: options?.endDate?.toISOString(),
       });
+
+      const result = this.unwrapResponse<{
+        logs: any[];
+        total: number;
+        nextCursor?: string;
+        hasMore?: boolean;
+      }>(response);
 
       // Convert RequestLogEntry to LogEntry format
       const logs: LogEntry[] = result.logs.map((log) => ({
