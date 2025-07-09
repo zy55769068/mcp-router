@@ -1,12 +1,16 @@
-import { createTRPCProxyClient, httpBatchLink, TRPCClientError } from '@trpc/client';
-import type { 
-  Server, 
+import {
+  createTRPCProxyClient,
+  httpBatchLink,
+  TRPCClientError,
+} from "@trpc/client";
+import type {
+  Server,
   ServerStatus,
-  CreateServerInput, 
+  CreateServerInput,
   UpdateServerInput,
   RequestLogEntry,
-  LogQueryOptions 
-} from './schema';
+  LogQueryOptions,
+} from "./schema";
 
 export interface RemoteAPIClientConfig {
   url: string;
@@ -16,10 +20,12 @@ export interface RemoteAPIClientConfig {
 
 /**
  * tRPCクライアントを作成
- * 
+ *
  * 注意: サーバー側でRemoteAPIRouterインターフェースに準拠したtRPCルーターを実装してください。
  */
-export function createRemoteAPIClient(config: RemoteAPIClientConfig): RemoteAPIClient {
+export function createRemoteAPIClient(
+  config: RemoteAPIClientConfig,
+): RemoteAPIClient {
   const client = createTRPCProxyClient<any>({
     links: [
       httpBatchLink({
@@ -32,7 +38,7 @@ export function createRemoteAPIClient(config: RemoteAPIClientConfig): RemoteAPIC
         fetch: (url, options) => {
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 30000);
-          
+
           return fetch(url, {
             ...options,
             signal: controller.signal,

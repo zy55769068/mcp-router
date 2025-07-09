@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // MCPServerConfig Zodスキーマ
 export const mcpServerConfigSchema = z.object({
@@ -9,20 +9,22 @@ export const mcpServerConfigSchema = z.object({
   autoStart: z.boolean().optional(),
   disabled: z.boolean().optional(),
   description: z.string().optional(),
-  serverType: z.enum(['local', 'remote', 'remote-streamable']),
+  serverType: z.enum(["local", "remote", "remote-streamable"]),
   command: z.string().optional(),
   args: z.array(z.string()).optional(),
   remoteUrl: z.string().optional(),
   bearerToken: z.string().optional(),
-  inputParams: z.record(
-    z.object({
-      default: z.string(),
-      description: z.string(),
-    })
-  ).optional(),
+  inputParams: z
+    .record(
+      z.object({
+        default: z.string(),
+        description: z.string(),
+      }),
+    )
+    .optional(),
   required: z.array(z.string()).optional(),
   latestVersion: z.string().optional(),
-  verificationStatus: z.enum(['verified', 'unverified']).optional(),
+  verificationStatus: z.enum(["verified", "unverified"]).optional(),
   version: z.string().optional(),
   toolPermissions: z.record(z.string(), z.boolean()).optional(),
 });

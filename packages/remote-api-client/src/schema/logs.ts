@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // LogQueryOptions Zodスキーマ
 export const logQueryOptionsSchema = z.object({
@@ -6,8 +6,8 @@ export const logQueryOptionsSchema = z.object({
   serverId: z.string().optional(),
   requestType: z.string().optional(),
   startDate: z.string().optional(), // ISO string
-  endDate: z.string().optional(),   // ISO string
-  responseStatus: z.enum(['success', 'error']).optional(),
+  endDate: z.string().optional(), // ISO string
+  responseStatus: z.enum(["success", "error"]).optional(),
   offset: z.number().optional(),
   limit: z.number().optional(),
 });
