@@ -52,7 +52,7 @@ interface AuthState {
 }
 
 export const createAuthStore = (
-  platformAPI: PlatformAPI,
+  getPlatformAPI: () => PlatformAPI,
 ): UseBoundStore<StoreApi<AuthState>> =>
   create<AuthState>((set, get) => ({
     // Initial state
@@ -88,7 +88,7 @@ export const createAuthStore = (
         setLoginError(null);
 
         // Call Platform API to start login flow
-        await platformAPI.auth.signIn();
+        await getPlatformAPI().auth.signIn();
       } catch (error) {
         setLoginError(error instanceof Error ? error.message : "Login failed");
         throw error;
@@ -102,7 +102,7 @@ export const createAuthStore = (
 
       try {
         // Call Platform API to clear stored auth data
-        await platformAPI.auth.signOut();
+        await getPlatformAPI().auth.signOut();
 
         // Clear local state
         setAuthenticated(false);
@@ -129,7 +129,7 @@ export const createAuthStore = (
 
       try {
         // Check auth status with optional force refresh
-        const status = await platformAPI.auth.getStatus(forceRefresh);
+        const status = await getPlatformAPI().auth.getStatus(forceRefresh);
 
         setAuthenticated(status.authenticated);
         setUserData({
@@ -169,7 +169,7 @@ export const createAuthStore = (
 
       try {
         // Refresh credits by getting the full auth status
-        const status = await platformAPI.auth.getStatus();
+        const status = await getPlatformAPI().auth.getStatus();
         // Credits are now part of user info
         if (status.authenticated && status.user) {
           setCredits(status.user.creditBalance || 0);
@@ -184,7 +184,7 @@ export const createAuthStore = (
       const { setAuthenticated, setUserInfo } = get();
 
       // Subscribe to auth status changes from Platform API
-      const unsubscribe = platformAPI.auth.onChange((status) => {
+      const unsubscribe = getPlatformAPI().auth.onChange((status) => {
         setAuthenticated(status.authenticated);
         if (status.authenticated && status.user) {
           setUserInfo({

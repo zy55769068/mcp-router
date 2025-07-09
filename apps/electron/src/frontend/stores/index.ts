@@ -25,14 +25,14 @@ function getPlatformAPI(): PlatformAPI {
 
 // Create store instances with dynamic platform API getter
 export const useServerStore = createServerStore(getPlatformAPI);
-export const useAuthStore = createAuthStore(getPlatformAPI());
-export const useAgentStore = createAgentStore(getPlatformAPI());
+export const useAuthStore = createAuthStore(getPlatformAPI);
+export const useAgentStore = createAgentStore(getPlatformAPI);
 
 // Store initialization utility
 export const initializeStores = async () => {
   // Load current workspace first
   await useWorkspaceStore.getState().loadCurrentWorkspace();
-  
+
   // Get platform API from workspace store
   const platformAPI = getPlatformAPI();
 

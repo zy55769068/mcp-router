@@ -50,7 +50,7 @@ interface ServerState {
 }
 
 export const createServerStore = (
-  getPlatformAPI: () => PlatformAPI
+  getPlatformAPI: () => PlatformAPI,
 ): UseBoundStore<StoreApi<ServerState>> =>
   create<ServerState>((set, get) => ({
     // Initial state

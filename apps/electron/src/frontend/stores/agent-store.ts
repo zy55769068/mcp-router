@@ -125,7 +125,7 @@ interface AgentState {
 }
 
 export const createAgentStore = (
-  platformAPI: PlatformAPI,
+  getPlatformAPI: () => PlatformAPI,
 ): UseBoundStore<StoreApi<AgentState>> =>
   create<AgentState>((set, get) => ({
     // Initial state
@@ -330,7 +330,7 @@ export const createAgentStore = (
     fetchAuthToken: async () => {
       const { setAuthToken } = get();
       try {
-        const status = await platformAPI.auth.getStatus();
+        const status = await getPlatformAPI().auth.getStatus();
         if (status.authenticated && status.token) {
           setAuthToken(status.token);
         } else {
@@ -349,7 +349,7 @@ export const createAgentStore = (
       try {
         setError(null);
 
-        const newAgent = await platformAPI.agents.create(config);
+        const newAgent = await getPlatformAPI().agents.create(config);
         addDevelopmentAgent(newAgent);
         return newAgent;
       } catch (error) {
@@ -366,7 +366,7 @@ export const createAgentStore = (
       try {
         setError(null);
 
-        const updatedAgent = await platformAPI.agents.update(id, config);
+        const updatedAgent = await getPlatformAPI().agents.update(id, config);
         updateDevelopmentAgent(id, updatedAgent);
       } catch (error) {
         setError(
@@ -382,7 +382,7 @@ export const createAgentStore = (
       try {
         setError(null);
 
-        const success = await platformAPI.agents.delete(id);
+        const success = await getPlatformAPI().agents.delete(id);
         if (success) {
           removeDevelopmentAgent(id);
         } else {
@@ -402,7 +402,7 @@ export const createAgentStore = (
       try {
         setError(null);
 
-        const result = await platformAPI.agents.deploy(agentId);
+        const result = await getPlatformAPI().agents.deploy(agentId);
         if (!result.success || !result.deployedAgent) {
           throw new Error(result.error || "Failed to deploy agent");
         }
@@ -422,7 +422,7 @@ export const createAgentStore = (
       try {
         setError(null);
 
-        const success = await platformAPI.agents.deleteDeployed(agentId);
+        const success = await getPlatformAPI().agents.deleteDeployed(agentId);
         if (success) {
           removeDeployedAgent(agentId);
         } else {
@@ -459,7 +459,10 @@ export const createAgentStore = (
           order: "DESC" as const,
         };
 
-        const data = await platformAPI.agents.sessions.list(agentId, options);
+        const data = await getPlatformAPI().agents.sessions.list(
+          agentId,
+          options,
+        );
 
         if (append) {
           set({
@@ -523,7 +526,8 @@ export const createAgentStore = (
         setSessionsError(null);
         setDeletingSession(sessionId, true);
 
-        const success = await platformAPI.agents.sessions.delete(sessionId);
+        const success =
+          await getPlatformAPI().agents.sessions.delete(sessionId);
 
         if (!success) {
           throw new Error("Failed to delete session");
@@ -552,7 +556,7 @@ export const createAgentStore = (
       try {
         setSessionsError(null);
 
-        const session = await platformAPI.agents.sessions.get(sessionId);
+        const session = await getPlatformAPI().agents.sessions.get(sessionId);
         const messages = session?.messages || [];
 
         // Update the session with the fetched messages
@@ -603,7 +607,7 @@ export const createAgentStore = (
         addMessageToSession(targetSessionId, userMessage);
 
         // Send message to agent using background chat
-        const result = await platformAPI.agents.background.start(
+        const result = await getPlatformAPI().agents.background.start(
           targetSessionId,
           currentAgent.id,
           message,
@@ -630,8 +634,8 @@ export const createAgentStore = (
         setError(null);
 
         const [developmentAgents, deployedAgents] = await Promise.all([
-          platformAPI.agents.list(),
-          platformAPI.agents.getDeployed(),
+          getPlatformAPI().agents.list(),
+          getPlatformAPI().agents.getDeployed(),
         ]);
 
         setDevelopmentAgents(developmentAgents);

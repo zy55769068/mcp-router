@@ -9,7 +9,7 @@ interface WorkspaceState {
   currentWorkspace: Workspace | null;
   isLoading: boolean;
   error: string | null;
-  
+
   // Platform API cache
   remotePlatformAPICache: Map<string, PlatformAPI>;
 
@@ -22,7 +22,7 @@ interface WorkspaceState {
   switchWorkspace: (id: string) => Promise<void>;
   setCurrentWorkspace: (workspace: Workspace | null) => void;
   setError: (error: string | null) => void;
-  
+
   // Platform API related
   getPlatformAPI: () => PlatformAPI;
 }
@@ -134,14 +134,14 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
         // ストアの再作成をトリガー（新しいPlatform APIを使用）
         const { useServerStore, useAgentStore } = await import("../stores");
-        
+
         // Only refresh data, don't reload workspace
         try {
           await useServerStore.getState().refreshServers();
         } catch (error) {
           console.error("Failed to refresh servers:", error);
         }
-        
+
         try {
           await useAgentStore.getState().refreshAgents();
         } catch (error) {
@@ -171,23 +171,23 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   getPlatformAPI: () => {
     const currentWorkspace = get().currentWorkspace;
     const cache = get().remotePlatformAPICache;
-    
+
     // If no workspace or local workspace, use electron API
-    if (!currentWorkspace || currentWorkspace.type === 'local') {
+    if (!currentWorkspace || currentWorkspace.type === "local") {
       return electronPlatformAPI;
     }
-    
+
     // For remote workspaces, use cached instance or create new one
-    if (currentWorkspace.type === 'remote' && currentWorkspace.remoteConfig) {
+    if (currentWorkspace.type === "remote" && currentWorkspace.remoteConfig) {
       const cacheKey = `${currentWorkspace.id}-${currentWorkspace.remoteConfig.apiUrl}-${currentWorkspace.remoteConfig.authToken}`;
-      
+
       if (!cache.has(cacheKey)) {
         const remoteAPI = new RemotePlatformAPI({
           apiUrl: currentWorkspace.remoteConfig.apiUrl,
-          authToken: currentWorkspace.remoteConfig.authToken || ''
+          authToken: currentWorkspace.remoteConfig.authToken || "",
         });
         cache.set(cacheKey, remoteAPI);
-        
+
         // Clear old cache entries for this workspace
         for (const [key] of cache) {
           if (key.startsWith(`${currentWorkspace.id}-`) && key !== cacheKey) {
@@ -195,10 +195,10 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
           }
         }
       }
-      
+
       return cache.get(cacheKey)!;
     }
-    
+
     // Fallback to electron API if remote config is missing
     return electronPlatformAPI;
   },
