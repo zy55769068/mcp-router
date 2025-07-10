@@ -137,13 +137,12 @@ const LogViewer: React.FC<LogViewerProps> = ({
         <div className="flex-1 flex items-center justify-center">
           <Card className="p-8 max-w-2xl w-full shadow-lg text-center">
             <Link
-              to="/discover"
+              to="/servers/add"
               className="px-6 py-3 rounded-md font-medium text-primary inline-block"
             >
               <h2 className="text-2xl font-bold mb-4">
-                {t("home.discovery.title")}
+                Add a server to start logging requests
               </h2>
-              <p className="mb-6">{t("home.discovery.description")}</p>
             </Link>
           </Card>
         </div>

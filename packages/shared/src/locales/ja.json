@@ -5,11 +5,7 @@
     "description": "MCPサーバを管理し、APIを提供するためのツール",
     "servers": "サーバ一覧",
     "clients": "クライアント一覧",
-    "logs": "ログ",
-    "discovery": {
-      "title": "MCPインデックス",
-      "description": "サーバを探索し、接続する"
-    }
+    "logs": "ログ"
   },
   "common": {
     "home": "ホーム",

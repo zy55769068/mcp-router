@@ -55,10 +55,6 @@
     "servers": "Servers",
     "clients": "Clients",
     "logs": "Logs",
-    "discovery": {
-      "title": "MCP Index",
-      "description": "Discover and connect to servers"
-    },
     "welcome": "Welcome to MCP Router",
     "description": "A tool for managing MCP servers and providing APIs"
   },
