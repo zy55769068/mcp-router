@@ -3,11 +3,10 @@ import {
   createRemoteAPIClient,
   type RemoteAPIClient,
 } from "@mcp_router/remote-api-types";
-import { MCPServer } from "@mcp_router/shared";
+import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import type {
   ServerStatus,
   CreateServerInput,
-  UpdateServerInput,
 } from "@/lib/platform-api/types/domains/server-api";
 import type {
   LogQueryOptions,
@@ -40,7 +39,7 @@ export class RemotePlatformAPI implements PlatformAPI {
    */
   private unwrapResponse<T>(response: any): T {
     // Direct response
-    if (response && (typeof response !== 'object' || Array.isArray(response))) {
+    if (response && (typeof response !== "object" || Array.isArray(response))) {
       return response as T;
     }
 
@@ -80,7 +79,10 @@ export class RemotePlatformAPI implements PlatformAPI {
       return this.unwrapResponse<MCPServer>(response);
     },
 
-    update: async (id: string, updates: UpdateServerInput): Promise<MCPServer> => {
+    update: async (
+      id: string,
+      updates: Partial<MCPServerConfig>,
+    ): Promise<MCPServer> => {
       const response = await this.client.servers.update.mutate({
         id,
         ...updates,

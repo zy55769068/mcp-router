@@ -554,15 +554,6 @@ export class MCPServerManager {
       this.serverNameToIdMap.delete(oldServer.name);
     }
 
-    // Extract inputParamValues if provided and merge them into env
-    // const configWithParams = config as Partial<MCPServerConfig> & { inputParamValues?: Record<string, string> };
-    // if (configWithParams.inputParamValues) {
-    //   // Create or update the env object with input param values
-    //   config.env = { ...(config.env || {}), ...configWithParams.inputParamValues };
-    //   // Remove inputParamValues from config as it's not part of MCPServerConfig
-    //   delete configWithParams.inputParamValues;
-    // }
-
     // データベースでサーバ情報を更新
     const updatedServer = this.serverService.updateServer(id, config);
 

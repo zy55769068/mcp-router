@@ -99,7 +99,7 @@ const ServerDetails: React.FC<ServerDetailsProps> = ({ server }) => {
         });
       }
 
-      // Create base config with updated parameters
+      // Create config with only the changed inputParams
       const updatedConfig: any = {
         inputParams: updatedInputParams,
         env: server.env,
@@ -108,7 +108,7 @@ const ServerDetails: React.FC<ServerDetailsProps> = ({ server }) => {
         args: server.args,
       };
 
-      await updateServerConfig(server.id, { config: updatedConfig });
+      await updateServerConfig(server.id, updatedConfig);
       setInitialInputParamValues(inputParamValues); // 保存後に初期値を更新
       setIsDirty(false);
       toast.success(t("serverDetails.updateSuccess"));
@@ -145,7 +145,7 @@ const ServerDetails: React.FC<ServerDetailsProps> = ({ server }) => {
         updatedConfig.bearerToken = editedBearerToken;
       }
 
-      await updateServerConfig(server.id, { config: updatedConfig });
+      await updateServerConfig(server.id, updatedConfig);
       setIsAdvancedEditing(false);
       toast.success(t("serverDetails.updateSuccess"));
     } catch (error) {

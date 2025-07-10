@@ -214,7 +214,7 @@ export const createServerStore = (
         setError(null);
 
         const platformAPI = getPlatformAPI();
-        const updatedServer = await platformAPI.servers.update(id, { config });
+        const updatedServer = await platformAPI.servers.update(id, config);
         updateServer(id, updatedServer);
 
         // Refresh the server list to ensure consistency with remote state

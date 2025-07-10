@@ -29,7 +29,7 @@ export interface ServerAPI {
   list(): Promise<MCPServer[]>;
   get(id: string): Promise<MCPServer | null>;
   create(input: CreateServerInput): Promise<MCPServer>;
-  update(id: string, updates: UpdateServerInput): Promise<MCPServer>;
+  update(id: string, updates: Partial<MCPServerConfig>): Promise<MCPServer>;
   delete(id: string): Promise<void>;
   start(id: string): Promise<boolean>;
   stop(id: string): Promise<boolean>;

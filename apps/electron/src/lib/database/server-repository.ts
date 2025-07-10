@@ -317,57 +317,14 @@ export class ServerRepository extends BaseRepository<MCPServer> {
       // 更新するフィールドを設定
       const updatedServer: MCPServer = {
         ...existingServer,
-        name: config.name !== undefined ? config.name : existingServer.name,
-        command:
-          config.command !== undefined
-            ? config.command
-            : existingServer.command,
-        args: config.args !== undefined ? config.args : existingServer.args,
-        env: config.env !== undefined ? config.env : existingServer.env,
-        autoStart:
-          config.autoStart !== undefined
-            ? config.autoStart
-            : existingServer.autoStart,
-        disabled:
-          config.disabled !== undefined
-            ? config.disabled
-            : existingServer.disabled,
-        serverType:
-          config.serverType !== undefined
-            ? config.serverType
-            : existingServer.serverType,
-        remoteUrl:
-          config.remoteUrl !== undefined
-            ? config.remoteUrl
-            : existingServer.remoteUrl,
-        bearerToken:
-          config.bearerToken !== undefined
-            ? config.bearerToken
-            : existingServer.bearerToken,
-        inputParams:
-          config.inputParams !== undefined
-            ? config.inputParams
-            : existingServer.inputParams,
-        description:
-          config.description !== undefined
-            ? config.description
-            : existingServer.description,
-        version:
-          config.version !== undefined
-            ? config.version
-            : existingServer.version,
-        latestVersion:
-          config.latestVersion !== undefined
-            ? config.latestVersion
-            : existingServer.latestVersion,
-        verificationStatus:
-          config.verificationStatus !== undefined
-            ? config.verificationStatus
-            : existingServer.verificationStatus,
-        required:
-          config.required !== undefined
-            ? config.required
-            : existingServer.required,
+        ...config,
+        // Preserve fields that are not part of MCPServerConfig
+        status: existingServer.status,
+        logs: existingServer.logs,
+        errorMessage: existingServer.errorMessage,
+        tools: existingServer.tools,
+        resources: existingServer.resources,
+        prompts: existingServer.prompts,
       };
 
       // 行データを生成（同期）
