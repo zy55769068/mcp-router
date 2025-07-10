@@ -9,7 +9,9 @@
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "lint": "eslint --ext .ts,.tsx .",
+    "lint:fix": "eslint --ext .ts,.tsx . --fix"
   },
   "dependencies": {
     "@mcp_router/remote-api-types": "workspace:*",

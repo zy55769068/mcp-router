@@ -335,7 +335,8 @@ const Manual: React.FC = () => {
       toast.success(t("manual.successCreate", { name: serverName }));
       resetForm();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t("manual.errorFailedCreate");
+      const errorMessage =
+        error instanceof Error ? error.message : t("manual.errorFailedCreate");
       toast.error(errorMessage);
     } finally {
       setIsLoadingManual(false);
@@ -368,7 +369,10 @@ const Manual: React.FC = () => {
       );
       resetRemoteForm();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t("manual.errorFailedConnectRemote");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t("manual.errorFailedConnectRemote");
       toast.error(errorMessage);
     } finally {
       setIsLoadingRemote(false);

@@ -8,7 +8,9 @@ export interface ServerVariable {
   source?: "env" | "arg" | "param";
 }
 
-export function parseServerVariables(env: Record<string, string>): ServerVariable[] {
+export function parseServerVariables(
+  env: Record<string, string>,
+): ServerVariable[] {
   return Object.entries(env).map(([name, value]) => ({
     name,
     value,
@@ -16,7 +18,9 @@ export function parseServerVariables(env: Record<string, string>): ServerVariabl
   }));
 }
 
-export function extractServerVariables(server: MCPServerConfig): ServerVariable[] {
+export function extractServerVariables(
+  server: MCPServerConfig,
+): ServerVariable[] {
   const variables: ServerVariable[] = [];
 
   // Extract from env
