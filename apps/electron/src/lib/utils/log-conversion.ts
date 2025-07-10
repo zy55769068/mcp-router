@@ -2,7 +2,7 @@
  * ログエントリの型変換ユーティリティ
  */
 
-import { RequestLogEntry } from "../types/log-types";
+import { RequestLogEntry } from "@mcp_router/shared";
 
 /**
  * Platform APIのLogEntryをRequestLogEntryに変換するための型

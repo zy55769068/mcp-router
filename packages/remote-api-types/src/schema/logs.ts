@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { RequestLogEntry } from "@mcp_router/shared";
 
 // LogQueryOptions Zodスキーマ
 export const logQueryOptionsSchema = z.object({
@@ -11,22 +12,6 @@ export const logQueryOptionsSchema = z.object({
   cursor: z.string().optional(),
   limit: z.number().optional(),
 });
-
-// 型定義
-export interface RequestLogEntry {
-  id: string;
-  timestamp: number;
-  clientId: string;
-  clientName: string;
-  serverId: string;
-  serverName: string;
-  requestType: string;
-  requestParams: any;
-  responseStatus: "success" | "error";
-  responseData?: any;
-  duration: number;
-  errorMessage?: string;
-}
 
 export type LogQueryOptions = z.infer<typeof logQueryOptionsSchema>;
 

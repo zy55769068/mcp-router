@@ -2,7 +2,10 @@
  * カーソルのエンコード・デコードユーティリティ
  */
 
-import { CursorData } from "../types/pagination";
+export interface CursorData {
+  timestamp: number;
+  id: string;
+}
 
 /**
  * カーソルデータをBase64エンコード

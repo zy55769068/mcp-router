@@ -28,4 +28,5 @@ export type {
   UpdateServerInput,
 } from "./servers";
 
-export type { RequestLogEntry, LogQueryOptions } from "./logs";
+export type { LogQueryOptions } from "./logs";
+export type { RequestLogEntry } from "@mcp_router/shared";

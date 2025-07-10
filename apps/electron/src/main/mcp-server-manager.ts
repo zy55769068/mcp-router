@@ -592,52 +592,6 @@ export class MCPServerManager {
   }
 
   /**
-   * Connect to an MCP server
-   */
-  private async connectToServer(id: string): Promise<Client | null> {
-    const server = this.servers.get(id);
-    if (!server) {
-      return null;
-    }
-
-    try {
-      // Use the shared utility function for connecting to MCP servers
-      const result = await connectToMCPServer(
-        {
-          id: server.id,
-          name: server.name,
-          serverType: server.serverType,
-          command: server.command,
-          args: server.args
-            ? substituteArgsParameters(
-                server.args,
-                server.env || {},
-                server.inputParams || {},
-              )
-            : undefined,
-          remoteUrl: server.remoteUrl,
-          bearerToken: server.bearerToken,
-          env: server.env,
-          inputParams: server.inputParams,
-        },
-        "mcp-router",
-      );
-
-      // Update server status based on connection result
-      if (result.status === "error") {
-        server.status = "error";
-        logError(`Failed to connect to server ${server.name}: ${result.error}`);
-        return null;
-      }
-
-      return result.client;
-    } catch (error) {
-      server.status = "error";
-      return null;
-    }
-  }
-
-  /**
    * Connect to an MCP server and return the full result
    */
   private async connectToServerWithResult(
@@ -842,57 +796,53 @@ export class MCPServerManager {
 
     // Collect all tools without duplicate detection
     for (const [serverId, client] of this.clients.entries()) {
-      try {
-        const server = this.servers.get(serverId);
-        if (!server || !this.serverStatusMap.get(server.name)) {
+      const server = this.servers.get(serverId);
+      if (!server || !this.serverStatusMap.get(server.name)) {
+        continue;
+      }
+
+      if (token) {
+        // Check token access using server's ID
+        if (!this.tokenService.hasServerAccess(token, serverId)) {
           continue;
         }
+      }
 
-        if (token) {
-          // Check token access using server's ID
-          if (!this.tokenService.hasServerAccess(token, serverId)) {
-            continue;
-          }
-        }
+      const response = await client.listTools();
 
-        const response = await client.listTools();
+      if (response && Array.isArray(response.tools)) {
+        // Add all tools with applied display rules
+        response.tools.forEach((tool) => {
+          // Store mapping from tool name to server name
+          this.toolNameToServerMap.set(tool.name, server.name);
 
-        if (response && Array.isArray(response.tools)) {
-          // Add all tools with applied display rules
-          response.tools.forEach((tool) => {
-            // Store mapping from tool name to server name
-            this.toolNameToServerMap.set(tool.name, server.name);
-
-            // Apply display rules to name and description
-            const { name: customName, description: customDescription } =
+          // Apply display rules to name and description
+          const { name: customName, description: customDescription } =
               applyDisplayRules(
-                tool.name,
-                tool.description || "",
-                server.name,
-                "tool",
+                  tool.name,
+                  tool.description || "",
+                  server.name,
+                  "tool",
               );
 
-            // Apply rules to tool input schema parameters if available
-            let customInputSchema = tool.inputSchema;
-            if (tool.inputSchema) {
-              customInputSchema = applyRulesToInputSchema(
+          // Apply rules to tool input schema parameters if available
+          let customInputSchema = tool.inputSchema;
+          if (tool.inputSchema) {
+            customInputSchema = applyRulesToInputSchema(
                 tool.inputSchema,
                 tool.name,
                 server.name,
-              );
-            }
+            );
+          }
 
-            // Add tool with templated name, description, and inputSchema
-            allTools.push({
-              ...tool,
-              name: customName,
-              description: customDescription,
-              inputSchema: customInputSchema,
-            });
+          // Add tool with templated name, description, and inputSchema
+          allTools.push({
+            ...tool,
+            name: customName,
+            description: customDescription,
+            inputSchema: customInputSchema,
           });
-        }
-      } catch (error) {
-        console.error(`Failed to list tools from server ${serverName}:`, error);
+        });
       }
     }
 

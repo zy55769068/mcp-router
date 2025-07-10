@@ -1,11 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import {
-  RequestLogEntry,
-  EMPTY_CURSOR,
-  isEmptyCursor,
-} from "@mcp_router/shared";
+import { RequestLogEntry } from "@mcp_router/shared";
+import { EMPTY_CURSOR, isEmptyCursor } from "../../../../lib/utils/cursor";
 import { useFilterState } from "./hooks/useFilterState";
 import { useRequestLogs } from "./hooks/useRequestLogs";
 import LogTable from "./components/LogTable";
