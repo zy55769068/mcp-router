@@ -196,6 +196,8 @@ export const createServerStore = (
 
         // Refresh the server list to ensure consistency with remote state
         await refreshServers();
+
+        return newServer;
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "Failed to create server",
@@ -212,7 +214,7 @@ export const createServerStore = (
         setError(null);
 
         const platformAPI = getPlatformAPI();
-        const updatedServer = await platformAPI.servers.update(id, config);
+        const updatedServer = await platformAPI.servers.update(id, { config });
         updateServer(id, updatedServer);
 
         // Refresh the server list to ensure consistency with remote state

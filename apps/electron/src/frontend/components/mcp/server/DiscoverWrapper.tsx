@@ -22,10 +22,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@mcp_router/ui";
+import { useServerStore } from "@/frontend/stores";
 
 const DiscoverWrapper: React.FC = () => {
   const { t } = useTranslation();
   const platformAPI = usePlatformAPI();
+  const { createServer } = useServerStore();
   const [verifiedServers, setVerifiedServers] = useState<LocalMCPServer[]>([]);
   const [communityServers, setCommunityServers] = useState<LocalMCPServer[]>(
     [],
@@ -288,7 +290,8 @@ const DiscoverWrapper: React.FC = () => {
           serverConfig.verificationStatus = server.verificationStatus;
         if (server.inputParams) serverConfig.inputParams = server.inputParams;
       }
-      await platformAPI.servers.create({ config: serverConfig });
+      // Add server using store method which handles refresh
+      await createServer(serverConfig);
       // Update installed servers list after successful installation
       await fetchInstalledServers();
     } catch (error) {
