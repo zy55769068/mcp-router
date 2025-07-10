@@ -331,16 +331,13 @@ const Manual: React.FC = () => {
       // Add server directly
       const result = await platformAPI.servers.create({ config: serverConfig });
 
-      if (result && !result.error) {
+      if (result) {
         toast.success(t("manual.successCreate", { name: serverName }));
         resetForm();
-      } else {
-        toast.error(
-          (result && result.message) || t("manual.errorFailedCreate"),
-        );
       }
     } catch (error) {
-      toast.error(t("manual.errorFailedCreate"));
+      const errorMessage = error instanceof Error ? error.message : t("manual.errorFailedCreate");
+      toast.error(errorMessage);
     } finally {
       setIsLoadingManual(false);
     }
@@ -367,18 +364,15 @@ const Manual: React.FC = () => {
 
       const result = await platformAPI.servers.create({ config });
 
-      if (result && result.success) {
+      if (result) {
         toast.success(
           t("manual.successConnectRemote", { name: remoteServerName }),
         );
         resetRemoteForm();
-      } else {
-        toast.error(
-          (result && result.message) || t("manual.errorFailedConnectRemote"),
-        );
       }
     } catch (error) {
-      toast.error(t("manual.errorFailedConnectRemote"));
+      const errorMessage = error instanceof Error ? error.message : t("manual.errorFailedConnectRemote");
+      toast.error(errorMessage);
     } finally {
       setIsLoadingRemote(false);
     }
