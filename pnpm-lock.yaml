@@ -339,9 +339,6 @@ importers:
       '@mcp_router/remote-api-types':
         specifier: workspace:*
         version: link:../remote-api-types
-      '@mcp_router/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@trpc/server':
         specifier: ^10.45.0
         version: 10.45.2

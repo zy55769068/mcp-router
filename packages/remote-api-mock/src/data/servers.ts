@@ -1,4 +1,4 @@
-import type { MCPServer } from "@mcp_router/shared";
+import type { MCPServer } from "@mcp_router/remote-api-types";
 
 class ServersStore {
   private servers: Map<string, MCPServer> = new Map();

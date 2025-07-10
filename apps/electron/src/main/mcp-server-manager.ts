@@ -38,7 +38,6 @@ import {
 } from "@/lib/utils/uri-utils";
 import { summarizeResponse } from "@/lib/utils/response-utils";
 import { AgentToolHandler } from "./agent-tools";
-import { logError } from "../lib/utils/backend/error-handler";
 
 // Constants for the Aggregator Server identification in LogService
 const AGGREGATOR_SERVER_ID = "mcp-router-aggregator";
