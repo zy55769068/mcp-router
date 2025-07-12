@@ -817,20 +817,20 @@ export class MCPServerManager {
 
           // Apply display rules to name and description
           const { name: customName, description: customDescription } =
-              applyDisplayRules(
-                  tool.name,
-                  tool.description || "",
-                  server.name,
-                  "tool",
-              );
+            applyDisplayRules(
+              tool.name,
+              tool.description || "",
+              server.name,
+              "tool",
+            );
 
           // Apply rules to tool input schema parameters if available
           let customInputSchema = tool.inputSchema;
           if (tool.inputSchema) {
             customInputSchema = applyRulesToInputSchema(
-                tool.inputSchema,
-                tool.name,
-                server.name,
+              tool.inputSchema,
+              tool.name,
+              server.name,
             );
           }
 
