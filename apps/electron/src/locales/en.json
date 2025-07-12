@@ -573,6 +573,8 @@
     "allowDangerous": "Allow Dangerous",
     "successCreate": "Successfully created server '{{name}}'.",
     "errorFailedCreate": "Failed to create server.",
+    "successConnectRemote": "Successfully connected to remote server '{{name}}'.",
+    "errorFailedConnectRemote": "Failed to connect to remote server.",
     "autoStart": "Auto Start",
     "remote": {
       "name": "Remote Server",
@@ -585,6 +587,12 @@
       "transportStreamable": "Streamable HTTP",
       "connect": "Connect",
       "connectedServers": "Connected Servers"
+    },
+    "errors": {
+      "nameRequired": "Server name is required",
+      "commandRequired": "Command is required",
+      "argsRequired": "Arguments are required",
+      "urlRequired": "Server URL is required"
     }
   },
   "pagination": {

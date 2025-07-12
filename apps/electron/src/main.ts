@@ -596,26 +596,22 @@ function setupMcpServerHandlers(): void {
   });
 
   ipcMain.handle("mcp:add", async (_, serverConfig: MCPServerConfig) => {
+    let server = null;
     try {
       // Add the server to the manager
-      const server = mcpServerManager.addServer(serverConfig);
+      server = mcpServerManager.addServer(serverConfig);
 
-      // For remote servers, automatically start the connection
+      // For remote servers, test the connection
       if (serverConfig.serverType !== "local") {
-        // Start the server
-        const success = await mcpServerManager.startServer(server.id);
-        if (!success) {
-          // If failed to start, remove the server and throw error
-          mcpServerManager.removeServer(server.id);
-          throw new Error("Failed to connect to remote server");
-        }
+        await mcpServerManager.startServer(server.id);
+        mcpServerManager.stopServer(server.id);
       }
-
-      // Return the server for both local and remote
       return server;
     } catch (error: any) {
-      console.error("Error adding server:", error);
-      throw error; // Let the client handle the error
+      if (serverConfig.serverType !== "local" && server && server?.id) {
+        mcpServerManager.removeServer(server?.id);
+      }
+      throw error;
     }
   });
 
