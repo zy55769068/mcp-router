@@ -322,7 +322,7 @@ export class MCPServerManager {
         `[MCPServerManager] Found ${servers.length} servers in database`,
       );
 
-      servers.forEach((server) => {
+      for (const server of servers) {
         // Initialize all servers as stopped when loading
         server.status = "stopped";
         server.logs = [];
@@ -333,9 +333,9 @@ export class MCPServerManager {
 
         // Auto start servers if configured
         if (server.autoStart && !server.disabled) {
-          this.startServer(server.id).catch(console.error);
+          await this.startServer(server.id);
         }
-      });
+      }
 
       console.log(
         `[MCPServerManager] ${servers.length}個のサーバ設定を読み込みました`,
@@ -385,7 +385,12 @@ export class MCPServerManager {
       }
     });
 
-    return Array.from(this.servers.values());
+    // Return servers with their current runtime status preserved
+    return Array.from(this.servers.values()).map(server => {
+      // Ensure we return the actual runtime status, not a stale one
+      const currentServer = this.servers.get(server.id);
+      return currentServer || server;
+    });
   }
 
   /**
