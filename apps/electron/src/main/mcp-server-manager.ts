@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { app } from "electron";
-import { MCPServer, MCPServerConfig, MCPTool } from "@mcp_router/shared";
+import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import {
   getServerService,
   ServerService,
@@ -66,7 +66,6 @@ export class MCPServerManager {
   private serversDir: string;
   private serverService!: ServerService; // 初期化はinitializeAsyncで行う
   private transport: StreamableHTTPServerTransport;
-  private sseTransport: SSEServerTransport | null = null;
 
   // Aggregator properties
   private serverStatusMap: Map<string, boolean> = new Map(); // Track which servers are connected
@@ -200,10 +199,6 @@ export class MCPServerManager {
     return this.transport;
   }
 
-  public getSSETransport(): SSEServerTransport | null {
-    return this.sseTransport;
-  }
-
   /**
    * Get the aggregator server instance
    * @returns The MCP aggregator server
@@ -223,10 +218,6 @@ export class MCPServerManager {
         // ステートレスなサーバの場合、undefined を指定する
         sessionIdGenerator: undefined,
       });
-
-      // SSE transportは実際にはHTTPエンドポイントで初期化します
-      // ここではプロパティの初期化のみ行い、実際の初期化はHTTPサーバーのハンドラで行います
-      this.sseTransport = null;
 
       // Connect server with primary transport
       await this.aggregatorServer.connect(this.transport);
