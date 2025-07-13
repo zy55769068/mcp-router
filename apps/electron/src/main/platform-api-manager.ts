@@ -207,6 +207,19 @@ export class PlatformAPIManager {
   }
 
   /**
+   * リモートAPIの認証トークンを取得
+   */
+  getRemoteAuthToken(): string | null {
+    if (
+      this.isRemoteWorkspace() &&
+      this.currentWorkspace?.remoteConfig?.authToken
+    ) {
+      return this.currentWorkspace.remoteConfig.authToken;
+    }
+    return null;
+  }
+
+  /**
    * 現在のワークスペースのデータベースを取得
    */
   getCurrentDatabase(): SqliteManager | null {
