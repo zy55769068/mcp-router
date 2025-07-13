@@ -117,6 +117,7 @@ class StdioMcpBridgeServer {
   private httpServer: ReturnType<typeof createServer> | null = null;
   private aggregator: MCPAggregator | null = null;
   private clients: Map<string, Client> = new Map();
+  private isReady = false;
 
   constructor(
     private options: {
@@ -133,19 +134,32 @@ class StdioMcpBridgeServer {
     // Create the aggregator
     this.aggregator = new MCPAggregator();
 
-    // Start all stdio MCP server processes
-    await this.startStdioServers();
-
-    // Get the aggregator's server and connect it to HTTP transport
-    const mcpServer = this.aggregator.getServer();
-    const transport = new StreamableHTTPServerTransport({
-      // Stateless server - no session ID needed
-      sessionIdGenerator: undefined,
-    });
-    mcpServer.connect(transport);
-
-    // Create HTTP server
+    // Create HTTP server and start listening immediately
     this.httpServer = createServer(async (req, res) => {
+      if (!this.isReady) {
+        // Return a fake response while servers are starting up
+        res.writeHead(503, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            error: {
+              code: -32002,
+              message: "MCP servers are still initializing",
+            },
+            id: null,
+          }),
+        );
+        return;
+      }
+
+      // Get the aggregator's server and transport
+      const mcpServer = this.aggregator!.getServer();
+      const transport = new StreamableHTTPServerTransport({
+        // Stateless server - no session ID needed
+        sessionIdGenerator: undefined,
+      });
+      mcpServer.connect(transport);
+
       await transport.handleRequest(req, res);
     });
 
@@ -154,15 +168,27 @@ class StdioMcpBridgeServer {
       console.error(
         `HTTP MCP Aggregator Server listening on 0.0.0.0:${this.options.port}`,
       );
-      console.error(
-        `Aggregating ${this.options.servers.length} MCP server(s):`,
-      );
-      for (const server of this.options.servers) {
-        console.error(
-          `  - ${server.name} (${server.id}): ${server.command} ${server.args.join(" ")}`,
-        );
-      }
+      console.error(`Starting ${this.options.servers.length} MCP server(s)...`);
     });
+
+    // Start all stdio MCP server processes in the background
+    this.startStdioServers()
+      .then(() => {
+        this.isReady = true;
+        console.error("All MCP servers connected and ready!");
+        console.error(
+          `Aggregating ${this.options.servers.length} MCP server(s):`,
+        );
+        for (const server of this.options.servers) {
+          console.error(
+            `  - ${server.name} (${server.id}): ${server.command} ${server.args.join(" ")}`,
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to start MCP servers:", error);
+        process.exit(1);
+      });
   }
 
   /**
