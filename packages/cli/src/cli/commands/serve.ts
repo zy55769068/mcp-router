@@ -1,19 +1,8 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer } from "http";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import {
-  ErrorCode,
-  InitializeRequestSchema,
-  ListResourcesRequestSchema,
-  ListResourceTemplatesRequestSchema,
-  ListToolsRequestSchema,
-  ListPromptsRequestSchema,
-  CallToolRequestSchema,
-  ReadResourceRequestSchema,
-  GetPromptRequestSchema,
-  McpError,
-} from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { MCPAggregator } from "../../mcp-aggregator.js";
 
 /**
  * Executes the serve command, starting an HTTP server that accepts
@@ -34,18 +23,26 @@ export async function executeServe(args: string[] = []): Promise<void> {
 }
 
 /**
+ * Server configuration
+ */
+interface ServerConfig {
+  id: string;
+  name: string;
+  command: string;
+  args: string[];
+}
+
+/**
  * Parse command line arguments
  */
 function parseArgs(args: string[]): {
   port: number;
-  command: string;
-  args: string[];
+  servers: ServerConfig[];
   verbose?: boolean;
 } {
   const options = {
     port: 3283,
-    command: "",
-    args: [] as string[],
+    servers: [] as ServerConfig[],
     verbose: false,
   };
 
@@ -57,22 +54,53 @@ function parseArgs(args: string[]): {
     } else if (args[i] === "--verbose" || args[i] === "-v") {
       options.verbose = true;
       i++;
+    } else if (args[i] === "--server" && i + 3 < args.length) {
+      // --server <id> <name> <command> [args...]
+      const id = args[i + 1];
+      const name = args[i + 2];
+      const command = args[i + 3];
+      i += 4;
+
+      // Collect args until next --server flag or end
+      const serverArgs: string[] = [];
+      while (i < args.length && args[i] !== "--server") {
+        serverArgs.push(args[i]);
+        i++;
+      }
+
+      options.servers.push({ id, name, command, args: serverArgs });
     } else if (args[i] === "--") {
-      // Everything after -- is the command and its arguments
-      options.command = args[i + 1];
-      options.args = args.slice(i + 2);
+      // Legacy single server mode: everything after -- is the command and its arguments
+      const command = args[i + 1];
+      const serverArgs = args.slice(i + 2);
+      options.servers.push({
+        id: "default",
+        name: "default",
+        command,
+        args: serverArgs,
+      });
+      break;
+    } else if (!options.servers.length) {
+      // Legacy single server mode: first non-option argument is the command
+      const command = args[i];
+      const serverArgs = args.slice(i + 1);
+      options.servers.push({
+        id: "default",
+        name: "default",
+        command,
+        args: serverArgs,
+      });
       break;
     } else {
-      // First non-option argument is the command
-      options.command = args[i];
-      options.args = args.slice(i + 1);
-      break;
+      throw new Error(`Unexpected argument: ${args[i]}`);
     }
   }
 
-  if (!options.command) {
+  if (options.servers.length === 0) {
     throw new Error(
-      "No command specified. Usage: mcpr-cli serve [--port <port>] [--verbose] <command> [args...]",
+      "No servers specified. Usage:\n" +
+        "  Single server: mcpr-cli serve [--port <port>] [--verbose] <command> [args...]\n" +
+        "  Multiple servers: mcpr-cli serve [--port <port>] [--verbose] --server <id> <name> <command> [args...] [--server ...]",
     );
   }
 
@@ -83,41 +111,57 @@ function parseArgs(args: string[]): {
  * HTTP to Stdio MCP Bridge Server
  *
  * This class creates an HTTP server that accepts Streamable HTTP MCP requests
- * and forwards them to a stdio-based MCP server process.
+ * and forwards them to one or more stdio-based MCP server processes using the MCPAggregator.
  */
 class StdioMcpBridgeServer {
   private httpServer: ReturnType<typeof createServer> | null = null;
-  private mcpClient: Client | null = null;
+  private aggregator: MCPAggregator | null = null;
+  private clients: Map<string, Client> = new Map();
 
   constructor(
     private options: {
       port: number;
-      command: string;
-      args: string[];
+      servers: ServerConfig[];
       verbose?: boolean;
     },
   ) {}
 
   /**
-   * Starts the HTTP server and connects to the stdio MCP server
+   * Starts the HTTP server and connects to the stdio MCP servers
    */
   async start(): Promise<void> {
-    // Start the stdio MCP server process
-    await this.startStdioServer();
+    // Create the aggregator
+    this.aggregator = new MCPAggregator();
+
+    // Start all stdio MCP server processes
+    await this.startStdioServers();
+
+    // Get the aggregator's server and connect it to HTTP transport
+    const mcpServer = this.aggregator.getServer();
+    const transport = new StreamableHTTPServerTransport({
+      // Stateless server - no session ID needed
+      sessionIdGenerator: undefined,
+    });
+    mcpServer.connect(transport);
 
     // Create HTTP server
     this.httpServer = createServer(async (req, res) => {
-      await this.handleRequest(req, res);
+      await transport.handleRequest(req, res);
     });
 
     // Start listening
     this.httpServer.listen(this.options.port, () => {
       console.error(
-        `HTTP MCP Bridge Server listening on port ${this.options.port}`,
+        `HTTP MCP Aggregator Server listening on port ${this.options.port}`,
       );
       console.error(
-        `Forwarding requests to: ${this.options.command} ${this.options.args.join(" ")}`,
+        `Aggregating ${this.options.servers.length} MCP server(s):`,
       );
+      for (const server of this.options.servers) {
+        console.error(
+          `  - ${server.name} (${server.id}): ${server.command} ${server.args.join(" ")}`,
+        );
+      }
     });
   }
 
@@ -125,296 +169,72 @@ class StdioMcpBridgeServer {
    * Stops the server and cleans up resources
    */
   async stop(): Promise<void> {
-    console.error("Stopping HTTP MCP Bridge Server...");
+    console.error("Stopping HTTP MCP Aggregator Server...");
 
     if (this.httpServer) {
       this.httpServer.close();
     }
 
-    if (this.mcpClient) {
-      await this.mcpClient.close();
-    }
-  }
-
-  /**
-   * Starts the stdio MCP server process and connects to it
-   */
-  private async startStdioServer(): Promise<void> {
-    // Create stdio transport (it will spawn the process internally)
-    const transport = new StdioClientTransport({
-      command: this.options.command,
-      args: this.options.args,
-    });
-
-    // Create MCP client
-    this.mcpClient = new Client(
-      {
-        name: "mcp-router-http-bridge",
-        version: "0.1.0",
-      },
-      {
-        capabilities: {},
-      },
-    );
-
-    // Connect to the stdio server
-    await this.mcpClient.connect(transport);
-  }
-
-  /**
-   * Handles incoming HTTP requests and forwards them to the stdio MCP server
-   */
-  private async handleRequest(
-    req: IncomingMessage,
-    res: ServerResponse,
-  ): Promise<void> {
-    // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization",
-    );
-
-    // Handle preflight requests
-    if (req.method === "OPTIONS") {
-      res.writeHead(200);
-      res.end();
-      return;
-    }
-
-    // Only accept POST requests to /mcp
-    if (req.method !== "POST" || req.url !== "/mcp") {
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Not found" }));
-      return;
-    }
-
-    let request: any = null;
-    try {
-      // Parse request body
-      const body = await this.parseRequestBody(req);
-      request = JSON.parse(body);
-
-      // Log incoming request for debugging
-      if (this.options.verbose) {
-        console.log("[serve] Incoming request:", JSON.stringify(request, null, 2));
+    // Close all client connections
+    for (const [id, client] of this.clients) {
+      try {
+        await client.close();
+      } catch (error) {
+        console.error(`Error closing client ${id}:`, error);
       }
+    }
+  }
 
-      // Handle different request types
-      let result: any;
+  /**
+   * Starts all stdio MCP server processes and registers them with the aggregator
+   */
+  private async startStdioServers(): Promise<void> {
+    const startPromises = this.options.servers.map(async (serverConfig) => {
+      try {
+        // Create stdio transport (it will spawn the process internally)
+        const transport = new StdioClientTransport({
+          command: serverConfig.command,
+          args: serverConfig.args,
+        });
 
-      switch (request.method) {
-        case "initialize":
-          result = await this.handleInitialize(request);
-          break;
-        case "tools/list":
-          result = await this.handleListTools(request);
-          break;
-        case "tools/call":
-          result = await this.handleCallTool(request);
-          break;
-        case "resources/list":
-          result = await this.handleListResources(request);
-          break;
-        case "resources/templates/list":
-          result = await this.handleListResourceTemplates(request);
-          break;
-        case "resources/read":
-          result = await this.handleReadResource(request);
-          break;
-        case "prompts/list":
-          result = await this.handleListPrompts(request);
-          break;
-        case "prompts/get":
-          result = await this.handleGetPrompt(request);
-          break;
-        default:
-          throw new McpError(
-            ErrorCode.MethodNotFound,
-            `Unknown method: ${request.method}`,
+        // Create MCP client
+        const client = new Client(
+          {
+            name: `mcp-aggregator-client-${serverConfig.id}`,
+            version: "0.1.0",
+          },
+          {
+            capabilities: {},
+          },
+        );
+
+        // Connect to the stdio server
+        await client.connect(transport);
+
+        // Store the client
+        this.clients.set(serverConfig.id, client);
+
+        // Register with aggregator
+        this.aggregator!.registerClient(
+          serverConfig.id,
+          serverConfig.name,
+          client,
+        );
+
+        if (this.options.verbose) {
+          console.error(
+            `Connected to server: ${serverConfig.name} (${serverConfig.id})`,
           );
+        }
+      } catch (error) {
+        console.error(
+          `Failed to start server ${serverConfig.name} (${serverConfig.id}):`,
+          error,
+        );
+        throw error;
       }
-
-      // Send response
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify({
-          jsonrpc: "2.0",
-          id: request.id,
-          result,
-        }),
-      );
-    } catch (error) {
-      // Send error response
-      let errorCode = ErrorCode.InternalError;
-      let errorMessage = "Unknown error";
-      let errorData = undefined;
-
-      if (error instanceof z.ZodError) {
-        errorCode = ErrorCode.InvalidParams;
-        errorMessage = "Invalid request parameters";
-        errorData = error.errors;
-        // Log validation error for debugging
-        console.error("[serve] Schema validation error:", JSON.stringify(error.errors, null, 2));
-      } else if (error instanceof McpError) {
-        errorCode = error.code;
-        errorMessage = error.message;
-        errorData = error.data;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      const errorResponse = {
-        jsonrpc: "2.0",
-        id: request?.id || null,
-        error: {
-          code: errorCode,
-          message: errorMessage,
-          data: errorData,
-        },
-      };
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(errorResponse));
-    }
-  }
-
-  /**
-   * Parse request body
-   */
-  private parseRequestBody(req: IncomingMessage): Promise<string> {
-    return new Promise((resolve, reject) => {
-      let body = "";
-      req.on("data", (chunk) => {
-        body += chunk.toString();
-      });
-      req.on("end", () => {
-        resolve(body);
-      });
-      req.on("error", reject);
     });
-  }
 
-  /**
-   * Handle initialize request
-   */
-  private async handleInitialize(request: any): Promise<any> {
-    const params = InitializeRequestSchema.parse({
-      jsonrpc: "2.0",
-      method: "initialize",
-      params: request.params
-    });
-    
-    return {
-      protocolVersion: params.params.protocolVersion || "2024-10-07",
-      capabilities: {
-        resources: {},
-        tools: {},
-        prompts: {},
-      },
-      serverInfo: {
-        name: "mcp-router-http-bridge",
-        version: "0.1.0",
-      },
-    };
-  }
-
-  /**
-   * Handle list tools request
-   */
-  private async handleListTools(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = ListToolsRequestSchema.parse(request.params || {});
-    return await this.mcpClient.listTools(params);
-  }
-
-  /**
-   * Handle call tool request
-   */
-  private async handleCallTool(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = CallToolRequestSchema.parse({
-      jsonrpc: "2.0",
-      method: "tools/call",
-      params: request.params
-    });
-    return await this.mcpClient.callTool(params.params);
-  }
-
-  /**
-   * Handle list resources request
-   */
-  private async handleListResources(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = ListResourcesRequestSchema.parse(request.params || {});
-    return await this.mcpClient.listResources(params);
-  }
-
-  /**
-   * Handle list resource templates request
-   */
-  private async handleListResourceTemplates(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = ListResourceTemplatesRequestSchema.parse(
-      request.params || {},
-    );
-    return await this.mcpClient.listResourceTemplates(params);
-  }
-
-  /**
-   * Handle read resource request
-   */
-  private async handleReadResource(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = ReadResourceRequestSchema.parse({
-      jsonrpc: "2.0",
-      method: "resources/read",
-      params: request.params
-    });
-    return await this.mcpClient.readResource(params.params);
-  }
-
-  /**
-   * Handle list prompts request
-   */
-  private async handleListPrompts(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = ListPromptsRequestSchema.parse(request.params || {});
-    return await this.mcpClient.listPrompts(params);
-  }
-
-  /**
-   * Handle get prompt request
-   */
-  private async handleGetPrompt(request: any): Promise<any> {
-    if (!this.mcpClient) {
-      throw new McpError(ErrorCode.InternalError, "MCP client not initialized");
-    }
-
-    const params = GetPromptRequestSchema.parse({
-      jsonrpc: "2.0",
-      method: "prompts/get",
-      params: request.params
-    });
-    return await this.mcpClient.getPrompt(params.params);
+    await Promise.all(startPromises);
   }
 }

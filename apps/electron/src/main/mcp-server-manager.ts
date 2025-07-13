@@ -386,7 +386,7 @@ export class MCPServerManager {
     });
 
     // Return servers with their current runtime status preserved
-    return Array.from(this.servers.values()).map(server => {
+    return Array.from(this.servers.values()).map((server) => {
       // Ensure we return the actual runtime status, not a stale one
       const currentServer = this.servers.get(server.id);
       return currentServer || server;

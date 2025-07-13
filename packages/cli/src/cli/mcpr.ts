@@ -4,7 +4,7 @@ import { executeHelp } from "./commands/help.js";
 import { executeVersion } from "./commands/version.js";
 import { executeServe } from "./commands/serve.js";
 
-export const VERSION = "0.1.2";
+export const VERSION = "0.1.3";
 export const SERVER_NAME = "MCP Router";
 
 // Parse command-line arguments
