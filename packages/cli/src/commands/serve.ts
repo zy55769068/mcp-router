@@ -149,10 +149,10 @@ class StdioMcpBridgeServer {
       await transport.handleRequest(req, res);
     });
 
-    // Start listening
-    this.httpServer.listen(this.options.port, () => {
+    // Start listening on all network interfaces (0.0.0.0)
+    this.httpServer.listen(this.options.port, "0.0.0.0", () => {
       console.error(
-        `HTTP MCP Aggregator Server listening on port ${this.options.port}`,
+        `HTTP MCP Aggregator Server listening on 0.0.0.0:${this.options.port}`,
       );
       console.error(
         `Aggregating ${this.options.servers.length} MCP server(s):`,
