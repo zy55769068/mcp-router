@@ -39,7 +39,7 @@ export class MCPAggregator {
           tools: {},
           prompts: {},
         },
-      }
+      },
     );
 
     this.setupRequestHandlers();

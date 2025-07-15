@@ -24,9 +24,6 @@ interface ClientConfig {
   content?: any;
 }
 
-// Base directory for imported server contexts
-const SERVERS_DIR = path.join(app.getPath("userData"), "mcp-servers");
-
 /**
  * Sync server configurations from a provided list of configs
  * Used by the mcp-apps-service to sync servers found in client config files
