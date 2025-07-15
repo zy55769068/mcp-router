@@ -22,12 +22,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@mcp_router/ui";
-import { useServerStore } from "@/frontend/stores";
+import { useServerStore, useWorkspaceStore } from "@/frontend/stores";
 
 const DiscoverWrapper: React.FC = () => {
   const { t } = useTranslation();
   const platformAPI = usePlatformAPI();
   const { createServer } = useServerStore();
+  const { currentWorkspace } = useWorkspaceStore();
+  const isRemoteWorkspace = currentWorkspace?.type === "remote";
   const [verifiedServers, setVerifiedServers] = useState<LocalMCPServer[]>([]);
   const [communityServers, setCommunityServers] = useState<LocalMCPServer[]>(
     [],
@@ -322,106 +324,117 @@ const DiscoverWrapper: React.FC = () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <Tabs defaultValue="manual" className="space-y-6">
-        <div>
+      {isRemoteWorkspace ? (
+        // リモートワークスペースの場合、Manualコンポーネントのみを表示
+        <div className="space-y-6">
           <h2 className="text-lg font-bold mb-4 text-center">
             {t("discoverServers.title")}
           </h2>
-          <TabsList className="w-full border-b">
-            <TabsTrigger value="registry" className="flex-1">
-              {t("discoverServers.tabs.registry")}
-            </TabsTrigger>
-            <TabsTrigger value="manual" className="flex-1">
-              {t("discoverServers.tabs.manual")}
-            </TabsTrigger>
-          </TabsList>
+          <Manual />
         </div>
-
-        <TabsContent value="registry" className="space-y-6">
-          <Tabs defaultValue="verified" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="verified">
-                {t("discoverServers.verifiedTab")}
+      ) : (
+        // ローカルワークスペースの場合、既存のタブ表示
+        <Tabs defaultValue="manual" className="space-y-6">
+          <div>
+            <h2 className="text-lg font-bold mb-4 text-center">
+              {t("discoverServers.title")}
+            </h2>
+            <TabsList className="w-full border-b">
+              <TabsTrigger value="registry" className="flex-1">
+                {t("discoverServers.tabs.registry")}
               </TabsTrigger>
-              <TabsTrigger value="community">
-                {t("discoverServers.communityTab")}
+              <TabsTrigger value="manual" className="flex-1">
+                {t("discoverServers.tabs.manual")}
               </TabsTrigger>
             </TabsList>
+          </div>
 
-            {/* Verified Servers Tab */}
-            <TabsContent value="verified" className="space-y-4">
-              <ServerSearchBox
-                searchTerm={verifiedSearchTerm}
-                onSearchChange={setVerifiedSearchTerm}
-                placeholderKey="discoverServers.searchVerifiedPlaceholder"
-              />
-              <DiscoverServerList
-                remoteServers={verifiedServers}
-                onImportServer={handleImportServer}
-                isLoading={isLoadingVerifiedServers}
-                importingServerIds={importingServerIds}
-                installedServerIds={installedServerIds}
-                tabType="verified"
-              />
+          <TabsContent value="registry" className="space-y-6">
+            <Tabs defaultValue="verified" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="verified">
+                  {t("discoverServers.verifiedTab")}
+                </TabsTrigger>
+                <TabsTrigger value="community">
+                  {t("discoverServers.communityTab")}
+                </TabsTrigger>
+              </TabsList>
 
-              {/* Verified Pagination controls */}
-              {!isLoadingVerifiedServers && (
-                <div className="overflow-x-auto">
-                  <CustomPagination
-                    currentPage={verifiedCurrentPage}
-                    totalPages={verifiedTotalPages}
-                    totalItems={verifiedTotalItems}
-                    pageSize={verifiedPageLimit}
-                    onPageChange={handleVerifiedPageChange}
-                    onPageSizeChange={handleVerifiedPageSizeChange}
-                    pageSizeOptions={[10, 20, 50]}
-                    showPageSizeSelector={true}
-                    maxPageButtons={5}
-                  />
-                </div>
-              )}
-            </TabsContent>
+              {/* Verified Servers Tab */}
+              <TabsContent value="verified" className="space-y-4">
+                <ServerSearchBox
+                  searchTerm={verifiedSearchTerm}
+                  onSearchChange={setVerifiedSearchTerm}
+                  placeholderKey="discoverServers.searchVerifiedPlaceholder"
+                />
+                <DiscoverServerList
+                  remoteServers={verifiedServers}
+                  onImportServer={handleImportServer}
+                  isLoading={isLoadingVerifiedServers}
+                  importingServerIds={importingServerIds}
+                  installedServerIds={installedServerIds}
+                  tabType="verified"
+                />
 
-            {/* Community Servers Tab */}
-            <TabsContent value="community" className="space-y-4">
-              <ServerSearchBox
-                searchTerm={communitySearchTerm}
-                onSearchChange={setCommunitySearchTerm}
-                placeholderKey="discoverServers.searchCommunityPlaceholder"
-              />
-              <DiscoverServerList
-                remoteServers={communityServers}
-                onImportServer={handleImportServer}
-                isLoading={isLoadingCommunityServers}
-                importingServerIds={importingServerIds}
-                installedServerIds={installedServerIds}
-                tabType="community"
-              />
+                {/* Verified Pagination controls */}
+                {!isLoadingVerifiedServers && (
+                  <div className="overflow-x-auto">
+                    <CustomPagination
+                      currentPage={verifiedCurrentPage}
+                      totalPages={verifiedTotalPages}
+                      totalItems={verifiedTotalItems}
+                      pageSize={verifiedPageLimit}
+                      onPageChange={handleVerifiedPageChange}
+                      onPageSizeChange={handleVerifiedPageSizeChange}
+                      pageSizeOptions={[10, 20, 50]}
+                      showPageSizeSelector={true}
+                      maxPageButtons={5}
+                    />
+                  </div>
+                )}
+              </TabsContent>
 
-              {/* Community Pagination controls */}
-              {!isLoadingCommunityServers && (
-                <div className="overflow-x-auto">
-                  <CustomPagination
-                    currentPage={communityCurrentPage}
-                    totalPages={communityTotalPages}
-                    totalItems={communityTotalItems}
-                    pageSize={communityPageLimit}
-                    onPageChange={handleCommunityPageChange}
-                    onPageSizeChange={handleCommunityPageSizeChange}
-                    pageSizeOptions={[5, 10, 20]}
-                    showPageSizeSelector={true}
-                    maxPageButtons={5}
-                  />
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
+              {/* Community Servers Tab */}
+              <TabsContent value="community" className="space-y-4">
+                <ServerSearchBox
+                  searchTerm={communitySearchTerm}
+                  onSearchChange={setCommunitySearchTerm}
+                  placeholderKey="discoverServers.searchCommunityPlaceholder"
+                />
+                <DiscoverServerList
+                  remoteServers={communityServers}
+                  onImportServer={handleImportServer}
+                  isLoading={isLoadingCommunityServers}
+                  importingServerIds={importingServerIds}
+                  installedServerIds={installedServerIds}
+                  tabType="community"
+                />
 
-        <TabsContent value="manual">
-          <Manual />
-        </TabsContent>
-      </Tabs>
+                {/* Community Pagination controls */}
+                {!isLoadingCommunityServers && (
+                  <div className="overflow-x-auto">
+                    <CustomPagination
+                      currentPage={communityCurrentPage}
+                      totalPages={communityTotalPages}
+                      totalItems={communityTotalItems}
+                      pageSize={communityPageLimit}
+                      onPageChange={handleCommunityPageChange}
+                      onPageSizeChange={handleCommunityPageSizeChange}
+                      pageSizeOptions={[5, 10, 20]}
+                      showPageSizeSelector={true}
+                      maxPageButtons={5}
+                    />
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="manual">
+            <Manual />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

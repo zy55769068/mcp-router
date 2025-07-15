@@ -102,13 +102,16 @@ export class MCPAggregator {
       async () => {
         const resourceTemplates = await this.aggregateResourceTemplates();
         return { resourceTemplates };
-      }
+      },
     );
 
     // Read Resource
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-      return await this.readResource(request.params.uri);
-    });
+    this.server.setRequestHandler(
+      ReadResourceRequestSchema,
+      async (request) => {
+        return await this.readResource(request.params.uri);
+      },
+    );
 
     // List Prompts
     this.server.setRequestHandler(ListPromptsRequestSchema, async () => {
@@ -118,7 +121,10 @@ export class MCPAggregator {
 
     // Get Prompt
     this.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-      return await this.getPrompt(request.params.name, request.params.arguments);
+      return await this.getPrompt(
+        request.params.name,
+        request.params.arguments,
+      );
     });
   }
 
@@ -140,11 +146,11 @@ export class MCPAggregator {
         } catch (error) {
           console.error(
             `Failed to list tools from server ${serverClient.name}:`,
-            error
+            error,
           );
         }
         return null;
-      }
+      },
     );
 
     const results = await Promise.all(toolPromises);
@@ -171,22 +177,22 @@ export class MCPAggregator {
     const serverId = this.toolToServerMap.get(name);
 
     if (!serverId) {
-      throw new McpError(
-        ErrorCode.InvalidRequest,
-        `Tool not found: ${name}`
-      );
+      throw new McpError(ErrorCode.InvalidRequest, `Tool not found: ${name}`);
     }
 
     const serverClient = this.clients.get(serverId);
     if (!serverClient) {
       throw new McpError(
         ErrorCode.InvalidRequest,
-        `Server not available for tool: ${name}`
+        `Server not available for tool: ${name}`,
       );
     }
 
     try {
-      return await serverClient.client.callTool({ name, arguments: args || {} });
+      return await serverClient.client.callTool({
+        name,
+        arguments: args || {},
+      });
     } catch (error) {
       console.error(`Failed to call tool ${name}:`, error);
       throw error;
@@ -205,19 +211,19 @@ export class MCPAggregator {
         try {
           const response = await serverClient.client.listResources();
           if (response && Array.isArray(response.resources)) {
-            return { 
-              serverName: serverClient.name, 
-              resources: response.resources 
+            return {
+              serverName: serverClient.name,
+              resources: response.resources,
             };
           }
         } catch (error) {
           console.error(
             `Failed to list resources from server ${serverClient.name}:`,
-            error
+            error,
           );
         }
         return null;
-      }
+      },
     );
 
     const results = await Promise.all(resourcePromises);
@@ -261,19 +267,19 @@ export class MCPAggregator {
         try {
           const response = await serverClient.client.listResourceTemplates();
           if (response && Array.isArray(response.resourceTemplates)) {
-            return { 
-              serverName: serverClient.name, 
-              templates: response.resourceTemplates 
+            return {
+              serverName: serverClient.name,
+              templates: response.resourceTemplates,
             };
           }
         } catch (error) {
           console.error(
             `Failed to list resource templates from server ${serverClient.name}:`,
-            error
+            error,
           );
         }
         return null;
-      }
+      },
     );
 
     const results = await Promise.all(templatePromises);
@@ -281,7 +287,9 @@ export class MCPAggregator {
     for (const result of results) {
       if (result) {
         for (const template of result.templates) {
-          const protocolMatch = template.uriTemplate.match(/^([a-zA-Z]+:\/\/)(.+)$/);
+          const protocolMatch = template.uriTemplate.match(
+            /^([a-zA-Z]+:\/\/)(.+)$/,
+          );
           let standardizedTemplate: string;
 
           if (protocolMatch) {
@@ -290,7 +298,7 @@ export class MCPAggregator {
             standardizedTemplate = `resource://${result.serverName}/${path}`;
             this.resourceProtocolMap.set(
               `template:${standardizedTemplate}`,
-              originalProtocol
+              originalProtocol,
             );
           } else {
             standardizedTemplate = `resource://${result.serverName}/${template.uriTemplate}`;
@@ -316,7 +324,7 @@ export class MCPAggregator {
     if (!match) {
       throw new McpError(
         ErrorCode.InvalidRequest,
-        `Invalid resource URI format: ${uri}`
+        `Invalid resource URI format: ${uri}`,
       );
     }
 
@@ -334,7 +342,7 @@ export class MCPAggregator {
     if (!targetClient) {
       throw new McpError(
         ErrorCode.InvalidRequest,
-        `Server not found: ${serverName}`
+        `Server not found: ${serverName}`,
       );
     }
 
@@ -351,7 +359,9 @@ export class MCPAggregator {
     // Try each variant
     for (const variantUri of uriVariants) {
       try {
-        const response = await targetClient.client.readResource({ uri: variantUri });
+        const response = await targetClient.client.readResource({
+          uri: variantUri,
+        });
         if (response && response.contents && response.contents.length > 0) {
           return response;
         }
@@ -379,11 +389,11 @@ export class MCPAggregator {
         } catch (error) {
           console.error(
             `Failed to list prompts from server ${serverClient.name}:`,
-            error
+            error,
           );
         }
         return [];
-      }
+      },
     );
 
     const results = await Promise.all(promptPromises);
@@ -403,7 +413,9 @@ export class MCPAggregator {
       try {
         const promptsResponse = await serverClient.client.listPrompts();
         if (promptsResponse && Array.isArray(promptsResponse.prompts)) {
-          const hasPrompt = promptsResponse.prompts.some((p) => p.name === name);
+          const hasPrompt = promptsResponse.prompts.some(
+            (p) => p.name === name,
+          );
           if (hasPrompt) {
             return await serverClient.client.getPrompt({
               name,
@@ -416,10 +428,7 @@ export class MCPAggregator {
       }
     }
 
-    throw new McpError(
-      ErrorCode.InvalidRequest,
-      `Prompt not found: ${name}`
-    );
+    throw new McpError(ErrorCode.InvalidRequest, `Prompt not found: ${name}`);
   }
 
   /**
