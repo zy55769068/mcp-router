@@ -10,7 +10,7 @@ import {
   IconFileText,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
-import { useAuthStore } from "@/frontend/stores";
+import { useAuthStore, useWorkspaceStore } from "@/frontend/stores";
 import { usePlatformAPI } from "@/lib/platform-api";
 // @ts-ignore
 import iconImage from "../../../../../public/images/icon/icon.png";
@@ -40,6 +40,8 @@ const SidebarComponent: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { isAuthenticated } = useAuthStore();
+  const currentWorkspace = useWorkspaceStore((state) => state.currentWorkspace);
+  const isRemoteWorkspace = currentWorkspace?.type === "remote";
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [isSendingFeedback, setIsSendingFeedback] = useState(false);
@@ -106,75 +108,77 @@ const SidebarComponent: React.FC = () => {
 
       <SidebarContent>
         <SidebarMenu>
-          <Collapsible defaultOpen className="group/collapsible">
-            <SidebarGroup>
-              <SidebarGroupLabel>
-                <CollapsibleTrigger className="flex flex-row items-center w-full">
-                  {t("agents.title")}
-                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={
-                        isAuthenticated
-                          ? t("agents.use")
-                          : t("agents.loginRequired.featureDescription")
-                      }
-                      isActive={
-                        location.pathname === "/agents/use" ||
-                        location.pathname.startsWith("/agents/use/")
-                      }
-                    >
-                      <Link
-                        to="/agents/use"
-                        className={`flex items-center gap-3 py-5 px-3 w-full ${!isAuthenticated ? "opacity-60" : ""}`}
+          {!isRemoteWorkspace && (
+            <Collapsible defaultOpen className="group/collapsible">
+              <SidebarGroup>
+                <SidebarGroupLabel>
+                  <CollapsibleTrigger className="flex flex-row items-center w-full">
+                    {t("agents.title")}
+                    <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  </CollapsibleTrigger>
+                </SidebarGroupLabel>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={
+                          isAuthenticated
+                            ? t("agents.use")
+                            : t("agents.loginRequired.featureDescription")
+                        }
+                        isActive={
+                          location.pathname === "/agents/use" ||
+                          location.pathname.startsWith("/agents/use/")
+                        }
                       >
-                        <IconRobot className="h-6 w-6" />
-                        <span className="text-base">{t("agents.use")}</span>
-                        {!isAuthenticated && (
-                          <span className="text-xs text-muted-foreground ml-auto">
-                            Login required
-                          </span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                        <Link
+                          to="/agents/use"
+                          className={`flex items-center gap-3 py-5 px-3 w-full ${!isAuthenticated ? "opacity-60" : ""}`}
+                        >
+                          <IconRobot className="h-6 w-6" />
+                          <span className="text-base">{t("agents.use")}</span>
+                          {!isAuthenticated && (
+                            <span className="text-xs text-muted-foreground ml-auto">
+                              Login required
+                            </span>
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
 
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={
-                        isAuthenticated
-                          ? t("agents.build")
-                          : t("agents.loginRequired.featureDescription")
-                      }
-                      isActive={
-                        location.pathname === "/agents/build" ||
-                        location.pathname.startsWith("/agents/build/")
-                      }
-                    >
-                      <Link
-                        to="/agents/build"
-                        className={`flex items-center gap-3 py-5 px-3 w-full ${!isAuthenticated ? "opacity-60" : ""}`}
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={
+                          isAuthenticated
+                            ? t("agents.build")
+                            : t("agents.loginRequired.featureDescription")
+                        }
+                        isActive={
+                          location.pathname === "/agents/build" ||
+                          location.pathname.startsWith("/agents/build/")
+                        }
                       >
-                        <Wrench className="h-6 w-6" />
-                        <span className="text-base">{t("agents.build")}</span>
-                        {!isAuthenticated && (
-                          <span className="text-xs text-muted-foreground ml-auto">
-                            Login required
-                          </span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
+                        <Link
+                          to="/agents/build"
+                          className={`flex items-center gap-3 py-5 px-3 w-full ${!isAuthenticated ? "opacity-60" : ""}`}
+                        >
+                          <Wrench className="h-6 w-6" />
+                          <span className="text-base">{t("agents.build")}</span>
+                          {!isAuthenticated && (
+                            <span className="text-xs text-muted-foreground ml-auto">
+                              Login required
+                            </span>
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+          )}
 
           <Collapsible defaultOpen className="group/collapsible">
             <SidebarGroup>
@@ -220,39 +224,43 @@ const SidebarComponent: React.FC = () => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={t("rules.title")}
-                      isActive={location.pathname === "/rules"}
-                    >
-                      <Link
-                        to="/rules"
-                        className="flex items-center gap-3 py-5 px-3 w-full"
+                  {!isRemoteWorkspace && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={t("rules.title")}
+                        isActive={location.pathname === "/rules"}
                       >
-                        <IconFileText className="h-6 w-6" />
-                        <span className="text-base">{t("rules.title")}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                        <Link
+                          to="/rules"
+                          className="flex items-center gap-3 py-5 px-3 w-full"
+                        >
+                          <IconFileText className="h-6 w-6" />
+                          <span className="text-base">{t("rules.title")}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
 
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={t("serverDetails.requestLogs")}
-                      isActive={location.pathname === "/logs"}
-                    >
-                      <Link
-                        to="/logs"
-                        className="flex items-center gap-3 py-5 px-3 w-full"
+                  {!isRemoteWorkspace && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={t("serverDetails.requestLogs")}
+                        isActive={location.pathname === "/logs"}
                       >
-                        <IconActivity className="h-6 w-6" />
-                        <span className="text-base">
-                          {t("serverDetails.requestLogs")}
-                        </span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                        <Link
+                          to="/logs"
+                          className="flex items-center gap-3 py-5 px-3 w-full"
+                        >
+                          <IconActivity className="h-6 w-6" />
+                          <span className="text-base">
+                            {t("serverDetails.requestLogs")}
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                 </SidebarGroupContent>
               </CollapsibleContent>
             </SidebarGroup>
