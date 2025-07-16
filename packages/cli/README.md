@@ -40,6 +40,9 @@ npx @mcp_router/cli serve npx @modelcontextprotocol/server-filesystem /path/to/d
 # Use a custom port
 npx @mcp_router/cli serve --port 8080 python my-mcp-server.py
 
+# Enable authentication with a Bearer token
+npx @mcp_router/cli serve --token secret123 python my-mcp-server.py
+
 # Pass arguments to the MCP server
 npx @mcp_router/cli serve -- node my-server.js --config config.json
 ```

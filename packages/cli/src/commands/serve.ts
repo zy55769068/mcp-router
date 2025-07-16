@@ -39,17 +39,22 @@ function parseArgs(args: string[]): {
   port: number;
   servers: ServerConfig[];
   verbose?: boolean;
+  token?: string;
 } {
   const options = {
     port: 3283,
     servers: [] as ServerConfig[],
     verbose: false,
+    token: undefined as string | undefined,
   };
 
   let i = 0;
   while (i < args.length) {
     if (args[i] === "--port" && i + 1 < args.length) {
       options.port = parseInt(args[i + 1], 10);
+      i += 2;
+    } else if (args[i] === "--token" && i + 1 < args.length) {
+      options.token = args[i + 1];
       i += 2;
     } else if (args[i] === "--verbose" || args[i] === "-v") {
       options.verbose = true;
@@ -99,8 +104,8 @@ function parseArgs(args: string[]): {
   if (options.servers.length === 0) {
     throw new Error(
       "No servers specified. Usage:\n" +
-        "  Single server: mcpr-cli serve [--port <port>] [--verbose] <command> [args...]\n" +
-        "  Multiple servers: mcpr-cli serve [--port <port>] [--verbose] --server <id> <name> <command> [args...] [--server ...]",
+        "  Single server: mcpr-cli serve [--port <port>] [--token <token>] [--verbose] <command> [args...]\n" +
+        "  Multiple servers: mcpr-cli serve [--port <port>] [--token <token>] [--verbose] --server <id> <name> <command> [args...] [--server ...]",
     );
   }
 
@@ -124,6 +129,7 @@ class StdioMcpBridgeServer {
       port: number;
       servers: ServerConfig[];
       verbose?: boolean;
+      token?: string;
     },
   ) {}
 
@@ -136,6 +142,41 @@ class StdioMcpBridgeServer {
 
     // Create HTTP server and start listening immediately
     this.httpServer = createServer(async (req, res) => {
+      // Check authentication if token is configured
+      if (this.options.token) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: {
+                code: -32001,
+                message: "Unauthorized: Missing or invalid Bearer token",
+              },
+              id: null,
+            }),
+          );
+          return;
+        }
+
+        const providedToken = authHeader.substring(7); // Remove "Bearer " prefix
+        if (providedToken !== this.options.token) {
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: {
+                code: -32001,
+                message: "Unauthorized: Invalid token",
+              },
+              id: null,
+            }),
+          );
+          return;
+        }
+      }
+
       if (!this.isReady) {
         // Return a fake response while servers are starting up
         res.writeHead(503, { "Content-Type": "application/json" });
@@ -168,6 +209,9 @@ class StdioMcpBridgeServer {
       console.error(
         `HTTP MCP Aggregator Server listening on 0.0.0.0:${this.options.port}`,
       );
+      if (this.options.token) {
+        console.error(`Authentication enabled with Bearer token`);
+      }
       console.error(`Starting ${this.options.servers.length} MCP server(s)...`);
     });
 
