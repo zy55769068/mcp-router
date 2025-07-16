@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils/tailwind-utils";
 import { Trash, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { useServerStore } from "../stores";
+import { useServerStore, useWorkspaceStore, useAuthStore } from "../stores";
 import { showServerError } from "@/frontend/components/common";
 
 // Import components
@@ -28,6 +28,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@mcp_router/ui";
+import { LoginScreen } from "@/frontend/components/setup/LoginScreen";
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
@@ -42,9 +43,12 @@ const Home: React.FC = () => {
     setSelectedServerId,
     startServer,
     stopServer,
-    updateServerConfig,
     deleteServer,
   } = useServerStore();
+
+  // Get workspace and auth state
+  const { currentWorkspace } = useWorkspaceStore();
+  const { isAuthenticated, login } = useAuthStore();
 
   // Filter servers based on search query and sort them
   const filteredServers = servers
@@ -94,7 +98,7 @@ const Home: React.FC = () => {
       try {
         await deleteServer(serverToRemove.id);
         toast.success(t("serverDetails.removeSuccess"));
-      } catch (error) {
+      } catch {
         toast.error(t("serverDetails.removeFailed"));
       } finally {
         setIsRemoveDialogOpen(false);
@@ -102,6 +106,11 @@ const Home: React.FC = () => {
       }
     }
   };
+
+  // Show login screen for remote workspaces if not authenticated
+  if (currentWorkspace?.type === "remote" && !isAuthenticated) {
+    return <LoginScreen onLogin={login} />;
+  }
 
   return (
     <div className="flex flex-col h-full">

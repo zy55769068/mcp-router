@@ -49,7 +49,7 @@
   },
   "login": {
     "title": "MCP Routerにログイン",
-    "description": "追加機能にアクセスするためにログインするか、アカウントなしでMCP Routerを使用するためにスキップしてください。",
+    "description": "この機能にアクセスするためにログインしてください。",
     "loginButton": "ログイン",
     "skipButton": "ログインをスキップ"
   },

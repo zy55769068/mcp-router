@@ -16,7 +16,7 @@ import type {
 
 interface RemoteWorkspaceConfig {
   apiUrl: string;
-  authToken: string;
+  userToken: string;
 }
 
 /**
@@ -25,11 +25,24 @@ interface RemoteWorkspaceConfig {
  */
 export class RemotePlatformAPI implements PlatformAPI {
   private client: RemoteAPIClient;
+  private config: RemoteWorkspaceConfig;
 
   constructor(config: RemoteWorkspaceConfig) {
+    this.config = config;
+    // Client will be initialized with user token when needed
+    this.initializeClient();
+  }
+
+  private initializeClient(): void {
+    if (!this.config.userToken) {
+      throw new Error(
+        "User authentication token is required for remote workspaces",
+      );
+    }
+
     this.client = createRemoteAPIClient({
-      url: config.apiUrl.replace(/\/$/, ""), // Remove trailing slash
-      token: config.authToken,
+      url: this.config.apiUrl.replace(/\/$/, ""), // Remove trailing slash
+      token: this.config.userToken,
     });
   }
 

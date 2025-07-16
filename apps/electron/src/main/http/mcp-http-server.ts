@@ -160,8 +160,9 @@ export class MCPHttpServer {
             throw new Error("Remote workspace has no API URL configured");
           }
 
-          // Get auth token for remote workspace
-          const authToken = platformManager.getRemoteAuthToken();
+          // Get user auth token instead of workspace token
+          const { getDecryptedAuthToken } = await import("../auth");
+          const authToken = await getDecryptedAuthToken();
 
           // Forward the request to remote aggregator
           await this.forwardToRemoteAggregator(
@@ -889,7 +890,7 @@ export class MCPHttpServer {
   ): Promise<void> {
     try {
       // Construct the remote MCP endpoint URL
-      const remoteUrl = new URL("/api/mcp", remoteApiUrl).toString();
+      const remoteUrl = new URL(remoteApiUrl + "/mcp");
 
       // Forward the request to the remote aggregator
       const response = await fetch(remoteUrl, {

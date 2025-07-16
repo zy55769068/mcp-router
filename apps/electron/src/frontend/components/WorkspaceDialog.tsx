@@ -25,7 +25,6 @@ interface WorkspaceDialogProps {
     type: "local" | "remote";
     remoteConfig?: {
       apiUrl?: string;
-      authToken?: string;
     };
   };
   onClose: () => void;
@@ -41,13 +40,11 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
     name: workspace?.name || "",
     type: workspace?.type || ("local" as "local" | "remote"),
     apiUrl: workspace?.remoteConfig?.apiUrl || "",
-    authToken: workspace?.remoteConfig?.authToken || "",
   });
 
   const [validationErrors, setValidationErrors] = useState<{
     name?: string;
     apiUrl?: string;
-    authToken?: string;
   }>({});
 
   useEffect(() => {
@@ -67,10 +64,6 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
         errors.apiUrl = "API URL is required for remote workspaces";
       } else if (!formData.apiUrl.match(/^https?:\/\/.+/)) {
         errors.apiUrl = "Please enter a valid URL";
-      }
-
-      if (!formData.authToken.trim()) {
-        errors.authToken = "Auth token is required for remote workspaces";
       }
     }
 
@@ -94,7 +87,6 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
         type: "local" | "remote";
         remoteConfig?: {
           apiUrl: string;
-          authToken: string;
         };
       } = {
         name: formData.name,
@@ -104,7 +96,6 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
       if (formData.type === "remote") {
         config.remoteConfig = {
           apiUrl: formData.apiUrl,
-          authToken: formData.authToken,
         };
       }
 
@@ -204,27 +195,6 @@ export function WorkspaceDialog({ workspace, onClose }: WorkspaceDialogProps) {
                   {validationErrors.apiUrl && (
                     <p className="text-sm text-destructive">
                       {validationErrors.apiUrl}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="authToken">Auth Token</Label>
-                  <Input
-                    id="authToken"
-                    type="password"
-                    value={formData.authToken}
-                    onChange={(e) =>
-                      setFormData({ ...formData, authToken: e.target.value })
-                    }
-                    placeholder="Your authentication token"
-                    className={
-                      validationErrors.authToken ? "border-destructive" : ""
-                    }
-                  />
-                  {validationErrors.authToken && (
-                    <p className="text-sm text-destructive">
-                      {validationErrors.authToken}
                     </p>
                   )}
                 </div>

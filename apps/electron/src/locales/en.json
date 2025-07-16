@@ -46,7 +46,7 @@
   "locale": "en-US",
   "login": {
     "title": "Login to MCP Router",
-    "description": "Login to access additional features, or skip to use MCP Router without an account.",
+    "description": "Login to access this feature",
     "loginButton": "Login",
     "skipButton": "Skip Login"
   },

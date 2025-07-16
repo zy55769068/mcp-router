@@ -31,6 +31,8 @@ export function WorkspaceSwitcher() {
   const handleWorkspaceSwitch = async (workspaceId: string) => {
     if (currentWorkspace?.id !== workspaceId) {
       await switchWorkspace(workspaceId);
+      // Navigate to root after switching workspace
+      navigate("/");
     }
   };
 

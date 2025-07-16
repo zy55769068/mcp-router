@@ -29,7 +29,7 @@ export function createRemoteAPIClient(
   const client = createTRPCProxyClient<any>({
     links: [
       httpBatchLink({
-        url: `${config.url}/api/trpc`,
+        url: `${config.url}/trpc`,
         headers: () => ({
           authorization: `Bearer ${config.token}`,
           ...config.headers,

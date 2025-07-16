@@ -3,6 +3,7 @@ import { Workspace } from "@/lib/platform-api";
 import { electronPlatformAPI } from "../lib/electron-platform-api";
 import { RemotePlatformAPI } from "../lib/remote-platform-api";
 import type { PlatformAPI } from "@/lib/platform-api/types/platform-api";
+import { useAuthStore } from "@/frontend/stores";
 
 interface WorkspaceState {
   workspaces: Workspace[];
@@ -196,12 +197,22 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
     // For remote workspaces, use cached instance or create new one
     if (currentWorkspace.type === "remote" && currentWorkspace.remoteConfig) {
-      const cacheKey = `${currentWorkspace.id}-${currentWorkspace.remoteConfig.apiUrl}-${currentWorkspace.remoteConfig.authToken}`;
+      // Get the user token from auth store
+      const authToken = useAuthStore.getState().authToken;
+
+      if (!authToken) {
+        console.error(
+          "No user authentication token available for remote workspace",
+        );
+        return electronPlatformAPI; // Fallback to electron API
+      }
+
+      const cacheKey = `${currentWorkspace.id}-${currentWorkspace.remoteConfig.apiUrl}-${authToken}`;
 
       if (!cache.has(cacheKey)) {
         const remoteAPI = new RemotePlatformAPI({
           apiUrl: currentWorkspace.remoteConfig.apiUrl,
-          authToken: currentWorkspace.remoteConfig.authToken || "",
+          userToken: authToken,
         });
         cache.set(cacheKey, remoteAPI);
 

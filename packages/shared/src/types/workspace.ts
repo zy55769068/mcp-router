@@ -27,7 +27,7 @@ export interface WorkspaceCreateConfig {
   type: "local" | "remote";
   remoteConfig?: {
     apiUrl: string;
-    authToken: string;
+    authToken?: string;
   };
 }
 
