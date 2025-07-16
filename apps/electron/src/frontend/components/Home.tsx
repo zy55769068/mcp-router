@@ -9,6 +9,7 @@ import {
   IconServer,
   IconChevronDown,
   IconPlus,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils/tailwind-utils";
@@ -44,6 +45,7 @@ const Home: React.FC = () => {
     startServer,
     stopServer,
     deleteServer,
+    refreshServers,
   } = useServerStore();
 
   // Get workspace and auth state
@@ -65,6 +67,9 @@ const Home: React.FC = () => {
   // State for error modal
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorServer, setErrorServer] = useState<MCPServer | null>(null);
+
+  // State for refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Toggle expanded server details
   const toggleServerExpand = (serverId: string) => {
@@ -107,6 +112,13 @@ const Home: React.FC = () => {
     }
   };
 
+  // Handle refresh servers
+  const handleRefreshServers = async () => {
+    setIsRefreshing(true);
+    await refreshServers();
+    setIsRefreshing(false);
+  };
+
   // Show login screen for remote workspaces if not authenticated
   if (currentWorkspace?.type === "remote" && !isAuthenticated) {
     return <LoginScreen onLogin={login} />;
@@ -133,8 +145,8 @@ const Home: React.FC = () => {
         </Button>
       </div>
 
-      <div className="mb-4">
-        <div className="relative">
+      <div className="mb-4 flex gap-2">
+        <div className="relative flex-1">
           <input
             type="text"
             value={searchQuery}
@@ -144,6 +156,16 @@ const Home: React.FC = () => {
           />
           <IconSearch className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefreshServers}
+          disabled={isRefreshing}
+          className="gap-1"
+          title={"Refresh Servers"}
+        >
+          <IconRefresh />
+        </Button>
       </div>
 
       <div className="border rounded-md overflow-hidden flex-1 mb-8">

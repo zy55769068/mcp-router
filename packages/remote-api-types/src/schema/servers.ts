@@ -74,7 +74,7 @@ export type ServersRouter = {
     mutate: (input: CreateServerInput) => Promise<MCPServer>;
   };
   update: {
-    mutate: (input: UpdateServerInput & { id: string }) => Promise<MCPServer>;
+    mutate: (input: UpdateServerInput) => Promise<MCPServer>;
   };
   delete: {
     mutate: (input: { id: string }) => Promise<void>;

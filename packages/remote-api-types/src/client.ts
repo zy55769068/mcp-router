@@ -3,6 +3,7 @@ import {
   httpBatchLink,
   TRPCClientError,
 } from "@trpc/client";
+import superjson from "superjson";
 import { MCPServer } from "@mcp_router/shared";
 import type {
   ServerStatus,
@@ -30,6 +31,7 @@ export function createRemoteAPIClient(
     links: [
       httpBatchLink({
         url: `${config.url}/trpc`,
+        transformer: superjson,
         headers: () => ({
           authorization: `Bearer ${config.token}`,
           ...config.headers,
@@ -64,7 +66,7 @@ export interface RemoteAPIClient {
       mutate: (input: CreateServerInput) => Promise<MCPServer>;
     };
     update: {
-      mutate: (input: UpdateServerInput & { id: string }) => Promise<MCPServer>;
+      mutate: (input: UpdateServerInput) => Promise<MCPServer>;
     };
     delete: {
       mutate: (input: { id: string }) => Promise<void>;

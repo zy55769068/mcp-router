@@ -98,7 +98,7 @@ export class RemotePlatformAPI implements PlatformAPI {
     ): Promise<MCPServer> => {
       const response = await this.client.servers.update.mutate({
         id,
-        ...updates,
+        config: updates,
       });
       return this.unwrapResponse<MCPServer>(response);
     },

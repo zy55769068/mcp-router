@@ -143,7 +143,33 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         useAgentStore.getState().clearStore();
         useAuthStore.getState().clearStore();
 
-        // Refresh data with new workspace
+        // 1. First, refresh auth store to ensure authentication is ready
+        try {
+          // Always use electron API to get settings (doesn't require auth)
+          const settings = await electronPlatformAPI.settings.get();
+          await useAuthStore.getState().initializeFromSettings(settings);
+
+          // For remote workspaces, check auth status
+          if (workspace.type === "remote") {
+            await useAuthStore.getState().checkAuthStatus();
+
+            // Verify authentication for remote workspaces
+            const authState = useAuthStore.getState();
+            if (!authState.isAuthenticated || !authState.authToken) {
+              console.log("Remote workspace requires authentication");
+              // Don't refresh data if not authenticated
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Failed to refresh auth store:", error);
+          // For remote workspaces, auth failure means we can't proceed
+          if (workspace.type === "remote") {
+            return;
+          }
+        }
+
+        // 2. Now refresh servers and agents (auth is ready)
         try {
           await useServerStore.getState().refreshServers();
         } catch (error) {
@@ -154,16 +180,6 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
           await useAgentStore.getState().refreshAgents();
         } catch (error) {
           console.error("Failed to refresh agents:", error);
-        }
-
-        // Re-initialize auth from settings
-        try {
-          const platformAPI = get().getPlatformAPI();
-          const settings = await platformAPI.settings.get();
-          await useAuthStore.getState().initializeFromSettings(settings);
-          await useAuthStore.getState().checkAuthStatus();
-        } catch (error) {
-          console.error("Failed to initialize auth:", error);
         }
       }
     } catch (error) {
