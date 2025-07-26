@@ -8,7 +8,7 @@ import {
 } from "electron";
 import { getSettingsService } from "@/main/services/settings-service";
 import path from "node:path";
-import { MCPServerManager } from "./main/mcp-server-manager";
+import { MCPServerManager } from "./main/mcp-manager";
 import { MCPServerConfig } from "@mcp_router/shared";
 import { getTokenService } from "@/main/services/token-service";
 import { TokenScope } from "@mcp_router/shared";
@@ -16,7 +16,7 @@ import {
   fetchMcpServersFromIndex,
   fetchMcpServerVersionDetails,
 } from "./main/mcp-fetcher";
-import { MCPHttpServer } from "./main/http/mcp-http-server";
+import { MCPHttpServer } from "./main/mcp-manager/http/mcp-http-server";
 import { logService } from "@/main/services/log-service";
 import started from "electron-squirrel-startup";
 import {

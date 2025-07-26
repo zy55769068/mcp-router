@@ -1,5 +1,5 @@
-import { app, BrowserWindow, Menu, Tray, nativeImage } from "electron";
-import { MCPServerManager } from "./mcp-server-manager";
+import { app, Menu, Tray, nativeImage } from "electron";
+import { MCPServerManager } from "./mcp-manager";
 import { mainWindow } from "../main";
 
 // Global tray instance

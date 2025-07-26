@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import * as http from "http";
-import { MCPServerManager } from "../mcp-server-manager";
+import { MCPServerManager } from "..";
 import { getLogService } from "@/main/services/log-service";
 import { getTokenService } from "@/main/services/token-service";
 import { listMcpApps } from "@/main/services/mcp-apps-service";
@@ -11,7 +11,7 @@ import {
 } from "@/lib/utils/mcp-server-utils";
 import { TokenScope } from "@mcp_router/shared";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse";
-import { getPlatformAPIManager } from "../platform-api-manager";
+import { getPlatformAPIManager } from "../../platform-api-manager";
 
 /**
  * HTTP server that exposes MCP functionality through REST endpoints
