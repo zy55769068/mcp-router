@@ -1,8 +1,6 @@
 import { ipcMain } from "electron";
-import {
-  getWorkspaceService,
-  WorkspaceCreateConfig,
-} from "../services/workspace-service";
+import { getWorkspaceService } from "../services/workspace-service";
+import type { WorkspaceCreateConfig } from "@mcp_router/shared";
 
 /**
  * ワークスペース関連のIPCハンドラーを登録

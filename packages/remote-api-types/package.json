@@ -1,0 +1,67 @@
+{
+  "name": "@mcp_router/remote-api-types",
+  "version": "0.5.3",
+  "description": "tRPC type definitions and schemas for MCP Router remote API",
+  "keywords": [
+    "mcp",
+    "mcp-router",
+    "trpc",
+    "types",
+    "schema",
+    "api"
+  ],
+  "homepage": "https://github.com/mcp-router/mcp-router#readme",
+  "bugs": {
+    "url": "https://github.com/mcp-router/mcp-router/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcp-router/mcp-router.git",
+    "directory": "packages/remote-api-types"
+  },
+  "license": "Apache-2.0",
+  "author": "fjm2u",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.mjs",
+      "require": "./dist/schema/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "prepublishOnly": "pnpm run build",
+    "publish:npm": "pnpm publish --access public"
+  },
+  "dependencies": {
+    "@trpc/client": "^11.0.0",
+    "superjson": "^2.2.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@mcp_router/shared": "workspace:*",
+    "@types/node": "^20.14.2",
+    "eslint": "^9.6.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.8.3"
+  }
+}

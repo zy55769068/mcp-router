@@ -1,6 +1,6 @@
 import { promises as fsPromises } from "fs";
 import { getServerService } from "@/main/services/server-service";
-import { MCPServerConfig } from "@mcp-router/shared";
+import { MCPServerConfig } from "@mcp_router/shared";
 import {
   claudeConfig,
   clineConfig,
@@ -23,9 +23,6 @@ interface ClientConfig {
   path: string;
   content?: any;
 }
-
-// Base directory for imported server contexts
-const SERVERS_DIR = path.join(app.getPath("userData"), "mcp-servers");
 
 /**
  * Sync server configurations from a provided list of configs

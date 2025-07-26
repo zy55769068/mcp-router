@@ -1,13 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@mcp-router/ui";
+import { Button } from "@mcp_router/ui";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import { IconDownload } from "@tabler/icons-react";
 
 export const UpdateNotification: React.FC = () => {

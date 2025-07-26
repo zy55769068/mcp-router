@@ -14,7 +14,7 @@ import {
   syncServersFromClientConfig,
   extractConfigInfo,
 } from "../mcp-config-importer";
-import { TokenScope, McpApp, McpAppsManagerResult } from "@mcp-router/shared";
+import { TokenScope, McpApp, McpAppsManagerResult } from "@mcp_router/shared";
 
 // 対応アプリが多くて複雑になってきたら、ストラテジーパターンに分けることを検討
 
@@ -105,9 +105,11 @@ function createVSCodeConfig(
   if (!config.mcp) config.mcp = {};
 
   // mcp.serversオブジェクトを作成・更新
-  config.mcp.servers = {
-    "mcp-router": createMcpRouterConfig(tokenId),
-  };
+  // 既存のserversを保持しながらmcp-routerを追加/更新
+  if (!config.mcp.servers) {
+    config.mcp.servers = {};
+  }
+  config.mcp.servers["mcp-router"] = createMcpRouterConfig(tokenId);
 
   return config;
 }

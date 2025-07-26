@@ -2,7 +2,7 @@
  * Settings management domain API
  */
 
-import { AppSettings } from "@mcp-router/shared";
+import { AppSettings } from "@mcp_router/shared";
 
 export interface OverlayCountResult {
   success: boolean;

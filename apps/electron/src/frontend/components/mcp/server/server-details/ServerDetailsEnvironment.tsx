@@ -2,11 +2,11 @@ import React from "react";
 import { MCPServer } from "../../../../../types";
 import { useTranslation } from "react-i18next";
 import { Settings, Info, Plus, Trash } from "lucide-react";
-import { Label } from "@mcp-router/ui";
-import { Input } from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
-import { Badge } from "@mcp-router/ui";
-import { ScrollArea } from "@mcp-router/ui";
+import { Label } from "@mcp_router/ui";
+import { Input } from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
+import { Badge } from "@mcp_router/ui";
+import { ScrollArea } from "@mcp_router/ui";
 
 interface ServerDetailsEnvironmentProps {
   server: MCPServer;

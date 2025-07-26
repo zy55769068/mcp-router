@@ -16,9 +16,11 @@ export * from "./types/domains/settings-api";
 export * from "./types/domains/log-api";
 export * from "./types/domains/workspace-api";
 
-// Platform API React context and provider
+// Platform API React context and provider (for backward compatibility)
 export {
   PlatformAPIProvider,
-  usePlatformAPI,
   type PlatformAPIProviderProps,
 } from "./platform-api-context";
+
+// Export the store-based hook instead of the context-based one
+export { usePlatformAPI } from "@/frontend/lib/hooks/use-platform-api";

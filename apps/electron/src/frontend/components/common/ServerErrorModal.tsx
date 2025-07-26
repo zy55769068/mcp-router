@@ -5,12 +5,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import { AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ScrollArea } from "@mcp-router/ui";
+import { ScrollArea } from "@mcp_router/ui";
 import { parseErrorMessage } from "@/lib/utils/error-message-utils";
-import { Button } from "@mcp-router/ui";
+import { Button } from "@mcp_router/ui";
 
 interface ServerErrorModalProps {
   isOpen: boolean;

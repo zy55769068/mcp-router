@@ -1,6 +1,6 @@
 import { BaseRepository } from "./base-repository";
 import { SqliteManager, getSqliteManager } from "./sqlite-manager";
-import { MCPServer, MCPServerConfig } from "@mcp-router/shared";
+import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -62,7 +62,6 @@ export class ServerRepository extends BaseRepository<MCPServer> {
       throw error;
     }
   }
-
 
   /**
    * JSON文字列を安全にパース
@@ -146,7 +145,9 @@ export class ServerRepository extends BaseRepository<MCPServer> {
     return {
       bearerToken: entity.bearerToken || null,
       env: JSON.stringify(entity.env || {}),
-      inputParams: entity.inputParams ? JSON.stringify(entity.inputParams) : null,
+      inputParams: entity.inputParams
+        ? JSON.stringify(entity.inputParams)
+        : null,
       command: entity.command || null,
       args: JSON.stringify(entity.args || []),
       remoteUrl: entity.remoteUrl || null,
@@ -161,14 +162,8 @@ export class ServerRepository extends BaseRepository<MCPServer> {
       const now = Date.now();
 
       // データをシリアライズ
-      const {
-        bearerToken,
-        env,
-        inputParams,
-        command,
-        args,
-        remoteUrl,
-      } = this.serializeEntityData(entity);
+      const { bearerToken, env, inputParams, command, args, remoteUrl } =
+        this.serializeEntityData(entity);
 
       // DB行オブジェクトを構築
       return {
@@ -264,14 +259,8 @@ export class ServerRepository extends BaseRepository<MCPServer> {
   ): Record<string, any> {
     try {
       // データをシリアライズ
-      const {
-        bearerToken,
-        env,
-        inputParams,
-        command,
-        args,
-        remoteUrl,
-      } = this.serializeEntityData(entity);
+      const { bearerToken, env, inputParams, command, args, remoteUrl } =
+        this.serializeEntityData(entity);
 
       // DB行オブジェクトを構築
       return {
@@ -328,57 +317,14 @@ export class ServerRepository extends BaseRepository<MCPServer> {
       // 更新するフィールドを設定
       const updatedServer: MCPServer = {
         ...existingServer,
-        name: config.name !== undefined ? config.name : existingServer.name,
-        command:
-          config.command !== undefined
-            ? config.command
-            : existingServer.command,
-        args: config.args !== undefined ? config.args : existingServer.args,
-        env: config.env !== undefined ? config.env : existingServer.env,
-        autoStart:
-          config.autoStart !== undefined
-            ? config.autoStart
-            : existingServer.autoStart,
-        disabled:
-          config.disabled !== undefined
-            ? config.disabled
-            : existingServer.disabled,
-        serverType:
-          config.serverType !== undefined
-            ? config.serverType
-            : existingServer.serverType,
-        remoteUrl:
-          config.remoteUrl !== undefined
-            ? config.remoteUrl
-            : existingServer.remoteUrl,
-        bearerToken:
-          config.bearerToken !== undefined
-            ? config.bearerToken
-            : existingServer.bearerToken,
-        inputParams:
-          config.inputParams !== undefined
-            ? config.inputParams
-            : existingServer.inputParams,
-        description:
-          config.description !== undefined
-            ? config.description
-            : existingServer.description,
-        version:
-          config.version !== undefined
-            ? config.version
-            : existingServer.version,
-        latestVersion:
-          config.latestVersion !== undefined
-            ? config.latestVersion
-            : existingServer.latestVersion,
-        verificationStatus:
-          config.verificationStatus !== undefined
-            ? config.verificationStatus
-            : existingServer.verificationStatus,
-        required:
-          config.required !== undefined
-            ? config.required
-            : existingServer.required,
+        ...config,
+        // Preserve fields that are not part of MCPServerConfig
+        status: existingServer.status,
+        logs: existingServer.logs,
+        errorMessage: existingServer.errorMessage,
+        tools: existingServer.tools,
+        resources: existingServer.resources,
+        prompts: existingServer.prompts,
       };
 
       // 行データを生成（同期）

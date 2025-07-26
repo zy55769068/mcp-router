@@ -1,5 +1,5 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { AppSettings } from "@mcp-router/shared";
+import { AppSettings } from "@mcp_router/shared";
 import { PlatformAPI } from "@/lib/platform-api";
 
 interface UserInfo {
@@ -49,10 +49,13 @@ interface AuthState {
 
   // Initialize from settings
   initializeFromSettings: (settings: AppSettings) => void;
+
+  // Store management
+  clearStore: () => void;
 }
 
 export const createAuthStore = (
-  platformAPI: PlatformAPI,
+  getPlatformAPI: () => PlatformAPI,
 ): UseBoundStore<StoreApi<AuthState>> =>
   create<AuthState>((set, get) => ({
     // Initial state
@@ -88,7 +91,7 @@ export const createAuthStore = (
         setLoginError(null);
 
         // Call Platform API to start login flow
-        await platformAPI.auth.signIn();
+        await getPlatformAPI().auth.signIn();
       } catch (error) {
         setLoginError(error instanceof Error ? error.message : "Login failed");
         throw error;
@@ -102,7 +105,7 @@ export const createAuthStore = (
 
       try {
         // Call Platform API to clear stored auth data
-        await platformAPI.auth.signOut();
+        await getPlatformAPI().auth.signOut();
 
         // Clear local state
         setAuthenticated(false);
@@ -129,7 +132,7 @@ export const createAuthStore = (
 
       try {
         // Check auth status with optional force refresh
-        const status = await platformAPI.auth.getStatus(forceRefresh);
+        const status = await getPlatformAPI().auth.getStatus(forceRefresh);
 
         setAuthenticated(status.authenticated);
         setUserData({
@@ -169,7 +172,7 @@ export const createAuthStore = (
 
       try {
         // Refresh credits by getting the full auth status
-        const status = await platformAPI.auth.getStatus();
+        const status = await getPlatformAPI().auth.getStatus();
         // Credits are now part of user info
         if (status.authenticated && status.user) {
           setCredits(status.user.creditBalance || 0);
@@ -184,7 +187,7 @@ export const createAuthStore = (
       const { setAuthenticated, setUserInfo } = get();
 
       // Subscribe to auth status changes from Platform API
-      const unsubscribe = platformAPI.auth.onChange((status) => {
+      const unsubscribe = getPlatformAPI().auth.onChange((status) => {
         setAuthenticated(status.authenticated);
         if (status.authenticated && status.user) {
           setUserInfo({
@@ -210,6 +213,18 @@ export const createAuthStore = (
       setUserData({
         userId: settings.userId || null,
         authToken: settings.authToken || null,
+      });
+    },
+
+    clearStore: () => {
+      set({
+        isAuthenticated: false,
+        userId: null,
+        authToken: null,
+        userInfo: null,
+        isLoggingIn: false,
+        loginError: null,
+        credits: null,
       });
     },
   }));

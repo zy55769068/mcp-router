@@ -4,10 +4,12 @@ import {
   RequestLogEntry,
   RequestLogEntryInput,
   RequestLogQueryOptions,
+  RequestLogQueryResult,
   ClientStats,
   ServerStats,
   RequestTypeStats,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
+import { encodeCursor, decodeCursor } from "../utils/cursor";
 
 /**
  * リクエストログ用リポジトリクラス
@@ -245,11 +247,11 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
   }
 
   /**
-   * リクエストログを検索（ページネーション、フィルタリング対応）
+   * リクエストログを検索（カーソルベースページネーション、フィルタリング対応）
    */
   public async getRequestLogs(
     options: RequestLogQueryOptions = {},
-  ): Promise<{ logs: RequestLogEntry[]; total: number }> {
+  ): Promise<RequestLogQueryResult> {
     try {
       const {
         clientId,
@@ -258,13 +260,26 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
         startDate,
         endDate,
         responseStatus,
-        offset = 0,
+        cursor,
         limit = 50,
       } = options;
 
       // SQLクエリとパラメータを構築
       let sql = `SELECT * FROM ${this.tableName} WHERE 1=1`;
       const params: any = {};
+
+      // カーソルのデコード
+      const cursorData = cursor ? decodeCursor(cursor) : null;
+      const cursorTimestamp = cursorData?.timestamp || null;
+      const cursorId = cursorData?.id || null;
+
+      // カーソル条件を追加
+      if (cursorTimestamp && cursorId) {
+        sql +=
+          " AND (timestamp < :cursorTimestamp OR (timestamp = :cursorTimestamp AND id < :cursorId))";
+        params.cursorTimestamp = cursorTimestamp;
+        params.cursorId = cursorId;
+      }
 
       // フィルタリング条件を追加
       if (clientId) {
@@ -302,26 +317,51 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
         params.endTime = endTime;
       }
 
-      // 合計カウントクエリ
-      const countSql = sql.replace("SELECT *", "SELECT COUNT(*) as count");
-      const countResult = this.db.get<{ count: number }>(countSql, params);
+      // 合計カウントクエリ（カーソル条件を除外）
+      let countSql = sql.replace("SELECT *", "SELECT COUNT(*) as count");
+      const countParams = { ...params };
+      if (cursorTimestamp && cursorId) {
+        // カーソル条件を除外してカウント
+        countSql = countSql.replace(
+          / AND \(timestamp < :cursorTimestamp OR \(timestamp = :cursorTimestamp AND id < :cursorId\)\)/,
+          "",
+        );
+        delete countParams.cursorTimestamp;
+        delete countParams.cursorId;
+      }
+      const countResult = this.db.get<{ count: number }>(countSql, countParams);
       const total = countResult?.count || 0;
 
-      // メインクエリにソートとページネーションを追加
-      sql += " ORDER BY timestamp DESC LIMIT :limit OFFSET :offset";
-      params.limit = limit;
-      params.offset = offset;
+      // メインクエリにソートとリミットを追加（+1 でhasMoreを判定）
+      sql += " ORDER BY timestamp DESC, id DESC LIMIT :limit";
+      params.limit = limit + 1;
 
       // クエリ実行
       const rows = this.db.all<any>(sql, params);
 
+      // hasMoreの判定
+      const hasMore = rows.length > limit;
+      if (hasMore) {
+        rows.pop(); // 余分な1件を削除
+      }
+
       // 結果をエンティティに変換
       const logs = rows.map((row) => this.mapRowToEntity(row));
 
-      return { logs, total };
+      // 次のカーソルを生成
+      let nextCursor: string | undefined;
+      if (hasMore && logs.length > 0) {
+        const lastLog = logs[logs.length - 1];
+        nextCursor = encodeCursor({
+          timestamp: lastLog.timestamp,
+          id: lastLog.id,
+        });
+      }
+
+      return { logs, total, nextCursor, hasMore };
     } catch (error) {
       console.error("リクエストログの取得中にエラーが発生しました:", error);
-      return { logs: [], total: 0 };
+      return { logs: [], total: 0, hasMore: false };
     }
   }
 

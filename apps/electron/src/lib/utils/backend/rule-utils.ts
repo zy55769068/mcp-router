@@ -9,7 +9,7 @@ import {
   MCPEntityType,
   DEFAULT_DISPLAY_RULES,
   RuleVariables,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
 
 /**
  * Apply a rule template to a string by replacing variables with their values

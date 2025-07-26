@@ -7,20 +7,20 @@ import {
   DEFAULT_DISPLAY_RULES,
   RuleVariables,
   ToolParameterSchemaRule,
-} from "@mcp-router/shared";
-import { Input } from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
-import { Label } from "@mcp-router/ui";
+} from "@mcp_router/shared";
+import { Input } from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
+import { Label } from "@mcp_router/ui";
 import { Info, RotateCcw, Save } from "lucide-react";
-import { Badge } from "@mcp-router/ui";
-import { Separator } from "@mcp-router/ui";
+import { Badge } from "@mcp_router/ui";
+import { Separator } from "@mcp_router/ui";
 import { toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +28,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@mcp-router/ui";
-import { Textarea } from "@mcp-router/ui";
-import { Checkbox } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Textarea } from "@mcp_router/ui";
+import { Checkbox } from "@mcp_router/ui";
 
 /**
  * Get sample data for preview display based on current language

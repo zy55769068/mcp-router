@@ -1,5 +1,5 @@
 import { ipcMain, Notification } from "electron";
-import { AgentConfig } from "@mcp-router/shared";
+import { AgentConfig } from "@mcp_router/shared";
 import {
   getDevelopmentAgentService,
   getDeployedAgentService,

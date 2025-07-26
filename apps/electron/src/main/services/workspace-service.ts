@@ -7,40 +7,7 @@ import path from "path";
 import fs from "fs/promises";
 import { v4 as uuidv4 } from "uuid";
 import * as fsSync from "fs";
-
-export interface Workspace {
-  id: string;
-  name: string;
-  type: "local" | "remote";
-  isActive: boolean;
-  createdAt: Date;
-  lastUsedAt: Date;
-  localConfig?: {
-    databasePath: string;
-  };
-  remoteConfig?: {
-    apiUrl: string;
-    authToken?: string;
-    teamId?: string;
-    userId?: string;
-    enableCache?: boolean;
-  };
-  displayInfo?: {
-    avatarUrl?: string;
-    email?: string;
-    teamName?: string;
-  };
-}
-
-export interface WorkspaceCreateConfig {
-  name: string;
-  type: "local" | "remote";
-  remoteConfig?: {
-    apiUrl: string;
-    authToken?: string;
-    teamId?: string;
-  };
-}
+import type { Workspace, WorkspaceCreateConfig } from "@mcp_router/shared";
 
 export class WorkspaceService
   extends BaseService<Workspace, string>
@@ -236,19 +203,14 @@ export class WorkspaceService
         remoteConfig: config.remoteConfig,
       };
 
-      // ローカルワークスペースの場合、データベースパスを設定
-      if (config.type === "local") {
-        workspace.localConfig = {
-          databasePath: path.join("workspaces", workspace.id, "database.db"),
-        };
-      }
+      // すべてのワークスペースにデータベースパスを設定（リモートも含む）
+      workspace.localConfig = {
+        databasePath: path.join("workspaces", workspace.id, "database.db"),
+      };
 
-      // リモートワークスペースの場合、認証トークンをそのまま保存
-      if (config.type === "remote" && config.remoteConfig?.authToken) {
-        workspace.remoteConfig = {
-          ...workspace.remoteConfig,
-          authToken: config.remoteConfig.authToken,
-        };
+      // リモートワークスペースの場合、設定を保存
+      if (config.type === "remote" && config.remoteConfig) {
+        workspace.remoteConfig = config.remoteConfig;
       }
 
       this.metaDb
@@ -432,8 +394,8 @@ export class WorkspaceService
         this.electronSessions.delete(id);
       }
 
-      // ワークスペースディレクトリを削除（ローカルの場合）
-      if (workspace.type === "local" && workspace.localConfig?.databasePath) {
+      // ワークスペースディレクトリを削除（ローカル・リモート両方）
+      if (workspace.localConfig?.databasePath) {
         const workspaceDir = path.dirname(
           path.join(
             app.getPath("userData"),
@@ -465,7 +427,6 @@ export class WorkspaceService
     }
   }
 
-
   /**
    * 認証情報の取得
    */
@@ -486,21 +447,18 @@ export class WorkspaceService
       const workspace = await this.findById(workspaceId);
       if (!workspace) throw new Error(`Workspace ${workspaceId} not found`);
 
-      if (workspace.type === "local") {
-        const dbPath =
-          workspace.localConfig?.databasePath ||
-          path.join("workspaces", workspaceId, "database.db");
+      // ローカル・リモート両方のワークスペースでデータベースを作成
+      const dbPath =
+        workspace.localConfig?.databasePath ||
+        path.join("workspaces", workspaceId, "database.db");
 
-        const fullPath = path.join(app.getPath("userData"), dbPath);
+      const fullPath = path.join(app.getPath("userData"), dbPath);
 
-        // ディレクトリが存在しない場合は作成
-        await fs.mkdir(path.dirname(fullPath), { recursive: true });
+      // ディレクトリが存在しない場合は作成
+      await fs.mkdir(path.dirname(fullPath), { recursive: true });
 
-        const db = new SqliteManager(fullPath);
-        this.databaseInstances.set(workspaceId, db);
-      } else {
-        throw new Error("Remote workspace database not implemented yet");
-      }
+      const db = new SqliteManager(fullPath);
+      this.databaseInstances.set(workspaceId, db);
     }
 
     const db = this.databaseInstances.get(workspaceId);

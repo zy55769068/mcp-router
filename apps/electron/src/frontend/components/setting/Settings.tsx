@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardHeader, CardTitle } from "@mcp-router/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@mcp_router/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
-import { Badge } from "@mcp-router/ui";
-import { Switch } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
+import { Badge } from "@mcp_router/ui";
+import { Switch } from "@mcp_router/ui";
 import { useThemeStore } from "@/frontend/stores";
 import { useAuthStore } from "../../stores";
 import { IconBrandDiscord } from "@tabler/icons-react";
@@ -351,13 +351,10 @@ const Settings: React.FC = () => {
         </CardContent>
       </Card>
 
-
       {/* External Applications Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">
-            {t("settings.advanced")}
-          </CardTitle>
+          <CardTitle className="text-xl">{t("settings.advanced")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -371,9 +368,9 @@ const Settings: React.FC = () => {
                 </p>
               </div>
               <Switch
-                  checked={loadExternalMCPConfigs}
-                  onCheckedChange={handleExternalMCPConfigsToggle}
-                  disabled={isSavingSettings}
+                checked={loadExternalMCPConfigs}
+                onCheckedChange={handleExternalMCPConfigsToggle}
+                disabled={isSavingSettings}
               />
             </div>
           </div>

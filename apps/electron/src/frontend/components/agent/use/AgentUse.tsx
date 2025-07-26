@@ -7,12 +7,12 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { DeployedAgent } from "@mcp-router/shared";
-import { Button } from "@mcp-router/ui";
+import { DeployedAgent } from "@mcp_router/shared";
+import { Button } from "@mcp_router/ui";
 import { toast } from "sonner";
 import { useAgentStore, useWorkspaceStore } from "../../../stores";
 import { Settings, Trash2, RefreshCw } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@mcp-router/ui";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@mcp_router/ui";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,7 +20,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import { usePlatformAPI } from "@/lib/platform-api";
 
 /**

@@ -8,15 +8,15 @@ import {
 } from "electron";
 import { getSettingsService } from "@/main/services/settings-service";
 import path from "node:path";
-import { MCPServerManager } from "./main/mcp-server-manager";
-import { MCPServerConfig } from "@mcp-router/shared";
+import { MCPServerManager } from "./main/mcp-manager";
+import { MCPServerConfig } from "@mcp_router/shared";
 import { getTokenService } from "@/main/services/token-service";
-import { TokenScope } from "@mcp-router/shared";
+import { TokenScope } from "@mcp_router/shared";
 import {
   fetchMcpServersFromIndex,
   fetchMcpServerVersionDetails,
 } from "./main/mcp-fetcher";
-import { MCPHttpServer } from "./main/http/mcp-http-server";
+import { MCPHttpServer } from "./main/mcp-manager/http/mcp-http-server";
 import { logService } from "@/main/services/log-service";
 import started from "electron-squirrel-startup";
 import {
@@ -380,7 +380,6 @@ async function initApplication(): Promise<void> {
     });
   }
 
-
   // データベース初期化
   await initDatabase();
 
@@ -597,31 +596,22 @@ function setupMcpServerHandlers(): void {
   });
 
   ipcMain.handle("mcp:add", async (_, serverConfig: MCPServerConfig) => {
+    let server = null;
     try {
       // Add the server to the manager
-      const server = mcpServerManager.addServer(serverConfig);
+      server = mcpServerManager.addServer(serverConfig);
 
-      // For remote servers, automatically start the connection
+      // For remote servers, test the connection
       if (serverConfig.serverType !== "local") {
-        // Start the server
-        const success = await mcpServerManager.startServer(server.id);
-        return {
-          success,
-          server,
-          message: success
-            ? "Remote server connected successfully"
-            : "Failed to connect to remote server",
-        };
+        await mcpServerManager.startServer(server.id);
+        mcpServerManager.stopServer(server.id);
       }
-
-      // For local servers, just return the added server without starting
       return server;
     } catch (error: any) {
-      console.error("Error adding server:", error);
-      return {
-        success: false,
-        message: `Error adding server: ${error.message}`,
-      };
+      if (serverConfig.serverType !== "local" && server && server?.id) {
+        mcpServerManager.removeServer(server?.id);
+      }
+      throw error;
     }
   });
 
@@ -674,7 +664,7 @@ function setupLogHandlers(): void {
         startDate?: Date;
         endDate?: Date;
         responseStatus?: "success" | "error";
-        offset?: number;
+        cursor?: string;
         limit?: number;
       },
     ) => {

@@ -1,16 +1,17 @@
 import express from "express";
 import cors from "cors";
 import * as http from "http";
-import { MCPServerManager } from "../mcp-server-manager";
+import { MCPServerManager } from "..";
 import { getLogService } from "@/main/services/log-service";
 import { getTokenService } from "@/main/services/token-service";
 import { listMcpApps } from "@/main/services/mcp-apps-service";
 import {
   validateMcpServerJson,
   processMcpServerConfigs,
-} from "@mcp-router/shared";
-import { TokenScope } from "@mcp-router/shared";
+} from "@/lib/utils/mcp-server-utils";
+import { TokenScope } from "@mcp_router/shared";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse";
+import { getPlatformAPIManager } from "../../platform-api-manager";
 
 /**
  * HTTP server that exposes MCP functionality through REST endpoints
@@ -149,26 +150,49 @@ export class MCPHttpServer {
       // オリジナルのリクエストボディをコピー
       const modifiedBody = { ...req.body };
 
-      // トークンをメタデータとして追加（ログに記録されないよう処理）
-      // JSONRPCリクエストの標準形式に従って、paramsにメタデータを追加
-      const token = req.headers["authorization"];
-      if (modifiedBody.params && typeof modifiedBody.params === "object") {
-        // パラメータが既に存在する場合、_metaを追加/上書き
-        modifiedBody.params._meta = {
-          ...(modifiedBody.params._meta || {}),
-          token: token, // トークンは内部処理用に使い、ログには記録しない
-        };
-      } else if (modifiedBody.params === undefined) {
-        // パラメータが存在しない場合は新規作成
-        modifiedBody.params = {
-          _meta: { token: token }, // トークンは内部処理用に使い、ログには記録しない
-        };
-      }
-
       try {
-        await this.serverManager
-          .getTransport()
-          .handleRequest(req, res, modifiedBody);
+        // Check if current workspace is remote
+        const platformManager = getPlatformAPIManager();
+        if (platformManager.isRemoteWorkspace()) {
+          // For remote workspaces, forward to remote aggregator
+          const remoteApiUrl = platformManager.getRemoteApiUrl();
+          if (!remoteApiUrl) {
+            throw new Error("Remote workspace has no API URL configured");
+          }
+
+          // Get user auth token instead of workspace token
+          const { getDecryptedAuthToken } = await import("../auth");
+          const authToken = await getDecryptedAuthToken();
+
+          // Forward the request to remote aggregator
+          await this.forwardToRemoteAggregator(
+            remoteApiUrl,
+            authToken || undefined,
+            req,
+            res,
+            modifiedBody,
+          );
+        } else {
+          // トークンをメタデータとして追加（ログに記録されないよう処理）
+          // JSONRPCリクエストの標準形式に従って、paramsにメタデータを追加
+          const token = req.headers["authorization"];
+          if (modifiedBody.params && typeof modifiedBody.params === "object") {
+            // パラメータが既に存在する場合、_metaを追加/上書き
+            modifiedBody.params._meta = {
+              ...(modifiedBody.params._meta || {}),
+              token: token, // トークンは内部処理用に使い、ログには記録しない
+            };
+          } else if (modifiedBody.params === undefined) {
+            // パラメータが存在しない場合は新規作成
+            modifiedBody.params = {
+              _meta: { token: token }, // トークンは内部処理用に使い、ログには記録しない
+            };
+          }
+          // For local workspaces, use local aggregator
+          await this.serverManager
+            .getTransport()
+            .handleRequest(req, res, modifiedBody);
+        }
       } catch (error) {
         console.error("Error handling MCP request:", error);
         if (!res.headersSent) {
@@ -190,7 +214,7 @@ export class MCPHttpServer {
    */
   private configureMcpSseRoute(): void {
     // GET /mcp/sse - Handle SSE connection setup
-    this.app.get("/mcp/sse", async (req, res) => {
+    this.app.get("/mcp/sse", async (_req, res) => {
       try {
         // ヘッダーを設定
         res.setHeader("Content-Type", "text/event-stream");
@@ -212,8 +236,20 @@ export class MCPHttpServer {
           this.sseSessions.delete(sessionId);
         });
 
-        // サーバーのトランスポートに接続
-        await this.serverManager.getAggregatorServer().connect(transport);
+        // Check if current workspace is remote
+        const platformManager = getPlatformAPIManager();
+        if (platformManager.isRemoteWorkspace()) {
+          // For remote workspaces, we need to connect to remote aggregator
+          // Note: This requires implementing a remote aggregator SSE endpoint
+          // For now, we'll use the local aggregator but log a warning
+          console.warn(
+            "Remote aggregator SSE not yet implemented, using local aggregator",
+          );
+          await this.serverManager.getAggregatorServer().connect(transport);
+        } else {
+          // For local workspaces, connect to local aggregator server
+          await this.serverManager.getAggregatorServer().connect(transport);
+        }
 
         // セッションID情報をクライアントに送信
         res.write(`data: ${JSON.stringify({ sessionId })}\n\n`);
@@ -346,7 +382,7 @@ export class MCPHttpServer {
             responseStatus?: "success" | "error";
             startDate?: Date;
             endDate?: Date;
-            offset?: number;
+            cursor?: string;
             limit?: number;
           } = {
             clientId: req.query.clientId as string | undefined,
@@ -356,9 +392,7 @@ export class MCPHttpServer {
               | "success"
               | "error"
               | undefined,
-            offset: req.query.offset
-              ? parseInt(req.query.offset as string)
-              : undefined,
+            cursor: req.query.cursor as string | undefined,
             limit: req.query.limit
               ? parseInt(req.query.limit as string)
               : undefined,
@@ -377,7 +411,8 @@ export class MCPHttpServer {
           res.json({
             logs: result.logs,
             total: result.total,
-            offset: options.offset || 0,
+            nextCursor: result.nextCursor,
+            hasMore: result.hasMore,
             limit: options.limit || 50,
           });
         } catch (error: any) {
@@ -841,6 +876,59 @@ export class MCPHttpServer {
         reject(error);
       }
     });
+  }
+
+  /**
+   * Forward MCP request to remote aggregator
+   */
+  private async forwardToRemoteAggregator(
+    remoteApiUrl: string,
+    authToken: string | undefined,
+    req: express.Request,
+    res: express.Response,
+    body: any,
+  ): Promise<void> {
+    try {
+      // Construct the remote MCP endpoint URL
+      const remoteUrl = new URL(remoteApiUrl + "/mcp");
+
+      // Forward the request to the remote aggregator
+      const response = await fetch(remoteUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(authToken && { Authorization: `Bearer ${authToken}` }),
+        },
+        body: JSON.stringify(body),
+      });
+
+      // Get the response body
+      const responseData = await response.text();
+
+      // Set the response status and headers
+      res.status(response.status);
+
+      // Forward relevant headers
+      const contentType = response.headers.get("content-type");
+      if (contentType) {
+        res.setHeader("Content-Type", contentType);
+      }
+
+      // Send the response
+      res.send(responseData);
+    } catch (error) {
+      console.error("Error forwarding to remote aggregator:", error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          jsonrpc: "2.0",
+          error: {
+            code: -32603,
+            message: "Failed to connect to remote aggregator",
+          },
+          id: body.id || null,
+        });
+      }
+    }
   }
 
   /**

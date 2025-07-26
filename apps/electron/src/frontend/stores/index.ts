@@ -9,44 +9,36 @@ export * from "./server-store";
 export * from "./auth-store";
 export * from "./agent-store";
 
-// Import the electron platform API
-import { electronPlatformAPI } from "../lib/electron-platform-api";
+// Import platform API type
+import type { PlatformAPI } from "@/lib/platform-api/types/platform-api";
 
 // Import store factories
 import { createServerStore, createServerSelectors } from "./server-store";
 import { createAuthStore, createAuthSelectors } from "./auth-store";
 import { createAgentStore, createAgentSelectors } from "./agent-store";
+import { useWorkspaceStore } from "./workspace-store";
 
-// Create store instances with Electron platform API
-export const useServerStore = createServerStore(electronPlatformAPI);
-export const useAuthStore = createAuthStore(electronPlatformAPI);
-export const useAgentStore = createAgentStore(electronPlatformAPI);
+// Get the appropriate platform API based on current workspace
+function getPlatformAPI(): PlatformAPI {
+  return useWorkspaceStore.getState().getPlatformAPI();
+}
 
-// Create selectors from store instances
-const serverSelectors = createServerSelectors(useServerStore);
-const authSelectors = createAuthSelectors(useAuthStore);
-const agentSelectors = createAgentSelectors(useAgentStore);
-
-// Export server selectors
-export const useServerById = serverSelectors.useServerById;
-export const useServersByStatus = serverSelectors.useServersByStatus;
-export const useIsServerUpdating = serverSelectors.useIsServerUpdating;
-
-// Export auth selectors
-export const useIsLoggedIn = authSelectors.useIsLoggedIn;
-export const useAuthToken = authSelectors.useAuthToken;
-export const useUserId = authSelectors.useUserId;
-
-// Export agent selectors
-export const useCurrentAgent = agentSelectors.useCurrentAgent;
-export const useCurrentSession = agentSelectors.useCurrentSession;
-export const useSessionsByAgent = agentSelectors.useSessionsByAgent;
+// Create store instances with dynamic platform API getter
+export const useServerStore = createServerStore(getPlatformAPI);
+export const useAuthStore = createAuthStore(getPlatformAPI);
+export const useAgentStore = createAgentStore(getPlatformAPI);
 
 // Store initialization utility
 export const initializeStores = async () => {
+  // Load current workspace first
+  await useWorkspaceStore.getState().loadCurrentWorkspace();
+
+  // Get platform API from workspace store
+  const platformAPI = getPlatformAPI();
+
   // Initialize auth state from settings
   try {
-    const settings = await electronPlatformAPI.settings.get();
+    const settings = await platformAPI.settings.get();
     await useAuthStore.getState().initializeFromSettings(settings);
   } catch (error) {
     console.error("Failed to initialize auth from settings:", error);

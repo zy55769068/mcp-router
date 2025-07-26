@@ -29,37 +29,37 @@ platform-api/
 
 #### 移動対象（packages/ → apps/electron/）
 ```
-- @mcp-router/database → apps/electron/src/lib/database/
+- @mcp_router/database → apps/electron/src/lib/database/
   理由: better-sqlite3はElectron環境専用
 
-- @mcp-router/frontend → apps/electron/src/frontend/
+- @mcp_router/frontend → apps/electron/src/frontend/
   理由: 現状Electron専用のため
 
-- @mcp-router/shared/utils → apps/electron/src/lib/utils/
+- @mcp_router/shared/utils → apps/electron/src/lib/utils/
   理由: 多くがElectron固有の実装
 ```
 
 #### 維持対象（packages/に残す）
 ```
-- @mcp-router/shared （型定義のみ）
+- @mcp_router/shared （型定義のみ）
   - types/ のみ維持
   - utils/ はElectronに移動
   
-- @mcp-router/platform-api # プラットフォーム抽象化層
+- @mcp_router/platform-api # プラットフォーム抽象化層
 ```
 
 ### 1.2 import文の更新
 ```typescript
 // Before
-import { getServerRepository } from '@mcp-router/database';
-import { someUtil } from '@mcp-router/shared/utils';
+import { getServerRepository } from '@mcp_router/database';
+import { someUtil } from '@mcp_router/shared/utils';
 
 // After  
 import { getServerRepository } from '@/lib/database';
 import { someUtil } from '@/lib/utils';
 
 // 型定義は引き続きpackagesから
-import { MCPServer } from '@mcp-router/shared/types';
+import { MCPServer } from '@mcp_router/shared/types';
 ```
 
 **推定工数**: 3日
@@ -248,7 +248,7 @@ export async function GET(request: Request) {
 ### 5.1 ProvidersへのPlatform API統合
 ```typescript
 // apps/web/components/providers.tsx
-import { PlatformAPIProvider } from '@mcp-router/platform-api';
+import { PlatformAPIProvider } from '@mcp_router/platform-api';
 import { WebPlatformAPI } from '@/lib/web-platform-api';
 
 export function Providers({ children }: ProvidersProps) {
@@ -313,7 +313,7 @@ export class WebPlatformAPI implements PlatformAPI {
 - React 19
 - Zustand（状態管理）
 - Radix UI + Tailwind CSS
-- @mcp-router/platform-api
+- @mcp_router/platform-api
 
 ### Electron版
 - Electron 35.x

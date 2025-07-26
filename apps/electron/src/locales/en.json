@@ -46,7 +46,7 @@
   "locale": "en-US",
   "login": {
     "title": "Login to MCP Router",
-    "description": "Login to access additional features, or skip to use MCP Router without an account.",
+    "description": "Login to access this feature",
     "loginButton": "Login",
     "skipButton": "Skip Login"
   },
@@ -55,10 +55,6 @@
     "servers": "Servers",
     "clients": "Clients",
     "logs": "Logs",
-    "discovery": {
-      "title": "MCP Index",
-      "description": "Discover and connect to servers"
-    },
     "welcome": "Welcome to MCP Router",
     "description": "A tool for managing MCP servers and providing APIs"
   },
@@ -577,6 +573,8 @@
     "allowDangerous": "Allow Dangerous",
     "successCreate": "Successfully created server '{{name}}'.",
     "errorFailedCreate": "Failed to create server.",
+    "successConnectRemote": "Successfully connected to remote server '{{name}}'.",
+    "errorFailedConnectRemote": "Failed to connect to remote server.",
     "autoStart": "Auto Start",
     "remote": {
       "name": "Remote Server",
@@ -589,6 +587,12 @@
       "transportStreamable": "Streamable HTTP",
       "connect": "Connect",
       "connectedServers": "Connected Servers"
+    },
+    "errors": {
+      "nameRequired": "Server name is required",
+      "commandRequired": "Command is required",
+      "argsRequired": "Arguments are required",
+      "urlRequired": "Server URL is required"
     }
   },
   "pagination": {

@@ -42,8 +42,6 @@ interface Workspace {
   remoteConfig?: {
     apiUrl: string;
     authToken?: string;
-    teamId?: string;
-    userId?: string;
   };
 
   // UI表示用
@@ -234,14 +232,7 @@ export interface Workspace {
   };
   remoteConfig?: {
     apiUrl: string;
-    authToken?: string; // 暗号化して保存
-    teamId?: string;
-    userId?: string;
-  };
-  displayInfo?: {
-    avatarUrl?: string;
-    email?: string;
-    teamName?: string;
+    authToken?: string;
   };
 }
 

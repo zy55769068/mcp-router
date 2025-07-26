@@ -5,11 +5,7 @@
     "description": "MCPサーバを管理し、APIを提供するためのツール",
     "servers": "サーバ一覧",
     "clients": "クライアント一覧",
-    "logs": "ログ",
-    "discovery": {
-      "title": "MCPインデックス",
-      "description": "サーバを探索し、接続する"
-    }
+    "logs": "ログ"
   },
   "common": {
     "home": "ホーム",
@@ -53,7 +49,7 @@
   },
   "login": {
     "title": "MCP Routerにログイン",
-    "description": "追加機能にアクセスするためにログインするか、アカウントなしでMCP Routerを使用するためにスキップしてください。",
+    "description": "この機能にアクセスするためにログインしてください。",
     "loginButton": "ログイン",
     "skipButton": "ログインをスキップ"
   },

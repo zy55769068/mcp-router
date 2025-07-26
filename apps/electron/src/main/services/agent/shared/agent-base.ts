@@ -2,7 +2,7 @@ import {
   MCPServerConfig,
   MCPTool,
   MCPAgentToolPermission,
-} from "@mcp-router/shared";
+} from "@mcp_router/shared";
 import { logError, logInfo } from "../../../../lib/utils/backend/error-handler";
 
 /**

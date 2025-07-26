@@ -2,8 +2,8 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from "electron";
-import { MCPServerConfig } from "@mcp-router/shared";
-import { TokenScope } from "@mcp-router/shared";
+import { MCPServerConfig } from "@mcp_router/shared";
+import { TokenScope } from "@mcp_router/shared";
 
 // Consolidate everything into one contextBridge call
 
@@ -61,7 +61,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     startDate?: Date;
     endDate?: Date;
     responseStatus?: "success" | "error";
-    offset?: number;
+    cursor?: string;
     limit?: number;
   }) => ipcRenderer.invoke("requestLogs:get", options),
 

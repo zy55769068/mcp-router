@@ -7,13 +7,13 @@ import {
   useLocation,
 } from "react-router-dom";
 import PageLayout from "./layout/PageLayout";
-import { Sonner } from "@mcp-router/ui";
+import { Sonner } from "@mcp_router/ui";
 import { toast } from "sonner";
 import DiscoverWrapper from "@/frontend/components/mcp/server/DiscoverWrapper";
 import Home from "./Home";
 import { useTranslation } from "react-i18next";
 import SidebarComponent from "./Sidebar";
-import { SidebarProvider, SidebarTrigger } from "@mcp-router/ui";
+import { SidebarProvider } from "@mcp_router/ui";
 import McpAppsManager from "@/frontend/components/mcp/apps/McpAppsManager";
 import LogViewer from "@/frontend/components/mcp/log/LogViewer";
 import Rules from "@/frontend/components/mcp/rules/Rules";
@@ -50,8 +50,7 @@ const App: React.FC = () => {
   // Zustand stores
   const { refreshServers } = useServerStore();
 
-  const { isAuthenticated, checkAuthStatus, subscribeToAuthChanges } =
-    useAuthStore();
+  const { checkAuthStatus, subscribeToAuthChanges } = useAuthStore();
 
   const { packageManagerOverlay, setPackageManagerOverlay } = useUIStore();
 
@@ -160,7 +159,7 @@ const App: React.FC = () => {
             navigate("/settings");
           }
         }
-      } catch (error) {
+      } catch {
         if (url.hostname === "agent") {
           // Show please sign in error
           toast.error(t("Please sign in to import agents."));
@@ -171,7 +170,7 @@ const App: React.FC = () => {
     [navigate, t],
   );
 
-  // Set up a timer to refresh the server list every 2 seconds
+  // Refresh servers on initial load only
   useEffect(() => {
     const intervalId = setInterval(() => {
       refreshServers();
@@ -216,15 +215,7 @@ const App: React.FC = () => {
         <Routes>
           {/* Public routes - no authentication required */}
           <Route element={<PageLayout />}>
-            <Route
-              path="/"
-              element={
-                <Navigate
-                  to={isAuthenticated ? "/agents/use" : "/servers"}
-                  replace
-                />
-              }
-            />
+            <Route path="/" element={<Navigate to="/servers" replace />} />
             <Route path="/servers" element={<Home />} />
             <Route path="/servers/add" element={<DiscoverWrapper />} />
             <Route path="/clients" element={<McpAppsManager />} />

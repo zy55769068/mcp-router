@@ -1,5 +1,5 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { MCPServer, MCPServerConfig } from "@mcp-router/shared";
+import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import { PlatformAPI } from "@/lib/platform-api";
 
 interface ServerState {
@@ -47,10 +47,13 @@ interface ServerState {
     config: Partial<MCPServerConfig>,
   ) => Promise<void>;
   deleteServer: (id: string) => Promise<void>;
+
+  // Store management
+  clearStore: () => void;
 }
 
 export const createServerStore = (
-  platformAPI: PlatformAPI,
+  getPlatformAPI: () => PlatformAPI,
 ): UseBoundStore<StoreApi<ServerState>> =>
   create<ServerState>((set, get) => ({
     // Initial state
@@ -109,7 +112,7 @@ export const createServerStore = (
 
     // Server operations with Platform API integration
     startServer: async (id) => {
-      const { setUpdating, setError, setServerStatus } = get();
+      const { setUpdating, setError, setServerStatus, refreshServers } = get();
 
       try {
         setUpdating(id, true);
@@ -119,10 +122,11 @@ export const createServerStore = (
         setServerStatus(id, "starting");
 
         // Call Platform API
+        const platformAPI = getPlatformAPI();
         await platformAPI.servers.start(id);
 
-        // The actual status will be updated via server status polling
-        // or through IPC events from the main process
+        // Refresh the server list to get the latest status
+        await refreshServers();
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "Failed to start server",
@@ -134,7 +138,7 @@ export const createServerStore = (
     },
 
     stopServer: async (id) => {
-      const { setUpdating, setError, setServerStatus } = get();
+      const { setUpdating, setError, setServerStatus, refreshServers } = get();
 
       try {
         setUpdating(id, true);
@@ -144,9 +148,11 @@ export const createServerStore = (
         setServerStatus(id, "stopping");
 
         // Call Platform API
+        const platformAPI = getPlatformAPI();
         await platformAPI.servers.stop(id);
 
-        // The actual status will be updated via server status polling
+        // Refresh the server list to get the latest status
+        await refreshServers();
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "Failed to stop server",
@@ -164,6 +170,7 @@ export const createServerStore = (
         setLoading(true);
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         const servers = await platformAPI.servers.list();
         setServers(servers);
       } catch (error) {
@@ -176,16 +183,21 @@ export const createServerStore = (
     },
 
     createServer: async (config) => {
-      const { setError, addServer } = get();
+      const { setError, addServer, refreshServers } = get();
 
       try {
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         const newServer = await platformAPI.servers.create({
-          name: config.name || "",
           config,
         });
         addServer(newServer);
+
+        // Refresh the server list to ensure consistency with remote state
+        await refreshServers();
+
+        return newServer;
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "Failed to create server",
@@ -195,14 +207,18 @@ export const createServerStore = (
     },
 
     updateServerConfig: async (id, config) => {
-      const { setUpdating, setError, updateServer } = get();
+      const { setUpdating, setError, updateServer, refreshServers } = get();
 
       try {
         setUpdating(id, true);
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         const updatedServer = await platformAPI.servers.update(id, config);
         updateServer(id, updatedServer);
+
+        // Refresh the server list to ensure consistency with remote state
+        await refreshServers();
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "Failed to update server",
@@ -214,14 +230,18 @@ export const createServerStore = (
     },
 
     deleteServer: async (id) => {
-      const { setUpdating, setError, removeServer } = get();
+      const { setUpdating, setError, removeServer, refreshServers } = get();
 
       try {
         setUpdating(id, true);
         setError(null);
 
+        const platformAPI = getPlatformAPI();
         await platformAPI.servers.delete(id);
         removeServer(id);
+
+        // Refresh the server list to ensure consistency with remote state
+        await refreshServers();
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "Failed to delete server",
@@ -230,6 +250,18 @@ export const createServerStore = (
       } finally {
         setUpdating(id, false);
       }
+    },
+
+    clearStore: () => {
+      set({
+        servers: [],
+        isLoading: false,
+        isUpdating: [],
+        error: null,
+        searchQuery: "",
+        expandedServerId: null,
+        selectedServerId: null,
+      });
     },
   }));
 

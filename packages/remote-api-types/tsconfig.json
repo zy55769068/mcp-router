@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "composite": false,
+    "incremental": false,
+    "baseUrl": ".",
+    "paths": {
+      "@mcp_router/shared": ["../shared/src"],
+      "@mcp_router/shared/*": ["../shared/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+  "references": [
+    { "path": "../shared" }
+  ]
+}

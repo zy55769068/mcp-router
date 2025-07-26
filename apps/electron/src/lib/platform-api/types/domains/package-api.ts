@@ -2,7 +2,7 @@
  * Package management domain API (includes system utilities)
  */
 
-import { ServerPackageUpdates } from "@mcp-router/shared";
+import { ServerPackageUpdates } from "@mcp_router/shared";
 import { Unsubscribe } from "./auth-api";
 
 export type PackageManager = "pnpm" | "uvx";

@@ -1,5 +1,5 @@
 import React from "react";
-import { RequestLogEntry } from "@mcp-router/shared";
+import { RequestLogEntry } from "@mcp_router/shared";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +7,10 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
-import { Card } from "@mcp-router/ui";
-import { ScrollArea } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
+import { Card } from "@mcp_router/ui";
+import { ScrollArea } from "@mcp_router/ui";
 import { useTranslation } from "react-i18next";
 import { formatDateI18n } from "@/lib/utils/date-utils";
 

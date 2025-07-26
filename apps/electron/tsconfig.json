@@ -11,9 +11,9 @@
     "allowSyntheticDefaultImports": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@mcp-router/shared": ["../../packages/shared/src"],
-      "@mcp-router/ui": ["../../packages/ui/src"],
-      "@mcp-router/ui/*": ["../../packages/ui/src/*"]
+      "@mcp_router/shared": ["../../packages/shared/src"],
+      "@mcp_router/ui": ["../../packages/ui/src"],
+      "@mcp_router/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["src/**/*"],

@@ -270,7 +270,7 @@ export class ElectronPlatformAPI implements PlatformAPI {
       delete: async (id) => {
         await window.electronAPI.deleteWorkspace(id);
       },
-      setActive: async (id) => {
+      switch: async (id) => {
         await window.electronAPI.switchWorkspace(id);
       },
       getActive: () => window.electronAPI.getCurrentWorkspace(),

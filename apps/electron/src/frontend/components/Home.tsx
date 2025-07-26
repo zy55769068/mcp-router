@@ -1,33 +1,35 @@
 import React, { useState } from "react";
 import ServerDetailsRemoveDialog from "@/frontend/components/mcp/server/server-details/ServerDetailsRemoveDialog";
-import { MCPServer } from "@mcp-router/shared";
-import { ScrollArea } from "@mcp-router/ui";
-import { Badge } from "@mcp-router/ui";
-import { Switch } from "@mcp-router/ui";
+import { MCPServer } from "@mcp_router/shared";
+import { ScrollArea } from "@mcp_router/ui";
+import { Badge } from "@mcp_router/ui";
+import { Switch } from "@mcp_router/ui";
 import {
   IconSearch,
   IconServer,
   IconChevronDown,
   IconPlus,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils/tailwind-utils";
 import { Trash, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { useServerStore } from "../stores";
+import { useServerStore, useWorkspaceStore, useAuthStore } from "../stores";
 import { showServerError } from "@/frontend/components/common";
 
 // Import components
 import ServerDetails from "@/frontend/components/mcp/server/ServerDetails";
 import { ServerErrorModal } from "@/frontend/components/common/ServerErrorModal";
 import { Link } from "react-router-dom";
-import { Button } from "@mcp-router/ui";
+import { Button } from "@mcp_router/ui";
 import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { LoginScreen } from "@/frontend/components/setup/LoginScreen";
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
@@ -42,9 +44,13 @@ const Home: React.FC = () => {
     setSelectedServerId,
     startServer,
     stopServer,
-    updateServerConfig,
     deleteServer,
+    refreshServers,
   } = useServerStore();
+
+  // Get workspace and auth state
+  const { currentWorkspace } = useWorkspaceStore();
+  const { isAuthenticated, login } = useAuthStore();
 
   // Filter servers based on search query and sort them
   const filteredServers = servers
@@ -61,6 +67,9 @@ const Home: React.FC = () => {
   // State for error modal
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorServer, setErrorServer] = useState<MCPServer | null>(null);
+
+  // State for refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Toggle expanded server details
   const toggleServerExpand = (serverId: string) => {
@@ -94,7 +103,7 @@ const Home: React.FC = () => {
       try {
         await deleteServer(serverToRemove.id);
         toast.success(t("serverDetails.removeSuccess"));
-      } catch (error) {
+      } catch {
         toast.error(t("serverDetails.removeFailed"));
       } finally {
         setIsRemoveDialogOpen(false);
@@ -102,6 +111,18 @@ const Home: React.FC = () => {
       }
     }
   };
+
+  // Handle refresh servers
+  const handleRefreshServers = async () => {
+    setIsRefreshing(true);
+    await refreshServers();
+    setIsRefreshing(false);
+  };
+
+  // Show login screen for remote workspaces if not authenticated
+  if (currentWorkspace?.type === "remote" && !isAuthenticated) {
+    return <LoginScreen onLogin={login} />;
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -124,8 +145,8 @@ const Home: React.FC = () => {
         </Button>
       </div>
 
-      <div className="mb-4">
-        <div className="relative">
+      <div className="mb-4 flex gap-2">
+        <div className="relative flex-1">
           <input
             type="text"
             value={searchQuery}
@@ -135,6 +156,16 @@ const Home: React.FC = () => {
           />
           <IconSearch className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefreshServers}
+          disabled={isRefreshing}
+          className="gap-1"
+          title={"Refresh Servers"}
+        >
+          <IconRefresh />
+        </Button>
       </div>
 
       <div className="border rounded-md overflow-hidden flex-1 mb-8">

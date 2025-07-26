@@ -7,8 +7,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@mcp-router/ui";
-import { Button } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Button } from "@mcp_router/ui";
 import {
   Upload,
   AlertTriangle,
@@ -24,15 +24,16 @@ import {
   processMcpServerConfigs,
 } from "../../../../lib/utils/mcp-server-utils";
 import { toast } from "sonner";
-import { Textarea } from "@mcp-router/ui";
-import { Alert, AlertDescription, AlertTitle } from "@mcp-router/ui";
-import { Input } from "@mcp-router/ui";
-import { Label } from "@mcp-router/ui";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mcp-router/ui";
+import { Textarea } from "@mcp_router/ui";
+import { Alert, AlertDescription, AlertTitle } from "@mcp_router/ui";
+import { Input } from "@mcp_router/ui";
+import { Label } from "@mcp_router/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mcp_router/ui";
 import { v4 as uuidv4 } from "uuid";
-import { MCPServerConfig } from "@mcp-router/shared";
-import { Checkbox } from "@mcp-router/ui";
-import { RadioGroup, RadioGroupItem } from "@mcp-router/ui";
+import { MCPServerConfig } from "@mcp_router/shared";
+import { Checkbox } from "@mcp_router/ui";
+import { RadioGroup, RadioGroupItem } from "@mcp_router/ui";
+import { useServerStore } from "@/frontend/stores";
 
 interface EnvVariable {
   key: string;
@@ -42,6 +43,7 @@ interface EnvVariable {
 const Manual: React.FC = () => {
   const { t } = useTranslation();
   const platformAPI = usePlatformAPI();
+  const { createServer } = useServerStore();
 
   // JSON Import State
   const [jsonInput, setJsonInput] = useState("");
@@ -328,19 +330,14 @@ const Manual: React.FC = () => {
         serverType: "local",
       };
 
-      // Add server directly
-      const result = await platformAPI.servers.create({ config: serverConfig });
-
-      if (result && !result.error) {
-        toast.success(t("manual.successCreate", { name: serverName }));
-        resetForm();
-      } else {
-        toast.error(
-          (result && result.message) || t("manual.errorFailedCreate"),
-        );
-      }
+      // Add server using store method which handles refresh
+      await createServer(serverConfig);
+      toast.success(t("manual.successCreate", { name: serverName }));
+      resetForm();
     } catch (error) {
-      toast.error(t("manual.errorFailedCreate"));
+      const errorMessage =
+        error instanceof Error ? error.message : t("manual.errorFailedCreate");
+      toast.error(errorMessage);
     } finally {
       setIsLoadingManual(false);
     }
@@ -365,20 +362,18 @@ const Manual: React.FC = () => {
         disabled: false,
       };
 
-      const result = await platformAPI.servers.create({ config });
-
-      if (result && result.success) {
-        toast.success(
-          t("manual.successConnectRemote", { name: remoteServerName }),
-        );
-        resetRemoteForm();
-      } else {
-        toast.error(
-          (result && result.message) || t("manual.errorFailedConnectRemote"),
-        );
-      }
+      // Add server using store method which handles refresh
+      await createServer(config);
+      toast.success(
+        t("manual.successConnectRemote", { name: remoteServerName }),
+      );
+      resetRemoteForm();
     } catch (error) {
-      toast.error(t("manual.errorFailedConnectRemote"));
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t("manual.errorFailedConnectRemote");
+      toast.error(errorMessage);
     } finally {
       setIsLoadingRemote(false);
     }

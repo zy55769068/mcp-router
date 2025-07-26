@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { AgentConfig, MCPServerConfig, MCPTool } from "@mcp-router/shared";
-import { Button } from "@mcp-router/ui";
-import { Input } from "@mcp-router/ui";
-import { Label } from "@mcp-router/ui";
-import { Textarea } from "@mcp-router/ui";
+import { AgentConfig, MCPServerConfig, MCPTool } from "@mcp_router/shared";
+import { Button } from "@mcp_router/ui";
+import { Input } from "@mcp_router/ui";
+import { Label } from "@mcp_router/ui";
+import { Textarea } from "@mcp_router/ui";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@mcp-router/ui";
-import { Switch } from "@mcp-router/ui";
-import { Badge } from "@mcp-router/ui";
+} from "@mcp_router/ui";
+import { Switch } from "@mcp_router/ui";
+import { Badge } from "@mcp_router/ui";
 import { toast } from "sonner";
 import { Server, Plus, X, Edit, Trash2, Wrench } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@mcp-router/ui";
+} from "@mcp_router/ui";
 import { v4 as uuidv4 } from "uuid";
 import { usePlatformAPI } from "@/lib/platform-api";
 
