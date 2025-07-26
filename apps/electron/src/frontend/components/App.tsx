@@ -172,7 +172,12 @@ const App: React.FC = () => {
 
   // Refresh servers on initial load only
   useEffect(() => {
-    refreshServers();
+    const intervalId = setInterval(() => {
+      refreshServers();
+    }, 2000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, [refreshServers]);
 
   // Loading indicator component to reuse
