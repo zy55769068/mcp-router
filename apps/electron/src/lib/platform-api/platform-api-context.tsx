@@ -12,7 +12,7 @@ import { PlatformAPI } from "./types/platform-api";
 const PlatformAPIContext = createContext<PlatformAPI | null>(null);
 
 // Provider component props
-export interface PlatformAPIProviderProps {
+interface PlatformAPIProviderProps {
   platformAPI: PlatformAPI;
   children: React.ReactNode;
 }
@@ -27,15 +27,4 @@ export function PlatformAPIProvider({
       {children}
     </PlatformAPIContext.Provider>
   );
-}
-
-// Hook to use the platform API
-export function usePlatformAPI(): PlatformAPI {
-  const context = useContext(PlatformAPIContext);
-
-  if (!context) {
-    throw new Error("usePlatformAPI must be used within a PlatformAPIProvider");
-  }
-
-  return context;
 }

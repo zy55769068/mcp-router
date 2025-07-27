@@ -4,6 +4,7 @@ import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { getUserShellEnv } from "../../get-env";
 import { logError, logInfo } from "./error-handler";
+import { MCPConnectionResult, IMCPServerConfig } from "@mcp_router/shared";
 
 /**
  * Helper function to prefix each line with a given string
@@ -13,28 +14,6 @@ function prefixLines(text: string, prefix: string): string {
     .split("\n")
     .map((line) => prefix + line)
     .join("\n");
-}
-
-/**
- * Result type for MCP server connection
- */
-export type MCPConnectionResult =
-  | { status: "success"; client: Client }
-  | { status: "error"; error: string };
-
-/**
- * Server configuration interface for MCP servers
- */
-export interface IMCPServerConfig {
-  id: string;
-  name: string;
-  serverType: "local" | "remote" | "remote-streamable";
-  command?: string;
-  args?: string[];
-  remoteUrl?: string;
-  bearerToken?: string;
-  env?: Record<string, string>;
-  inputParams?: Record<string, { default: string; description: string }>;
 }
 
 /**
@@ -96,7 +75,7 @@ export async function connectToMCPServer(
       }
 
       // Use SSE transport for remote servers
-      const headers: HeadersInit = {
+      const headers: Record<string, string> = {
         Accept: "text/event-stream",
       };
 
@@ -124,13 +103,21 @@ export async function connectToMCPServer(
       // Get environment variables from user shell
       const userEnvs = await getUserShellEnv();
 
+      // Filter out undefined values from userEnvs
+      const filteredUserEnvs: Record<string, string> = {};
+      for (const [key, value] of Object.entries(userEnvs)) {
+        if (value !== undefined) {
+          filteredUserEnvs[key] = value;
+        }
+      }
+
       // Use stdio transport for local servers
       const transport = new StdioClientTransport({
         command: server.command,
         args: server.args || [],
         env: {
           ...server.env,
-          ...userEnvs,
+          ...filteredUserEnvs,
         },
         stderr: "pipe",
       });

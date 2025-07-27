@@ -128,10 +128,3 @@ function createOrShowMainWindow(): void {
     console.log("No main window found to show");
   }
 }
-
-/**
- * Get the current tray instance
- */
-export function getTray(): Tray | null {
-  return tray;
-}

@@ -2,28 +2,13 @@
  * ログエントリの型変換ユーティリティ
  */
 
-import { RequestLogEntry } from "@mcp_router/shared";
-
-/**
- * Platform APIのLogEntryをRequestLogEntryに変換するための型
- */
-export interface LogEntry {
-  id: string;
-  timestamp: Date;
-  clientId: string;
-  serverId: string;
-  requestType: string;
-  responseStatus: "success" | "error";
-  duration?: number;
-  error?: string;
-  details?: any;
-}
+import { RequestLogEntry, PlatformLogEntry } from "@mcp_router/shared";
 
 /**
  * LogEntryをRequestLogEntryに変換
  */
-export function convertLogEntryToRequestLogEntry(
-  log: LogEntry,
+function convertLogEntryToRequestLogEntry(
+  log: PlatformLogEntry,
 ): RequestLogEntry {
   return {
     id: log.id,
@@ -47,7 +32,7 @@ export function convertLogEntryToRequestLogEntry(
 /**
  * ログエントリが既にRequestLogEntry形式かどうかを判定
  */
-export function isRequestLogEntry(log: any): log is RequestLogEntry {
+function isRequestLogEntry(log: any): log is RequestLogEntry {
   return (
     typeof log === "object" &&
     "clientName" in log &&
@@ -63,5 +48,5 @@ export function normalizeToRequestLogEntry(log: any): RequestLogEntry {
   if (isRequestLogEntry(log)) {
     return log;
   }
-  return convertLogEntryToRequestLogEntry(log as LogEntry);
+  return convertLogEntryToRequestLogEntry(log as PlatformLogEntry);
 }

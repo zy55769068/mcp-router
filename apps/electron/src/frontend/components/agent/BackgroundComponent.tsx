@@ -3,6 +3,10 @@ import { useChat, Message } from "@ai-sdk/react";
 import { AgentConfig } from "@mcp_router/shared";
 import { getServerAgentId } from "@/lib/utils/agent-utils";
 import { usePlatformAPI } from "@/lib/platform-api";
+import {
+  ExtendedPlatformChatMessage as PlatformChatMessage,
+  convertToLocalChatMessage,
+} from "@/lib/types/chat-types";
 
 interface BackgroundComponentProps {
   chatHistorySessionId?: string; // チャット履歴のsessionId
@@ -15,6 +19,34 @@ interface BackgroundComponentProps {
   onSessionComplete?: (backgroundSessionKey: string) => void; // セッション完了時のコールバック
   backgroundSessionKey: string; // Background内部のセッションキー
 }
+
+/**
+ * UIMessageをChatMessageに変換する関数
+ */
+const convertUIMessagesToChatMessages = (
+  messages: Message[],
+): PlatformChatMessage[] => {
+  return messages
+    .filter((msg) => msg.role !== "data") // 'data' roleを除外
+    .map((msg) => ({
+      id: msg.id,
+      role: msg.role as "user" | "assistant" | "system",
+      content: msg.content,
+      timestamp: msg.createdAt ? new Date(msg.createdAt).getTime() : Date.now(),
+      toolCalls: msg.toolInvocations?.map((ti) => ({
+        id: ti.toolCallId,
+        name: ti.toolName,
+        arguments: ti.args,
+      })),
+      toolResults: msg.toolInvocations
+        ?.filter((ti) => "result" in ti && ti.result !== undefined)
+        .map((ti) => ({
+          toolCallId: ti.toolCallId,
+          content: "result" in ti ? ti.result : undefined,
+          isError: false,
+        })),
+    }));
+};
 
 /**
  * バックグラウンドでチャット処理を行うコンポーネント
@@ -137,7 +169,12 @@ const BackgroundComponent: React.FC<BackgroundComponentProps> = ({
         } catch (error) {
           addToolResult({
             toolCallId: toolCall.toolCallId,
-            result: { error: error.message || "Auto tool execution failed" },
+            result: {
+              error:
+                error instanceof Error
+                  ? error.message
+                  : "Auto tool execution failed",
+            },
           });
         }
       }
@@ -261,7 +298,7 @@ const BackgroundComponent: React.FC<BackgroundComponentProps> = ({
               backgroundSessionKey,
               chatHistorySessionId,
               agentId,
-              error: error.message || error.toString(),
+              error: error instanceof Error ? error.message : String(error),
               timestamp: Date.now(),
               source, // 呼び出し元を含める
             });
@@ -290,16 +327,20 @@ const BackgroundComponent: React.FC<BackgroundComponentProps> = ({
         try {
           if (!chatHistorySessionId) {
             // 新しいセッションを作成
+            const chatMessages = convertUIMessagesToChatMessages(messages);
+            const localMessages = chatMessages.map(convertToLocalChatMessage);
             const session = await platformAPI.agents.sessions.create(
               agent.id || agentId,
-              messages,
+              localMessages,
             );
             console.log("Created new local session:", session.id);
           } else {
             // 既存セッションのメッセージを更新
+            const chatMessages = convertUIMessagesToChatMessages(messages);
+            const localMessages = chatMessages.map(convertToLocalChatMessage);
             await platformAPI.agents.sessions.update(
               chatHistorySessionId,
-              messages,
+              localMessages,
             );
           }
 
@@ -320,7 +361,7 @@ const BackgroundComponent: React.FC<BackgroundComponentProps> = ({
               backgroundSessionKey,
               chatHistorySessionId,
               agentId,
-              error: `Session save failed: ${error.message || error.toString()}`,
+              error: `Session save failed: ${error instanceof Error ? error.message : String(error)}`,
               timestamp: Date.now(),
               source, // 呼び出し元を含める
             });

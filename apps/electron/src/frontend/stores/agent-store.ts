@@ -1,53 +1,15 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
-import { AgentConfig, DeployedAgent } from "@mcp_router/shared";
-import { AgentChatMessage } from "@mcp_router/shared";
+import {
+  AgentConfig,
+  DeployedAgent,
+  AgentState,
+  AgentStoreChatSession,
+} from "@mcp_router/shared";
+import { AgentChatMessage } from "@/lib/types/chat-types";
 import { Message } from "@ai-sdk/react";
 import { PlatformAPI } from "@/lib/platform-api";
 
-interface ChatSession {
-  id: string;
-  agentId: string;
-  lastMessage?: string;
-  createdAt: number;
-  updatedAt?: number;
-  messages?: any[]; // Messages from @ai-sdk/react (stored locally in database)
-}
-
-interface AgentState {
-  // Development agents
-  developmentAgents: AgentConfig[];
-  currentDevelopmentAgent: AgentConfig | null;
-
-  // Deployed agents
-  deployedAgents: DeployedAgent[];
-  currentDeployedAgent: DeployedAgent | null;
-
-  // Chat sessions
-  chatSessions: ChatSession[];
-  currentSessionId: string | null;
-  hasMoreSessions: boolean;
-  nextCursor: string | undefined;
-
-  // Chat messages for current session
-  messages: Message[];
-  currentStreamMessage: Message | null;
-  isStreaming: boolean;
-
-  // Loading states
-  isLoading: boolean;
-  isLoadingSessions: boolean;
-  isLoadingMoreSessions: boolean;
-  isProcessingMessage: boolean;
-  deletingSessions: Set<string>;
-
-  // Error states
-  error: string | null;
-  chatError: string | null;
-  sessionsError: string | null;
-
-  // Auth state for chat operations
-  authToken: string | null;
-
+export interface AgentStoreInterface extends AgentState {
   // Actions for development agents
   setDevelopmentAgents: (agents: AgentConfig[]) => void;
   addDevelopmentAgent: (agent: AgentConfig) => void;
@@ -63,9 +25,12 @@ interface AgentState {
   setCurrentDeployedAgent: (agent: DeployedAgent | null) => void;
 
   // Actions for chat sessions
-  setChatSessions: (sessions: ChatSession[]) => void;
-  addChatSession: (session: ChatSession) => void;
-  updateChatSession: (id: string, updates: Partial<ChatSession>) => void;
+  setChatSessions: (sessions: AgentStoreChatSession[]) => void;
+  addChatSession: (session: AgentStoreChatSession) => void;
+  updateChatSession: (
+    id: string,
+    updates: Partial<AgentStoreChatSession>,
+  ) => void;
   removeChatSession: (id: string) => void;
   setCurrentSessionId: (sessionId: string | null) => void;
   addMessageToSession: (sessionId: string, message: AgentChatMessage) => void;
@@ -129,8 +94,8 @@ interface AgentState {
 
 export const createAgentStore = (
   getPlatformAPI: () => PlatformAPI,
-): UseBoundStore<StoreApi<AgentState>> =>
-  create<AgentState>((set, get) => ({
+): UseBoundStore<StoreApi<AgentStoreInterface>> =>
+  create<AgentStoreInterface>((set, get) => ({
     // Initial state
     developmentAgents: [],
     currentDevelopmentAgent: null,
@@ -467,15 +432,28 @@ export const createAgentStore = (
           options,
         );
 
+        // Convert ChatSession to AgentStoreChatSession
+        const convertedSessions = (data.sessions || []).map((session) => ({
+          id: session.id,
+          agentId: session.agentId,
+          lastMessage:
+            session.messages && session.messages.length > 0
+              ? session.messages[session.messages.length - 1].content
+              : undefined,
+          createdAt: session.createdAt.getTime(),
+          updatedAt: session.updatedAt.getTime(),
+          messages: session.messages,
+        }));
+
         if (append) {
           set({
-            chatSessions: [...chatSessions, ...(data.sessions || [])],
+            chatSessions: [...chatSessions, ...convertedSessions],
             hasMoreSessions: data.hasMore || false,
             nextCursor: data.nextCursor,
           });
         } else {
           set({
-            chatSessions: data.sessions || [],
+            chatSessions: convertedSessions,
             hasMoreSessions: data.hasMore || false,
             nextCursor: data.nextCursor,
           });

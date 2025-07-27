@@ -1,12 +1,4 @@
-import { MCPServerConfig } from "@mcp_router/shared";
-
-export interface ServerVariable {
-  name: string;
-  value: string;
-  description?: string;
-  source: "env" | "arg" | "inputParam"; // Added source to track where variable comes from
-  required?: boolean;
-}
+import { MCPServerConfig, ServerVariable } from "@mcp_router/shared";
 
 /**
  * Extract variables from a server configuration
@@ -68,27 +60,6 @@ export function extractServerVariables(
       }
     });
   }
-
-  return variables;
-}
-
-/**
- * Extract variables from multiple server configurations
- * @param servers Array of MCP server configurations
- * @returns Object with server IDs as keys and array of server variables as values
- */
-export function extractAllServerVariables(
-  servers: MCPServerConfig[],
-): Record<string, ServerVariable[]> {
-  const variables: Record<string, ServerVariable[]> = {};
-
-  if (!servers || !Array.isArray(servers)) return variables;
-
-  servers.forEach((server) => {
-    if (server && server.id) {
-      variables[server.id] = extractServerVariables(server);
-    }
-  });
 
   return variables;
 }

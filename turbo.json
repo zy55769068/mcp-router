@@ -22,6 +22,10 @@
     "format:check": {
       "cache": true
     },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "cache": true
+    },
     "start": {
       "dependsOn": ["build"],
       "cache": false
@@ -37,6 +41,20 @@
     "publish": {
       "dependsOn": ["build"],
       "cache": false
+    },
+    "knip": {
+      "cache": true,
+      "outputs": [],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "*.config.{js,ts,mjs}",
+        "package.json",
+        "knip.json",
+        "tsconfig.json"
+      ],
+      "dependsOn": ["^build"],
+      "env": ["NODE_ENV"],
+      "passThroughEnv": ["CI"]
     }
   }
 }

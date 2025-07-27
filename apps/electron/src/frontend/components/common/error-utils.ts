@@ -43,23 +43,3 @@ export function showServerError(error: Error, serverName?: string): void {
     parsedError,
   });
 }
-
-/**
- * Display general error messages
- * @param error - The error object or string
- * @param context - Optional context for the error
- */
-export function showError(error: Error | string, context?: string): void {
-  const errorMessage = error instanceof Error ? error.message : error;
-  const displayMessage = context ? `${context}: ${errorMessage}` : errorMessage;
-
-  toast.error(displayMessage, {
-    duration: 5000,
-  });
-
-  // Log for debugging
-  console.error("Operation failed:", {
-    context,
-    error,
-  });
-}

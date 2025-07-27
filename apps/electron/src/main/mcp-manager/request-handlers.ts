@@ -11,7 +11,6 @@ import {
   createUriVariants,
 } from "@/lib/utils/uri-utils";
 import { summarizeResponse } from "@/lib/utils/response-utils";
-import { AgentToolHandler } from "@/main/agent-tools";
 import { RequestLogEntry } from "./types";
 import { LoggingService } from "./logging";
 import { ServerManager } from "./server-manager";
@@ -95,11 +94,19 @@ export class RequestHandlers {
       serverName,
     );
 
-    const client = this.clients.get(this.getServerIdByName(serverName));
-    if (!client) {
+    const serverId = this.getServerIdByName(serverName);
+    if (!serverId) {
       throw new McpError(
         ErrorCode.InvalidRequest,
         `Unknown server: ${serverName}`,
+      );
+    }
+
+    const client = this.clients.get(serverId);
+    if (!client) {
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Server ${serverName} is not connected`,
       );
     }
 
@@ -158,7 +165,7 @@ export class RequestHandlers {
     this.toolNameToServerMap.clear();
 
     // Add agent tools
-    this.addAgentsAsTools(allTools);
+    // this.addAgentsAsTools(allTools); // Agent tools removed
 
     // Collect all tools
     for (const [serverId, client] of this.clients.entries()) {
@@ -217,15 +224,15 @@ export class RequestHandlers {
   /**
    * Add agent tools to the tools list
    */
-  private addAgentsAsTools(allTools: any[]): void {
-    const agentServerName = "Agent Tools";
-    const enabledAgentTools = AgentToolHandler.getEnabledAgentTools();
+  // private addAgentsAsTools(allTools: any[]): void {
+  //   const agentServerName = "Agent Tools";
+  //   const enabledAgentTools = AgentToolHandler.getEnabledAgentTools();
 
-    enabledAgentTools.forEach((tool) => {
-      this.toolNameToServerMap.set(tool.name, agentServerName);
-      allTools.push(tool);
-    });
-  }
+  //   enabledAgentTools.forEach((tool) => {
+  //     this.toolNameToServerMap.set(tool.name, agentServerName);
+  //     allTools.push(tool);
+  //   });
+  // }
 
   /**
    * Handle a request to list all resources from all servers
@@ -674,6 +681,10 @@ export class RequestHandlers {
     args: any,
     token?: string,
   ): Promise<any> {
-    return await AgentToolHandler.handleTool(toolName, args);
+    // return await AgentToolHandler.handleTool(toolName, args);
+    throw new McpError(
+      ErrorCode.MethodNotFound,
+      `Agent tool ${toolName} not available`
+    );
   }
 }

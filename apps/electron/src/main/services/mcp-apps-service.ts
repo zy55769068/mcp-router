@@ -14,43 +14,25 @@ import {
   syncServersFromClientConfig,
   extractConfigInfo,
 } from "../mcp-config-importer";
-import { TokenScope, McpApp, McpAppsManagerResult } from "@mcp_router/shared";
+import {
+  TokenScope,
+  McpApp,
+  McpAppsManagerResult,
+  McpRouterConfig,
+  StandardAppConfig,
+  VSCodeAppConfig,
+} from "@mcp_router/shared";
 
 // 対応アプリが多くて複雑になってきたら、ストラテジーパターンに分けることを検討
 
 // 標準アプリの定義
-export const STANDARD_APPS = [
+const STANDARD_APPS = [
   { id: "claude", name: "Claude", configPathFn: claudeConfig },
   { id: "cline", name: "Cline", configPathFn: clineConfig },
   { id: "windsurf", name: "Windsurf", configPathFn: windsurfConfig },
   { id: "cursor", name: "Cursor", configPathFn: cursorConfig },
   { id: "vscode", name: "VSCode", configPathFn: vscodeConfig },
 ];
-
-// 基本的なMCP設定の構造
-interface McpRouterConfig {
-  command: string;
-  args: string[];
-  env: {
-    MCPR_TOKEN: string;
-  };
-}
-
-// 通常アプリの設定構造
-interface StandardAppConfig {
-  mcpServers: {
-    "mcp-router": McpRouterConfig;
-  };
-}
-
-// VSCode用の設定構造
-interface VSCodeAppConfig {
-  mcp: {
-    servers: {
-      "mcp-router": McpRouterConfig;
-    };
-  };
-}
 
 /**
  * アプリの設定ファイルパスを取得
@@ -517,8 +499,8 @@ async function checkApp(
 
     const installed = await exists(configPath);
     let configured = false;
-    let token: string = knownToken;
-    let serverIds: string[] = knownServerIds;
+    let token: string = knownToken || "";
+    let serverIds: string[] = knownServerIds || [];
     let isCustom = false;
     let hasOtherServers = false;
 
@@ -528,7 +510,7 @@ async function checkApp(
       (app) => app.name.toLowerCase() === name.toLowerCase(),
     );
     if (customApp) {
-      token = token || customApp.token;
+      token = token || customApp.token || "";
       serverIds = serverIds || customApp.serverIds;
       isCustom = true;
     }
@@ -547,7 +529,7 @@ async function checkApp(
 
       if (!tokenValid) {
         configured = false;
-        token = undefined;
+        token = "";
       } else if (isCustom) {
         // カスタムアプリは設定ファイル不要
         configured = true;
@@ -558,7 +540,7 @@ async function checkApp(
         const configTokenValid =
           configToken && allTokens.some((t) => t.id === configToken);
 
-        configured = hasMcpConfig && configTokenValid;
+        configured = !!(hasMcpConfig && configTokenValid);
 
         // 有効なトークンなら使用
         if (configTokenValid) {
@@ -566,11 +548,11 @@ async function checkApp(
         }
 
         // 他のMCPサーバが設定されているか確認
-        hasOtherServers = otherServers && otherServers.length > 0;
+        hasOtherServers = !!(otherServers && otherServers.length > 0);
 
         // 他のMCPサーバが設定されていたら同期する
         if (hasOtherServers) {
-          await syncServersFromClientConfig(otherServers);
+          await syncServersFromClientConfig(otherServers || []);
         }
       }
     }

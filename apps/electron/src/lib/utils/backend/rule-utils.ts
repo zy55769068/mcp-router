@@ -17,7 +17,7 @@ import {
  * @param variables Object containing variable values
  * @returns String with variables replaced by their values
  */
-export function applyRule(rule: string, variables: RuleVariables): string {
+function applyRule(rule: string, variables: RuleVariables): string {
   return rule.replace(/\{([a-zA-Z]+)\}/g, (match, variable) => {
     return variables[variable] !== undefined ? variables[variable] : match;
   });
@@ -50,40 +50,41 @@ export function applyDisplayRules(
     serverName,
   };
 
-  let nameRule, descriptionRule;
+  let nameRule: string;
+  let descriptionRule: string;
 
   // Select the appropriate rule based on entity type
   switch (type) {
     case "resource":
       nameRule =
         effectiveRules.resourceNameRule ||
-        DEFAULT_DISPLAY_RULES.resourceNameRule;
+        DEFAULT_DISPLAY_RULES.resourceNameRule!;
       descriptionRule =
         effectiveRules.resourceDescriptionRule ||
-        DEFAULT_DISPLAY_RULES.resourceDescriptionRule;
+        DEFAULT_DISPLAY_RULES.resourceDescriptionRule!;
       break;
     case "prompt":
       nameRule =
-        effectiveRules.promptNameRule || DEFAULT_DISPLAY_RULES.promptNameRule;
+        effectiveRules.promptNameRule || DEFAULT_DISPLAY_RULES.promptNameRule!;
       descriptionRule =
         effectiveRules.promptDescriptionRule ||
-        DEFAULT_DISPLAY_RULES.promptDescriptionRule;
+        DEFAULT_DISPLAY_RULES.promptDescriptionRule!;
       break;
     case "resourceTemplate":
       nameRule =
         effectiveRules.resourceTemplateNameRule ||
-        DEFAULT_DISPLAY_RULES.resourceTemplateNameRule;
+        DEFAULT_DISPLAY_RULES.resourceTemplateNameRule!;
       descriptionRule =
         effectiveRules.resourceTemplateDescriptionRule ||
-        DEFAULT_DISPLAY_RULES.resourceTemplateDescriptionRule;
+        DEFAULT_DISPLAY_RULES.resourceTemplateDescriptionRule!;
       break;
     case "tool":
     default:
       nameRule =
-        effectiveRules.toolNameRule || DEFAULT_DISPLAY_RULES.toolNameRule;
+        effectiveRules.toolNameRule || DEFAULT_DISPLAY_RULES.toolNameRule!;
       descriptionRule =
         effectiveRules.toolDescriptionRule ||
-        DEFAULT_DISPLAY_RULES.toolDescriptionRule;
+        DEFAULT_DISPLAY_RULES.toolDescriptionRule!;
       break;
   }
 
@@ -115,13 +116,13 @@ export function applyRulesToInputSchema(
   const displayRules = settings.mcpDisplayRules || DEFAULT_DISPLAY_RULES;
 
   const paramRule =
-    displayRules.toolParameterRule || DEFAULT_DISPLAY_RULES.toolParameterRule;
+    displayRules.toolParameterRule || DEFAULT_DISPLAY_RULES.toolParameterRule!;
 
   // Create a deep clone of the schema to avoid modifying the original
   const modifiedSchema = JSON.parse(JSON.stringify(inputSchema));
 
   // Add additional top-level properties from the rule to the schema
-  if (paramRule.properties) {
+  if (paramRule?.properties) {
     // Ensure properties object exists
     if (!modifiedSchema.properties) {
       modifiedSchema.properties = {};
@@ -130,7 +131,7 @@ export function applyRulesToInputSchema(
     // Add all properties from the rule to the schema
     Object.keys(paramRule.properties).forEach((propKey) => {
       modifiedSchema.properties[propKey] = JSON.parse(
-        JSON.stringify(paramRule.properties[propKey]),
+        JSON.stringify(paramRule.properties![propKey]),
       );
     });
   }
@@ -142,22 +143,11 @@ export function applyRulesToInputSchema(
       const param = modifiedSchema.properties[paramName];
 
       if (param && param.description) {
-        // Apply parameter rule with variables
-        const variables: RuleVariables = {
-          description: param.description,
-          serverName,
-          name: toolName,
-          toolName, // alias for backward compatibility
-          paramName,
-        };
-
-        // We no longer apply description template
-
         // Add additional properties from the rule
-        if (paramRule.properties) {
+        if (paramRule?.properties) {
           Object.keys(paramRule.properties).forEach((propKey) => {
             param[propKey] = JSON.parse(
-              JSON.stringify(paramRule.properties[propKey]),
+              JSON.stringify(paramRule.properties![propKey]),
             );
           });
         }
@@ -175,21 +165,11 @@ export function applyRulesToInputSchema(
       // Process items for array types
       if (param.items && typeof param.items === "object") {
         if (param.items.description) {
-          const variables: RuleVariables = {
-            description: param.items.description,
-            serverName,
-            name: toolName,
-            toolName,
-            paramName: `${paramName}[]`,
-          };
-
-          // We no longer apply description template
-
           // Add additional properties from the rule
-          if (paramRule.properties) {
+          if (paramRule?.properties) {
             Object.keys(paramRule.properties).forEach((propKey) => {
               param.items[propKey] = JSON.parse(
-                JSON.stringify(paramRule.properties[propKey]),
+                JSON.stringify(paramRule.properties![propKey]),
               );
             });
           }
@@ -208,14 +188,14 @@ export function applyRulesToInputSchema(
   }
 
   // Apply additional required fields from the rule if applicable
-  if (paramRule.required && Array.isArray(paramRule.required)) {
+  if (paramRule?.required && Array.isArray(paramRule.required)) {
     // Ensure required array exists
     if (!modifiedSchema.required) {
       modifiedSchema.required = [];
     }
 
     // Add any required fields from the rule that aren't already in the schema
-    paramRule.required.forEach((requiredField) => {
+    paramRule.required!.forEach((requiredField) => {
       if (!modifiedSchema.required.includes(requiredField)) {
         modifiedSchema.required.push(requiredField);
       }

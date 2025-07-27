@@ -1,5 +1,5 @@
 import React from "react";
-import { LocalMCPServer } from "../../../../types";
+import { LocalMCPServer } from "@mcp_router/shared";
 import { RotateCw, Plus, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -131,7 +131,7 @@ const DiscoverServerList: React.FC<DiscoverServerListProps> = ({
             <div
               className="cursor-pointer transition-colors hover:bg-muted/50"
               onClick={() => {
-                const url = `https://mcp-router.net/mcpservers/${encodeURIComponent(server.displayId)}/`;
+                const url = `https://mcp-router.net/mcpservers/${encodeURIComponent(server.displayId || server.id)}/`;
                 window.open(url, "_blank");
               }}
             >

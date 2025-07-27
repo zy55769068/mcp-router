@@ -1,11 +1,8 @@
+import { CursorData } from "@mcp_router/shared";
+
 /**
  * カーソルのエンコード・デコードユーティリティ
  */
-
-export interface CursorData {
-  timestamp: number;
-  id: string;
-}
 
 /**
  * カーソルデータをBase64エンコード

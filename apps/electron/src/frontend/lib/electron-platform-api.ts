@@ -16,7 +16,7 @@ import type {
 } from "@/lib/platform-api";
 
 // Electron implementation of the Platform API
-export class ElectronPlatformAPI implements PlatformAPI {
+class ElectronPlatformAPI implements PlatformAPI {
   auth: AuthAPI;
   servers: ServerAPI;
   agents: AgentAPI;
@@ -33,7 +33,7 @@ export class ElectronPlatformAPI implements PlatformAPI {
       signOut: () => window.electronAPI.logout(),
       getStatus: (forceRefresh) =>
         window.electronAPI.getAuthStatus(forceRefresh).then((status) => ({
-          authenticated: status.authenticated ?? status.loggedIn ?? false,
+          authenticated: status.authenticated ?? false,
           userId: status.userId,
           user: status.user,
           token: status.token,
@@ -248,7 +248,13 @@ export class ElectronPlatformAPI implements PlatformAPI {
 
     // Initialize logs domain
     this.logs = {
-      query: (options) => window.electronAPI.getRequestLogs(options),
+      query: async (options) => {
+        const result = await window.electronAPI.getRequestLogs(options);
+        return {
+          ...result,
+          items: result.logs, // Map logs to items for CursorPaginationResult compatibility
+        };
+      },
     };
 
     // Initialize workspaces domain

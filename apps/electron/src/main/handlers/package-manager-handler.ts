@@ -52,8 +52,10 @@ export function registerPackageManagerHandlers(): void {
         } catch (error) {
           console.error("Error installing pnpm/node:", error);
           result.success = false;
-          result.errors.pnpm = error.message;
-          result.errors.node = error.message;
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          result.errors.pnpm = errorMessage;
+          result.errors.node = errorMessage;
         }
       }
 
@@ -65,7 +67,8 @@ export function registerPackageManagerHandlers(): void {
         } catch (error) {
           console.error("Error installing uv:", error);
           result.success = false;
-          result.errors.uv = error.message;
+          result.errors.uv =
+            error instanceof Error ? error.message : String(error);
         }
       }
 
@@ -81,10 +84,12 @@ export function registerPackageManagerHandlers(): void {
       return result;
     } catch (error) {
       console.error("Error in installPackageManagers:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         success: false,
         installed: { node: false, pnpm: false, uv: false },
-        errors: { node: error.message, pnpm: error.message, uv: error.message },
+        errors: { node: errorMessage, pnpm: errorMessage, uv: errorMessage },
         needsRestart: false,
       };
     }

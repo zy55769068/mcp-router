@@ -139,6 +139,9 @@ const App: React.FC = () => {
       try {
         if (url.hostname === "agent") {
           const agentId = url.searchParams.get("id");
+          if (!agentId) {
+            throw new Error("No agent ID provided in URL");
+          }
           const result = await platformAPI.agents.import(agentId);
           if (result) {
             // Show success message for agent import
@@ -172,12 +175,7 @@ const App: React.FC = () => {
 
   // Refresh servers on initial load only
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      refreshServers();
-    }, 2000);
-
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    refreshServers();
   }, [refreshServers]);
 
   // Loading indicator component to reuse
