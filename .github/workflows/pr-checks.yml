@@ -20,11 +20,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'pnpm'
           
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        
+      - name: Build shared package
+        run: pnpm --filter @mcp_router/shared build
         
       - name: Run typecheck
         run: pnpm run typecheck
