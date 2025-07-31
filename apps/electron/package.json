@@ -21,7 +21,10 @@
     "typecheck": "tsc --noEmit",
     "knip": "cd ../.. && knip --workspace apps/electron",
     "postinstall": "electron-rebuild",
-    "rebuild": "electron-rebuild"
+    "rebuild": "electron-rebuild",
+    "test:e2e": "pnpm make && cp package.json .webpack/arm64/main/ && playwright test --config=e2e/playwright-electron.config.ts",
+    "test:e2e:only": "playwright test --config=e2e/playwright-electron.config.ts",
+    "test:e2e:headed": "pnpm make && cp package.json .webpack/arm64/main/ && playwright test --config=e2e/playwright-electron.config.ts --headed"
   },
   "dependencies": {
     "@ai-sdk/react": "^1.2.12",
@@ -95,6 +98,8 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "webpack": "^5.99.9"
+    "webpack": "^5.99.9",
+    "@playwright/test": "^1.49.0",
+    "playwright": "^1.49.0"
   }
 }

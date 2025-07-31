@@ -5,9 +5,6 @@ import {
   RequestLogEntryInput,
   RequestLogQueryOptions,
   RequestLogQueryResult,
-  ClientStats,
-  ServerStats,
-  RequestTypeStats,
 } from "@mcp_router/shared";
 import { encodeCursor, decodeCursor } from "@/renderer/utils/cursor";
 
@@ -16,8 +13,6 @@ import { encodeCursor, decodeCursor } from "@/renderer/utils/cursor";
  * BetterSQLite3を使用してリクエストログを管理
  */
 export class LogRepository extends BaseRepository<RequestLogEntry> {
-  private clientNameCache: Map<string, string> = new Map();
-
   /**
    * コンストラクタ
    * @param db SqliteManagerインスタンス
@@ -32,10 +27,49 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
 
   /**
    * テーブルを初期化（BaseRepositoryの抽象メソッドを実装）
-   * 注: スキーマのマイグレーションはDatabaseMigrationクラスで一元管理されます
    */
   protected initializeTable(): void {
-    // 初期化処理はDatabaseMigrationで行うため、ここでは何もしない
+    try {
+      // requestLogsテーブルを作成（存在しない場合）
+      this.db.execute(`
+        CREATE TABLE IF NOT EXISTS requestLogs (
+          id TEXT PRIMARY KEY,
+          timestamp INTEGER NOT NULL,
+          client_id TEXT NOT NULL,
+          client_name TEXT NOT NULL,
+          server_id TEXT NOT NULL,
+          server_name TEXT NOT NULL,
+          request_type TEXT NOT NULL,
+          request_params TEXT,
+          response_data TEXT,
+          response_status TEXT NOT NULL,
+          duration INTEGER NOT NULL,
+          error_message TEXT
+        )
+      `);
+
+      // インデックスを作成
+      this.db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_request_logs_timestamp ON requestLogs(timestamp)",
+      );
+      this.db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_request_logs_client_id ON requestLogs(client_id)",
+      );
+      this.db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_request_logs_server_id ON requestLogs(server_id)",
+      );
+      this.db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_request_logs_request_type ON requestLogs(request_type)",
+      );
+      this.db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_request_logs_response_status ON requestLogs(response_status)",
+      );
+
+      console.log("[LogRepository] テーブルの初期化が完了しました");
+    } catch (error) {
+      console.error("[LogRepository] テーブルの初期化中にエラー:", error);
+      throw error;
+    }
   }
 
   /**
@@ -134,62 +168,10 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
       // リポジトリに追加
       const addedEntry = this.add(logEntry);
 
-      // メタデータを更新
-      this.updateMetadata(entry);
-
       return addedEntry;
     } catch (error) {
       console.error("リクエストログの追加中にエラーが発生しました:", error);
       throw error;
-    }
-  }
-
-  /**
-   * メタデータを更新
-   */
-  private updateMetadata(entry: RequestLogEntryInput): void {
-    try {
-      this.db.transaction(() => {
-        // クライアントIDのメタデータ更新
-        this.updateMetadataArray("client_ids", entry.clientId);
-
-        // サーバIDのメタデータ更新
-        this.updateMetadataArray("server_ids", entry.serverId);
-
-        // リクエストタイプのメタデータ更新
-        this.updateMetadataArray("request_types", entry.requestType);
-      });
-    } catch (error) {
-      console.error("メタデータの更新中にエラーが発生しました:", error);
-      // メタデータ更新の失敗はログに記録するが、例外はスローしない（ログ機能自体の動作を妨げないため）
-    }
-  }
-
-  /**
-   * メタデータ配列を更新（存在しない値がある場合のみ追加）
-   */
-  private updateMetadataArray(key: string, value: string): void {
-    // 現在の値を取得
-    const metadataRow = this.db.get<{ value: string }>(
-      "SELECT value FROM logs_metadata WHERE key = :key",
-      { key },
-    );
-    if (!metadataRow) {
-      throw new Error(`メタデータキー '${key}' が見つかりません`);
-    }
-
-    // JSON配列にパース
-    const values = JSON.parse(metadataRow.value) as string[];
-
-    // 値が存在しない場合のみ追加
-    if (!values.includes(value)) {
-      values.push(value);
-
-      // 更新
-      this.db.execute(
-        "UPDATE logs_metadata SET value = :value WHERE key = :key",
-        { key, value: JSON.stringify(values) },
-      );
     }
   }
 
@@ -309,170 +291,6 @@ export class LogRepository extends BaseRepository<RequestLogEntry> {
     } catch (error) {
       console.error("リクエストログの取得中にエラーが発生しました:", error);
       return { items: [], logs: [], total: 0, hasMore: false };
-    }
-  }
-
-  /**
-   * 利用可能なクライアントIDのリストを取得
-   */
-  public getAvailableClientIds(): string[] {
-    try {
-      const metadata = this.db.get<{ value: string }>(
-        "SELECT value FROM logs_metadata WHERE key = :key",
-        { key: "client_ids" },
-      );
-      return metadata ? JSON.parse(metadata.value) : [];
-    } catch (error) {
-      console.error(
-        "クライアントIDリストの取得中にエラーが発生しました:",
-        error,
-      );
-      return [];
-    }
-  }
-
-  /**
-   * リクエストタイプのリストを取得
-   */
-  public getAvailableRequestTypes(): string[] {
-    try {
-      const metadata = this.db.get<{ value: string }>(
-        "SELECT value FROM logs_metadata WHERE key = :key",
-        { key: "request_types" },
-      );
-      return metadata ? JSON.parse(metadata.value) : [];
-    } catch (error) {
-      console.error(
-        "リクエストタイプリストの取得中にエラーが発生しました:",
-        error,
-      );
-      return [];
-    }
-  }
-
-  /**
-   * クライアント別リクエスト統計情報を取得
-   */
-  public getClientStats(): ClientStats[] {
-    try {
-      const sql = `
-        SELECT client_id, client_name, COUNT(*) as request_count
-        FROM ${this.tableName}
-        GROUP BY client_id
-        ORDER BY request_count DESC
-      `;
-
-      const rows = this.db.all<{
-        client_id: string;
-        client_name: string;
-        request_count: number;
-      }>(sql);
-
-      return rows.map((row) => ({
-        clientId: row.client_id,
-        clientName: row.client_name,
-        requestCount: row.request_count,
-      }));
-    } catch (error) {
-      console.error(
-        "クライアント統計情報の取得中にエラーが発生しました:",
-        error,
-      );
-      return [];
-    }
-  }
-
-  /**
-   * サーバ別リクエスト統計情報を取得
-   */
-  public getServerStats(): ServerStats[] {
-    try {
-      const sql = `
-        SELECT server_id, server_name, COUNT(*) as request_count
-        FROM ${this.tableName}
-        GROUP BY server_id
-        ORDER BY request_count DESC
-      `;
-
-      const rows = this.db.all<{
-        server_id: string;
-        server_name: string;
-        request_count: number;
-      }>(sql);
-
-      return rows.map((row) => ({
-        serverId: row.server_id,
-        serverName: row.server_name,
-        requestCount: row.request_count,
-      }));
-    } catch (error) {
-      console.error("サーバ統計情報の取得中にエラーが発生しました:", error);
-      return [];
-    }
-  }
-
-  /**
-   * リクエストタイプ別統計情報を取得
-   */
-  public getRequestTypeStats(): RequestTypeStats[] {
-    try {
-      const sql = `
-        SELECT request_type, COUNT(*) as count
-        FROM ${this.tableName}
-        GROUP BY request_type
-        ORDER BY count DESC
-      `;
-
-      const rows = this.db.all<{ request_type: string; count: number }>(sql);
-
-      return rows.map((row) => ({
-        requestType: row.request_type,
-        count: row.count,
-      }));
-    } catch (error) {
-      console.error(
-        "リクエストタイプ統計情報の取得中にエラーが発生しました:",
-        error,
-      );
-      return [];
-    }
-  }
-
-  /**
-   * クライアントIDから名前を取得
-   */
-  public getClientNameById(clientId: string): string {
-    // キャッシュにある場合はそれを返す
-    if (this.clientNameCache.has(clientId)) {
-      return this.clientNameCache.get(clientId)!;
-    }
-
-    try {
-      // 最新のクライアント名を取得
-      const sql = `
-        SELECT client_name
-        FROM ${this.tableName}
-        WHERE client_id = :clientId AND client_name != 'unknown-client' AND client_name != ''
-        ORDER BY timestamp DESC
-        LIMIT 1
-      `;
-
-      const result = this.db.get<{ client_name: string }>(sql, { clientId });
-
-      let clientName: string;
-      if (result && result.client_name) {
-        clientName = result.client_name;
-      } else {
-        // クライアントIDから短縮名を生成
-        clientName = `client-${clientId.substring(0, Math.min(8, clientId.length))}`;
-      }
-
-      // キャッシュに保存
-      this.clientNameCache.set(clientId, clientName);
-      return clientName;
-    } catch (error) {
-      console.error("クライアント名の取得中にエラーが発生しました:", error);
-      return `client-${clientId.substring(0, Math.min(8, clientId.length))}`;
     }
   }
 }
