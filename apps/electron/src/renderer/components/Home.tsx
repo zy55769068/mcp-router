@@ -7,29 +7,35 @@ import { Switch } from "@mcp_router/ui";
 import {
   IconSearch,
   IconServer,
-  IconChevronDown,
   IconPlus,
   IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/renderer/utils/tailwind-utils";
-import { Trash, AlertCircle } from "lucide-react";
+import { Trash, AlertCircle, Grid3X3, List } from "lucide-react";
 import { toast } from "sonner";
-import { useServerStore, useWorkspaceStore, useAuthStore } from "../stores";
+import {
+  useServerStore,
+  useWorkspaceStore,
+  useAuthStore,
+  useViewPreferencesStore,
+} from "../stores";
 import { showServerError } from "@/renderer/components/common";
 
 // Import components
-import ServerDetails from "@/renderer/components/mcp/server/ServerDetails";
 import { ServerErrorModal } from "@/renderer/components/common/ServerErrorModal";
+import { ServerCardCompact } from "@/renderer/components/mcp/server/ServerCardCompact";
 import { Link } from "react-router-dom";
 import { Button } from "@mcp_router/ui";
 import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@mcp_router/ui";
-import { LoginScreen } from "@/renderer/components/setup/LoginScreen";
+import { LoginScreen } from "@/renderer/components/auth/LoginScreen";
+import ServerDetailsAdvancedSheet from "@/renderer/components/mcp/server/server-details/ServerDetailsAdvancedSheet";
+import { useServerEditingStore } from "@/renderer/stores";
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
@@ -46,11 +52,13 @@ const Home: React.FC = () => {
     stopServer,
     deleteServer,
     refreshServers,
+    updateServerConfig,
   } = useServerStore();
 
   // Get workspace and auth state
   const { currentWorkspace } = useWorkspaceStore();
   const { isAuthenticated, login } = useAuthStore();
+  const { serverViewMode, setServerViewMode } = useViewPreferencesStore();
 
   // Filter servers based on search query and sort them
   const filteredServers = servers
@@ -71,14 +79,22 @@ const Home: React.FC = () => {
   // State for refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Toggle expanded server details
+  // State for Advanced Settings
+  const [advancedSettingsServer, setAdvancedSettingsServer] =
+    useState<MCPServer | null>(null);
+  const {
+    initializeFromServer,
+    setIsAdvancedEditing,
+    isLoading: isSavingAdvanced,
+  } = useServerEditingStore();
+
+  // Toggle expanded server details - open settings
   const toggleServerExpand = (serverId: string) => {
-    if (expandedServerId === serverId) {
-      setExpandedServerId(null);
-      setSelectedServerId(null);
-    } else {
-      setExpandedServerId(serverId);
-      setSelectedServerId(serverId);
+    const server = servers.find((s) => s.id === serverId);
+    if (server) {
+      initializeFromServer(server);
+      setAdvancedSettingsServer(server);
+      setIsAdvancedEditing(true);
     }
   };
 
@@ -126,25 +142,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/servers">{t("serverList.title")}</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <Button asChild variant="outline" size="sm" className="gap-1">
-          <Link to="/servers/add">
-            <IconPlus className="h-4 w-4" />
-            {t("serverList.addServer")}
-          </Link>
-        </Button>
-      </div>
-
       <div className="mb-4 flex gap-2">
         <div className="relative flex-1">
           <input
@@ -156,6 +153,26 @@ const Home: React.FC = () => {
           />
           <IconSearch className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
+        <div className="flex gap-1">
+          <Button
+            variant={serverViewMode === "list" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setServerViewMode("list")}
+            className="h-8 w-8 p-0"
+            title="List View"
+          >
+            <List className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={serverViewMode === "grid" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setServerViewMode("grid")}
+            className="h-8 w-8 p-0"
+            title="Grid View"
+          >
+            <Grid3X3 className="h-4 w-4" />
+          </Button>
+        </div>
         <Button
           variant="outline"
           size="sm"
@@ -165,6 +182,11 @@ const Home: React.FC = () => {
           title={"Refresh Servers"}
         >
           <IconRefresh />
+        </Button>
+        <Button asChild variant="outline" size="sm" className="gap-1">
+          <Link to="/servers/add">
+            <IconPlus className="h-4 w-4" />
+          </Link>
         </Button>
       </div>
 
@@ -193,7 +215,7 @@ const Home: React.FC = () => {
               </div>
             </div>
           </div>
-        ) : (
+        ) : serverViewMode === "list" ? (
           <ScrollArea className="h-full">
             <div className="divide-y divide-border">
               {filteredServers.map((server) => {
@@ -236,11 +258,8 @@ const Home: React.FC = () => {
                     >
                       <div className="flex justify-between">
                         <div className="flex flex-col">
-                          <div className="font-medium text-base mb-1 hover:text-primary flex items-center">
+                          <div className="font-medium text-base mb-1 hover:text-primary">
                             {server.name}
-                            <IconChevronDown
-                              className={`w-4 h-4 ml-2 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                            />
                           </div>
 
                           {/* Description - if available */}
@@ -251,38 +270,12 @@ const Home: React.FC = () => {
                               </p>
                             )}
                           <div className="flex flex-wrap gap-2 mb-1">
-                            {/* Verification Badge - if available */}
-                            {"verificationStatus" in server && (
-                              <Badge
-                                variant={
-                                  server.verificationStatus === "verified"
-                                    ? "default"
-                                    : "outline"
-                                }
-                                className="w-fit"
-                              >
-                                {server.verificationStatus === "verified"
-                                  ? "Verified"
-                                  : "Unverified"}
-                              </Badge>
-                            )}
-
                             {/* Server Type Badge */}
                             <Badge variant="secondary" className="w-fit">
                               {server.serverType === "local"
                                 ? "Local"
                                 : "Remote"}
                             </Badge>
-
-                            {/* Version Badge - if available */}
-                            {server.version && (
-                              <Badge
-                                variant="outline"
-                                className="bg-blue-500/10 text-blue-600 border-blue-200 text-xs"
-                              >
-                                v{server.version}
-                              </Badge>
-                            )}
 
                             {/* Status Badge */}
                             <Badge
@@ -389,10 +382,52 @@ const Home: React.FC = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Expanded Server Details Section */}
-                    {isExpanded && <ServerDetails server={server} />}
                   </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        ) : (
+          <ScrollArea className="h-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+              {filteredServers.map((server) => {
+                const isExpanded = expandedServerId === server.id;
+
+                return (
+                  <React.Fragment key={server.id}>
+                    <ServerCardCompact
+                      server={server}
+                      isExpanded={isExpanded}
+                      onClick={() => toggleServerExpand(server.id)}
+                      onToggle={async (checked) => {
+                        try {
+                          if (checked) {
+                            await startServer(server.id);
+                            toast.success(t("serverList.serverStarted"));
+                          } else {
+                            await stopServer(server.id);
+                            toast.success(t("serverList.serverStopped"));
+                          }
+                        } catch (error) {
+                          console.error("Server operation failed:", error);
+                          showServerError(
+                            error instanceof Error
+                              ? error
+                              : new Error(String(error)),
+                            server.name,
+                          );
+                        }
+                      }}
+                      onRemove={() => {
+                        setServerToRemove(server);
+                        setIsRemoveDialogOpen(true);
+                      }}
+                      onError={() => {
+                        setErrorServer(server);
+                        setErrorModalOpen(true);
+                      }}
+                    />
+                  </React.Fragment>
                 );
               })}
             </div>
@@ -418,6 +453,55 @@ const Home: React.FC = () => {
           onClose={() => setErrorModalOpen(false)}
           serverName={errorServer.name}
           errorMessage={errorServer.errorMessage}
+        />
+      )}
+
+      {/* Advanced Settings Sheet */}
+      {advancedSettingsServer && (
+        <ServerDetailsAdvancedSheet
+          server={advancedSettingsServer}
+          handleSave={async () => {
+            try {
+              const {
+                editedCommand,
+                editedArgs,
+                editedBearerToken,
+                editedAutoStart,
+                envPairs,
+              } = useServerEditingStore.getState();
+
+              const envObj: Record<string, string> = {};
+              envPairs.forEach((pair) => {
+                if (pair.key.trim()) {
+                  envObj[pair.key.trim()] = pair.value;
+                }
+              });
+
+              const updatedConfig: any = {
+                name: advancedSettingsServer.name,
+                command: editedCommand,
+                args: editedArgs,
+                env: envObj,
+                autoStart: editedAutoStart,
+                inputParams: advancedSettingsServer.inputParams,
+              };
+
+              if (advancedSettingsServer.serverType !== "local") {
+                updatedConfig.bearerToken = editedBearerToken;
+              }
+
+              await updateServerConfig(
+                advancedSettingsServer.id,
+                updatedConfig,
+              );
+              setIsAdvancedEditing(false);
+              setAdvancedSettingsServer(null);
+              toast.success(t("serverDetails.updateSuccess"));
+            } catch (error) {
+              console.error("Failed to update server:", error);
+              toast.error(t("serverDetails.updateFailed"));
+            }
+          }}
         />
       )}
     </div>

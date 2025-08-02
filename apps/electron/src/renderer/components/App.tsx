@@ -32,13 +32,13 @@ import {
   useUIStore,
   initializeStores,
 } from "../stores";
-import { usePlatformAPI } from "@/main/infrastructure/platform-api";
+import { usePlatformAPI } from "@/renderer/platform-api";
 import { IconProgress } from "@tabler/icons-react";
 import { postHogService } from "../services/posthog-service";
 
 // Lazy load components
 const WorkspaceManagement = React.lazy(
-  () => import("./setting/WorkspaceManagement"),
+  () => import("./workspace/WorkspaceManagement"),
 );
 
 // Main App component

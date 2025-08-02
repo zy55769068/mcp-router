@@ -1,4 +1,4 @@
-import type { PlatformAPI } from "@/main/infrastructure/platform-api/types/platform-api";
+import type { PlatformAPI } from "@mcp_router/shared";
 import {
   createRemoteAPIClient,
   type RemoteAPIClient,
@@ -7,12 +7,10 @@ import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
 import type {
   ServerStatus,
   CreateServerInput,
-} from "@/main/infrastructure/platform-api/types/domains/server-api";
-import type {
   LogQueryOptions,
-  LogEntry,
   LogQueryResult,
-} from "@/main/infrastructure/platform-api/types/domains/log-api";
+} from "@mcp_router/shared";
+import type { RequestLogEntry } from "@mcp_router/shared";
 
 interface RemoteWorkspaceConfig {
   apiUrl: string;
@@ -26,9 +24,11 @@ interface RemoteWorkspaceConfig {
 export class RemotePlatformAPI implements PlatformAPI {
   private client!: RemoteAPIClient; // Using definite assignment assertion since it's initialized in constructor
   private config: RemoteWorkspaceConfig;
+  private localPlatformAPI: PlatformAPI;
 
-  constructor(config: RemoteWorkspaceConfig) {
+  constructor(config: RemoteWorkspaceConfig, localPlatformAPI: PlatformAPI) {
     this.config = config;
+    this.localPlatformAPI = localPlatformAPI;
     // Client will be initialized with user token when needed
     this.initializeClient();
   }
@@ -139,6 +139,15 @@ export class RemotePlatformAPI implements PlatformAPI {
         "fetchVersionDetails is not supported in remote workspaces",
       );
     },
+
+    selectFile: (options?: {
+      title?: string;
+      mode?: "file" | "directory";
+      filters?: { name: string; extensions: string[] }[];
+    }) => {
+      // File selection is a local operation
+      return this.localPlatformAPI.servers.selectFile(options);
+    },
   };
 
   // Log API implementation via tRPC
@@ -162,10 +171,10 @@ export class RemotePlatformAPI implements PlatformAPI {
         hasMore?: boolean;
       }>(response);
 
-      // Convert RequestLogEntry to LogEntry format
-      const logs: LogEntry[] = result.logs.map((log) => ({
+      // Convert to RequestLogEntry format
+      const logs: RequestLogEntry[] = result.logs.map((log) => ({
         id: log.id,
-        timestamp: new Date(log.timestamp),
+        timestamp: log.timestamp, // Keep as number, not Date
         clientId: log.clientId,
         clientName: log.clientName,
         serverId: log.serverId,
@@ -179,7 +188,7 @@ export class RemotePlatformAPI implements PlatformAPI {
       }));
 
       return {
-        items: logs, // CursorPaginationResult requires items property
+        items: logs, // LogQueryResult extends CursorPaginationResult which requires items
         logs, // Keep for backward compatibility
         total: result.total,
         nextCursor: result.nextCursor,
@@ -190,29 +199,26 @@ export class RemotePlatformAPI implements PlatformAPI {
 
   // All other APIs delegate to local implementation
   get agents() {
-    return electronPlatformAPI.agents;
+    return this.localPlatformAPI.agents;
   }
 
   get apps() {
-    return electronPlatformAPI.apps;
+    return this.localPlatformAPI.apps;
   }
 
   get auth() {
-    return electronPlatformAPI.auth;
+    return this.localPlatformAPI.auth;
   }
 
   get packages() {
-    return electronPlatformAPI.packages;
+    return this.localPlatformAPI.packages;
   }
 
   get settings() {
-    return electronPlatformAPI.settings;
+    return this.localPlatformAPI.settings;
   }
 
   get workspaces() {
-    return electronPlatformAPI.workspaces;
+    return this.localPlatformAPI.workspaces;
   }
 }
-
-// Import at the end to avoid circular dependency
-import { electronPlatformAPI } from "./electron-platform-api";

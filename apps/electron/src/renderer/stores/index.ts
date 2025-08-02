@@ -3,6 +3,7 @@ export * from "./theme-store";
 export * from "./ui-store";
 export * from "./server-editing-store";
 export * from "./workspace-store";
+export * from "./view-preferences-store";
 
 // Platform-dependent store factories
 export * from "./server-store";
@@ -10,7 +11,7 @@ export * from "./auth-store";
 export * from "./agent-store";
 
 // Import platform API type
-import type { PlatformAPI } from "@/main/infrastructure/platform-api/types/platform-api";
+import type { PlatformAPI } from "@mcp_router/shared";
 
 // Import store factories
 import { createServerStore, createServerSelectors } from "./server-store";

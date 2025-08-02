@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import { Workspace } from "@/main/infrastructure/platform-api";
-import { electronPlatformAPI } from "../lib/electron-platform-api";
-import { RemotePlatformAPI } from "../lib/remote-platform-api";
-import type { PlatformAPI } from "@/main/infrastructure/platform-api/types/platform-api";
+import { electronPlatformAPI } from "../platform-api/electron-platform-api";
+import { RemotePlatformAPI } from "../platform-api/remote-platform-api";
+import type { PlatformAPI, Workspace } from "@mcp_router/shared";
 import { useAuthStore } from "@/renderer/stores";
 
 interface WorkspaceState {
@@ -226,10 +225,13 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       const cacheKey = `${currentWorkspace.id}-${currentWorkspace.remoteConfig.apiUrl}-${authToken}`;
 
       if (!cache.has(cacheKey)) {
-        const remoteAPI = new RemotePlatformAPI({
-          apiUrl: currentWorkspace.remoteConfig.apiUrl,
-          userToken: authToken,
-        });
+        const remoteAPI = new RemotePlatformAPI(
+          {
+            apiUrl: currentWorkspace.remoteConfig.apiUrl,
+            userToken: authToken,
+          },
+          electronPlatformAPI,
+        );
         cache.set(cacheKey, remoteAPI);
 
         // Clear old cache entries for this workspace

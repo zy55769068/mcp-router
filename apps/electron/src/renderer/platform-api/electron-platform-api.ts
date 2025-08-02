@@ -2,7 +2,7 @@
  * Electron-specific Platform API implementation
  */
 
-import { PlatformAPI } from "@/main/infrastructure/platform-api";
+import type { PlatformAPI } from "@mcp_router/shared";
 import type {
   AuthAPI,
   ServerAPI,
@@ -13,7 +13,7 @@ import type {
   LogAPI,
   WorkspaceAPI,
   Workspace,
-} from "@/main/infrastructure/platform-api";
+} from "@mcp_router/shared";
 
 // Electron implementation of the Platform API
 class ElectronPlatformAPI implements PlatformAPI {
@@ -57,7 +57,7 @@ class ElectronPlatformAPI implements PlatformAPI {
         const servers = await window.electronAPI.listMcpServers();
         return servers.find((s: any) => s.id === id) || null;
       },
-      create: (input) => window.electronAPI.addMcpServer(input.config),
+      create: (input) => window.electronAPI.addMcpServer(input),
       update: (id, updates) =>
         window.electronAPI.updateMcpServerConfig(id, updates),
       delete: (id) => window.electronAPI.removeMcpServer(id),
@@ -77,6 +77,7 @@ class ElectronPlatformAPI implements PlatformAPI {
         ),
       fetchVersionDetails: (displayId, version) =>
         window.electronAPI.fetchMcpServerVersionDetails(displayId, version),
+      selectFile: (options) => window.electronAPI.serverSelectFile(options),
     };
 
     // Initialize agents domain (with chat functionality)
@@ -237,10 +238,11 @@ class ElectronPlatformAPI implements PlatformAPI {
     this.logs = {
       query: async (options) => {
         const result = await window.electronAPI.getRequestLogs(options);
-        // RequestLogQueryResultをLogQueryResultに変換
+        // Ensure consistent return type with LogQueryResult
         return {
           ...result,
-          items: result.logs, // LogQueryResultにはitemsプロパティが必要
+          items: result.logs, // LogQueryResult extends CursorPaginationResult which requires items
+          // logs property is already included from spread operator
         };
       },
     };

@@ -1,9 +1,10 @@
-import { ipcMain } from "electron";
-import { MCPServerConfig } from "@mcp_router/shared";
+import { ipcMain, dialog, BrowserWindow } from "electron";
+import { MCPServerConfig, CreateServerInput } from "@mcp_router/shared";
 import {
   fetchMcpServersFromIndex,
   fetchMcpServerVersionDetails,
 } from "@/main/application/mcp-core/registry/mcp-fetcher";
+import { processDxtFile } from "@/main/application/mcp-core/server-processors/dxt-processor";
 
 export function setupMcpServerHandlers(): void {
   const getMCPServerManager = () => (global as any).getMCPServerManager();
@@ -25,10 +26,24 @@ export function setupMcpServerHandlers(): void {
     return result;
   });
 
-  ipcMain.handle("mcp:add", async (_, serverConfig: MCPServerConfig) => {
+  ipcMain.handle("mcp:add", async (_, input: CreateServerInput) => {
     const mcpServerManager = getMCPServerManager();
     let server = null;
+
     try {
+      let serverConfig: MCPServerConfig;
+
+      // Process based on input type
+      if (input.type === "dxt" && input.dxtFile) {
+        // Process DXT file
+        serverConfig = await processDxtFile(input.dxtFile);
+      } else if (input.type === "config" && input.config) {
+        // Use config directly (validation will be done by addServer)
+        serverConfig = input.config;
+      } else {
+        throw new Error("Invalid input: missing config or dxtFile");
+      }
+
       // Add the server to the manager
       server = mcpServerManager.addServer(serverConfig);
 
@@ -37,9 +52,10 @@ export function setupMcpServerHandlers(): void {
         await mcpServerManager.startServer(server.id);
         mcpServerManager.stopServer(server.id);
       }
+
       return server;
     } catch (error: any) {
-      if (serverConfig.serverType !== "local" && server && server?.id) {
+      if (server && server?.id && server?.serverType !== "local") {
         mcpServerManager.removeServer(server?.id);
       }
       throw error;
@@ -78,6 +94,49 @@ export function setupMcpServerHandlers(): void {
     "mcp:fetch-server-version-details",
     async (_, displayId: string, version: string) => {
       return await fetchMcpServerVersionDetails(displayId, version);
+    },
+  );
+
+  // ファイル/ディレクトリ選択ダイアログ
+  ipcMain.handle(
+    "server:selectFile",
+    async (
+      _event,
+      options?: {
+        title?: string;
+        mode?: "file" | "directory";
+        filters?: { name: string; extensions: string[] }[];
+      },
+    ) => {
+      const browserWindow = BrowserWindow.getFocusedWindow();
+      if (!browserWindow) {
+        return { success: false, error: "No focused window" };
+      }
+
+      try {
+        const isDirectory = options?.mode === "directory";
+        const result = await dialog.showOpenDialog(browserWindow, {
+          title:
+            options?.title ||
+            (isDirectory ? "Select Directory" : "Select File"),
+          properties: isDirectory ? ["openDirectory"] : ["openFile"],
+          filters:
+            !isDirectory && options?.filters
+              ? options.filters
+              : [{ name: "All Files", extensions: ["*"] }],
+        });
+
+        if (result.canceled) {
+          return { success: false, canceled: true };
+        }
+
+        return { success: true, path: result.filePaths[0] };
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
     },
   );
 }

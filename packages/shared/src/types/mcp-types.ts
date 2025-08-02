@@ -1,8 +1,19 @@
+// Input parameter definition for MCP servers
+export interface MCPInputParam {
+  type?: "string" | "number" | "boolean" | "directory" | "file";
+  title?: string;
+  description?: string;
+  sensitive?: boolean;
+  required?: boolean;
+  default?: string | number | boolean;
+  min?: number;
+  max?: number;
+}
+
 export interface MCPServerConfig {
   id: string;
   name: string;
   env: Record<string, string>;
-  setupInstructions?: string;
   autoStart?: boolean;
   disabled?: boolean;
   description?: string;
@@ -11,11 +22,15 @@ export interface MCPServerConfig {
   args?: string[];
   remoteUrl?: string;
   bearerToken?: string;
-  inputParams?: Record<string, { default: string; description: string }>;
-  required?: string[];
-  latestVersion?: string;
+
+  setupInstructions?: string;
+  inputParams?: Record<string, MCPInputParam>;
   verificationStatus?: "verified" | "unverified";
+  required?: string[];
+
+  latestVersion?: string;
   version?: string;
+
   toolPermissions?: MCPServerToolPermissions;
 }
 
@@ -126,7 +141,7 @@ export interface LocalMCPServer {
   iconUrl?: string;
   tags?: string[];
   verificationStatus?: "verified" | "unverified";
-  inputParams?: Record<string, { default: string; description: string }>;
+  inputParams?: Record<string, MCPInputParam>;
   latestVersion?: string;
   version?: string;
   required?: string[];
