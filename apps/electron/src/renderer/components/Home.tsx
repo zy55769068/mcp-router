@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { cn } from "@/renderer/utils/tailwind-utils";
 import { Trash, AlertCircle, Grid3X3, List } from "lucide-react";
+import { hasUnsetRequiredParams } from "@/renderer/utils/server-validation-utils";
 import { toast } from "sonner";
 import {
   useServerStore,
@@ -287,6 +288,18 @@ const Home: React.FC = () => {
                               ></div>
                               {t(`serverList.status.${server.status}`)}
                             </Badge>
+
+                            {/* Warning Badge for unset required params */}
+                            {hasUnsetRequiredParams(server) && (
+                              <Badge
+                                variant="destructive"
+                                className="w-fit flex items-center gap-1"
+                                title={t("serverList.requiredParamsNotSet")}
+                              >
+                                <AlertCircle className="h-3 w-3" />
+                                {t("serverList.configRequired")}
+                              </Badge>
+                            )}
                           </div>
 
                           {/* Tags - if available */}
@@ -332,7 +345,13 @@ const Home: React.FC = () => {
                               checked={server.status === "running"}
                               disabled={
                                 server.status === "starting" ||
-                                server.status === "stopping"
+                                server.status === "stopping" ||
+                                hasUnsetRequiredParams(server)
+                              }
+                              title={
+                                hasUnsetRequiredParams(server)
+                                  ? t("serverList.requiredParamsNotSet")
+                                  : undefined
                               }
                               onCheckedChange={async (checked) => {
                                 try {
@@ -454,7 +473,7 @@ const Home: React.FC = () => {
       {advancedSettingsServer && (
         <ServerDetailsAdvancedSheet
           server={advancedSettingsServer}
-          handleSave={async () => {
+          handleSave={async (updatedInputParams?: any, editedName?: string) => {
             try {
               const {
                 editedCommand,
@@ -472,12 +491,13 @@ const Home: React.FC = () => {
               });
 
               const updatedConfig: any = {
-                name: advancedSettingsServer.name,
+                name: editedName || advancedSettingsServer.name,
                 command: editedCommand,
                 args: editedArgs,
                 env: envObj,
                 autoStart: editedAutoStart,
-                inputParams: advancedSettingsServer.inputParams,
+                inputParams:
+                  updatedInputParams || advancedSettingsServer.inputParams,
               };
 
               if (advancedSettingsServer.serverType !== "local") {

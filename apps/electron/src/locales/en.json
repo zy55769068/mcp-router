@@ -93,7 +93,6 @@
         "other": "Other"
       },
       "detail": {
-        "title": "Log Details",
         "timestamp": "Timestamp",
         "processingTime": "Processing Time",
         "client": "Client",
@@ -170,7 +169,8 @@
       "title": "Verify Your Server",
       "description": "Verify your server to enhance trust",
       "link": "Verify Server"
-    }
+    },
+    "serverNameRequired": "Please enter a server name"
   },
   "serverList": {
     "title": "MCP Servers",
@@ -190,7 +190,9 @@
     "activeNow": "Active Now",
     "start": "Start",
     "stop": "Stop",
-    "errorDetails": "Error Details"
+    "errorDetails": "Error Details",
+    "configRequired": "Config Required",
+    "requiredParamsNotSet": "Required parameters are not configured"
   },
   "settings": {
     "title": "Settings",
@@ -467,6 +469,7 @@
   },
   "serverDetails": {
     "configuration": "Configuration",
+    "serverName": "Server Name",
     "finalCommand": "Execution Command",
     "noInputParams": "No input parameters",
     "parameters": "Parameters",
@@ -616,7 +619,9 @@
       "dxtFilesOnly": "DXT files only",
       "remove": "Remove",
       "error": "Error",
-      "errorInvalidFile": "Please select a valid DXT file"
+      "errorInvalidFile": "Please select a valid DXT file",
+      "successImport": "Successfully imported {{name}}",
+      "errorFailedImport": "Failed to import DXT file"
     }
   },
   "pagination": {

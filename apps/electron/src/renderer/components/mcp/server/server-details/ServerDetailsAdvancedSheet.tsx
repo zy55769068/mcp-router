@@ -29,12 +29,11 @@ import ServerDetailsRemote from "./ServerDetailsRemote";
 import ServerDetailsEnvironment from "./ServerDetailsEnvironment";
 import ServerDetailsAutoStart from "./ServerDetailsAutoStart";
 import ServerDetailsInputParams from "./ServerDetailsInputParams";
-import { useServerEditingStore, useServerStore } from "@/renderer/stores";
-import { toast } from "sonner";
+import { useServerEditingStore } from "@/renderer/stores";
 
 interface ServerDetailsAdvancedSheetProps {
   server: MCPServer;
-  handleSave: (updatedInputParams?: any) => void;
+  handleSave: (updatedInputParams?: any, editedName?: string) => void;
 }
 
 const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
@@ -42,16 +41,17 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
   handleSave,
 }) => {
   const { t } = useTranslation();
-  const { updateServerConfig } = useServerStore();
   const {
     isAdvancedEditing: isOpen,
     isLoading,
+    editedName,
     editedCommand,
     editedArgs,
     editedBearerToken,
     editedAutoStart,
     envPairs,
     setIsAdvancedEditing: setIsOpen,
+    setEditedName,
     setEditedCommand,
     setEditedArgs,
     setEditedBearerToken,
@@ -86,7 +86,7 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
       setInitialInputParamValues(initialValues);
       setIsParamsDirty(false);
     }
-  }, [server.id, isOpen]);
+  }, [server.id, isOpen, server.inputParams]);
 
   const updateInputParam = (key: string, value: string) => {
     setInputParamValues((prev) => {
@@ -142,24 +142,21 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
             </TabsList>
 
             <TabsContent value="general" className="space-y-6 mt-4">
-              {/* Final Command Display */}
+              {/* Server Name */}
               <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Terminal className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-medium text-primary">
-                    {t("serverDetails.finalCommand")}
-                  </h3>
-                </div>
-                {server.serverType === "local" ? (
-                  <FinalCommandDisplay
-                    server={server}
-                    inputParamValues={inputParamValues}
-                    editedCommand={editedCommand}
-                    editedArgs={editedArgs}
-                  />
-                ) : (
-                  <ServerDetailsRemote server={server} isEditing={false} />
-                )}
+                <Label
+                  htmlFor="server-name"
+                  className="text-base font-medium flex items-center gap-1.5"
+                >
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                  {t("serverDetails.serverName")}
+                </Label>
+                <Input
+                  id="server-name"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  placeholder={t("discoverServers.serverNameRequired")}
+                />
               </div>
 
               {/* Edit Forms */}
@@ -263,6 +260,26 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
                 removeEnvPair={removeEnvPair}
                 addEnvPair={addEnvPair}
               />
+
+              {/* Final Command Display */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Terminal className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-medium text-primary">
+                    {t("serverDetails.finalCommand")}
+                  </h3>
+                </div>
+                {server.serverType === "local" ? (
+                  <FinalCommandDisplay
+                    server={server}
+                    inputParamValues={inputParamValues}
+                    editedCommand={editedCommand}
+                    editedArgs={editedArgs}
+                  />
+                ) : (
+                  <ServerDetailsRemote server={server} isEditing={false} />
+                )}
+              </div>
             </TabsContent>
 
             <TabsContent value="params" className="space-y-6 mt-4">
@@ -275,24 +292,21 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
           </Tabs>
         ) : (
           <div className="space-y-6 mt-4">
-            {/* Final Command Display */}
+            {/* Server Name */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-medium text-primary">
-                  {t("serverDetails.finalCommand")}
-                </h3>
-              </div>
-              {server.serverType === "local" ? (
-                <FinalCommandDisplay
-                  server={server}
-                  inputParamValues={inputParamValues}
-                  editedCommand={editedCommand}
-                  editedArgs={editedArgs}
-                />
-              ) : (
-                <ServerDetailsRemote server={server} isEditing={false} />
-              )}
+              <Label
+                htmlFor="server-name"
+                className="text-base font-medium flex items-center gap-1.5"
+              >
+                <Info className="h-4 w-4 text-muted-foreground" />
+                {t("serverDetails.serverName")}
+              </Label>
+              <Input
+                id="server-name"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                placeholder={t("discoverServers.serverNameRequired")}
+              />
             </div>
 
             {/* Edit Forms */}
@@ -396,6 +410,26 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
               removeEnvPair={removeEnvPair}
               addEnvPair={addEnvPair}
             />
+
+            {/* Final Command Display */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Terminal className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-medium text-primary">
+                  {t("serverDetails.finalCommand")}
+                </h3>
+              </div>
+              {server.serverType === "local" ? (
+                <FinalCommandDisplay
+                  server={server}
+                  inputParamValues={inputParamValues}
+                  editedCommand={editedCommand}
+                  editedArgs={editedArgs}
+                />
+              ) : (
+                <ServerDetailsRemote server={server} isEditing={false} />
+              )}
+            </div>
           </div>
         )}
 
@@ -417,8 +451,8 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
                   ? prepareInputParamsForSave()
                   : server.inputParams;
 
-                // Call the parent's handleSave with inputParams
-                await handleSave(updatedInputParams);
+                // Call the parent's handleSave with inputParams and editedName
+                await handleSave(updatedInputParams, editedName);
 
                 // Reset dirty state after successful save
                 if (isParamsDirty) {
