@@ -141,6 +141,13 @@ export class DatabaseMigration {
         "Ensure tokens table exists in main database for workspace sharing",
       execute: (db) => this.migrateEnsureTokensTableInMainDb(db),
     });
+
+    // Hooksテーブルを追加
+    this.migrations.push({
+      id: "20250805_add_hooks_table",
+      description: "Add hooks table for MCP request/response hooks",
+      execute: (db) => this.migrateAddHooksTable(db),
+    });
   }
 
   /**
@@ -872,6 +879,23 @@ export class DatabaseMigration {
         executedAt: Math.floor(Date.now() / 1000),
       },
     );
+  }
+
+  /**
+   * hooksテーブルを追加するマイグレーション
+   */
+  private migrateAddHooksTable(db: SqliteManager): void {
+    try {
+      // HookRepositoryが初めて呼ばれた時に
+      // テーブルが作成されるため、ここでは何もしない
+      console.log("hooksテーブルの作成はHookRepositoryに委譲されます");
+    } catch (error) {
+      console.error(
+        "hooksテーブルのマイグレーション中にエラーが発生しました:",
+        error,
+      );
+      throw error;
+    }
   }
 }
 

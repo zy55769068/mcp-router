@@ -11,6 +11,7 @@ import { setupPackageVersionHandlers } from "./handlers/package-version-handlers
 import { setupPackageManagerHandlers } from "./handlers/package-manager-handlers";
 import { setupAgentHandlers } from "./handlers/agent-handlers";
 import { setupWorkspaceHandlers } from "./handlers/workspace-handlers";
+import { setupHookHandlers } from "./handlers/hook-handler";
 
 /**
  * IPC通信ハンドラのセットアップを行う関数
@@ -55,4 +56,7 @@ export function setupIpcHandlers(): void {
 
   // ワークスペース関連
   setupWorkspaceHandlers();
+
+  // Hook関連
+  setupHookHandlers();
 }

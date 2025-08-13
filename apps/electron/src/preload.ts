@@ -2,7 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from "electron";
-import { MCPServerConfig, CreateServerInput } from "@mcp_router/shared";
+import { CreateServerInput } from "@mcp_router/shared";
 import { TokenScope } from "@mcp_router/shared";
 
 // Consolidate everything into one contextBridge call
@@ -255,4 +255,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
       ipcRenderer.removeListener("workspace:switched", listener);
     };
   },
+
+  // Hook Management
+  listHooks: () => ipcRenderer.invoke("hook:list"),
+  getHook: (id: string) => ipcRenderer.invoke("hook:get", id),
+  createHook: (hookData: any) => ipcRenderer.invoke("hook:create", hookData),
+  updateHook: (id: string, updates: any) =>
+    ipcRenderer.invoke("hook:update", id, updates),
+  deleteHook: (id: string) => ipcRenderer.invoke("hook:delete", id),
+  setHookEnabled: (id: string, enabled: boolean) =>
+    ipcRenderer.invoke("hook:setEnabled", id, enabled),
+  reorderHooks: (hookIds: string[]) =>
+    ipcRenderer.invoke("hook:reorder", hookIds),
 });
