@@ -8,6 +8,7 @@ import {
 import { getHookRepository } from "@/main/infrastructure/database";
 import { logInfo, logError } from "@/main/utils/logger";
 import vm from "vm";
+import fetch from "node-fetch";
 
 /**
  * Hook Service for MCP Router
@@ -141,14 +142,16 @@ export class HookService extends SingletonService<
           currentContext = result.context;
         }
       } catch (error) {
-        const executionError: HookExecutionError = {
-          hookId: hook.id,
-          hookName: hook.name,
-          error: error as Error,
-          timestamp: Date.now(),
-        };
+        const executionError = new HookExecutionError(
+          `Hook execution failed: ${hook.name}`,
+          "HOOK_EXECUTION_ERROR",
+          hook.id,
+        );
 
-        logError(`Hook execution failed: ${hook.name}`, executionError);
+        logError(`Hook execution failed: ${hook.name}`, {
+          error: executionError,
+          originalError: error,
+        });
 
         // Continue execution even if a hook fails
         // TODO: Make this configurable
@@ -184,9 +187,6 @@ export class HookService extends SingletonService<
           if (parsedUrl.protocol !== "https:") {
             throw new Error("Only HTTPS URLs are allowed");
           }
-
-          // Import fetch dynamically (Node.js 18+)
-          const { default: fetch } = await import("node-fetch");
 
           // Limit request options for security
           const safeOptions = {
