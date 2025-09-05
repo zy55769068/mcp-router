@@ -2,15 +2,16 @@
  * Augment the global Window interface so TypeScript knows about "window.electronAPI".
  */
 
-import { TokenScope } from "@mcp_router/shared";
 import { AppSettings } from "@mcp_router/shared";
 import {
   Agent,
   AgentConfig,
   DeployedAgent,
   CreateServerInput,
+  WorkflowDefinition,
+  HookModule,
 } from "@mcp_router/shared";
-import { McpAppsManagerResult, McpApp } from "@/main/domain/mcp-apps-service";
+import { McpAppsManagerResult, McpApp } from "@/main/modules/mcp-apps-service";
 import { ServerPackageUpdates } from "./lib/utils/backend/package-version-resolver";
 
 declare global {
@@ -41,16 +42,6 @@ declare global {
       serverSelectFile: (options: any) => Promise<any>;
       removeMcpServer: (id: string) => Promise<any>;
       updateMcpServerConfig: (id: string, config: any) => Promise<any>;
-      fetchMcpServersFromIndex: (
-        page?: number,
-        limit?: number,
-        search?: string,
-        isVerified?: boolean,
-      ) => Promise<any>;
-      fetchMcpServerVersionDetails: (
-        displayId: string,
-        version: string,
-      ) => Promise<any>;
 
       getRequestLogs: (options?: {
         clientId?: string;
@@ -181,11 +172,6 @@ declare global {
       onChatStreamEnd: (callback: (data: any) => void) => () => void;
       onChatStreamError: (callback: (data: any) => void) => () => void;
 
-      // Token Scope Management
-      updateTokenScopes: (
-        tokenId: string,
-        scopes: TokenScope[],
-      ) => Promise<McpAppsManagerResult>;
 
       // Feedback
       submitFeedback: (feedback: string) => Promise<boolean>;
@@ -227,14 +213,39 @@ declare global {
       onWorkspaceSwitched: (callback: (workspace: any) => void) => () => void;
       onWorkspaceConfigChanged: (callback: (config: any) => void) => () => void;
 
-      // Hook Management
-      listHooks: () => Promise<any[]>;
-      getHook: (id: string) => Promise<any>;
-      createHook: (hookData: any) => Promise<any>;
-      updateHook: (id: string, updates: any) => Promise<any>;
-      deleteHook: (id: string) => Promise<boolean>;
-      setHookEnabled: (id: string, enabled: boolean) => Promise<any>;
-      reorderHooks: (hookIds: string[]) => Promise<any[]>;
+      // Workflow Management
+      listWorkflows: () => Promise<WorkflowDefinition[]>;
+      getWorkflow: (id: string) => Promise<WorkflowDefinition | null>;
+      createWorkflow: (
+        workflow: Omit<WorkflowDefinition, "id" | "createdAt" | "updatedAt">,
+      ) => Promise<WorkflowDefinition>;
+      updateWorkflow: (
+        id: string,
+        updates: Partial<Omit<WorkflowDefinition, "id" | "createdAt">>,
+      ) => Promise<WorkflowDefinition | null>;
+      deleteWorkflow: (id: string) => Promise<boolean>;
+      setActiveWorkflow: (id: string) => Promise<boolean>;
+      disableWorkflow: (id: string) => Promise<boolean>;
+      executeWorkflow: (id: string, context?: any) => Promise<any>;
+      getEnabledWorkflows: () => Promise<WorkflowDefinition[]>;
+      getWorkflowsByType: (
+        workflowType: string,
+      ) => Promise<WorkflowDefinition[]>;
+
+      // Hook Module Management
+      listHookModules: () => Promise<HookModule[]>;
+      getHookModule: (id: string) => Promise<HookModule | null>;
+      createHookModule: (module: Omit<HookModule, "id">) => Promise<HookModule>;
+      updateHookModule: (
+        id: string,
+        updates: Partial<Omit<HookModule, "id">>,
+      ) => Promise<HookModule | null>;
+      deleteHookModule: (id: string) => Promise<boolean>;
+      executeHookModule: (id: string, context: any) => Promise<any>;
+      importHookModule: (module: Omit<HookModule, "id">) => Promise<HookModule>;
+      validateHookScript: (
+        script: string,
+      ) => Promise<{ valid: boolean; error?: string }>;
     };
   }
 }

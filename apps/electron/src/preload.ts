@@ -3,7 +3,6 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { CreateServerInput } from "@mcp_router/shared";
-import { TokenScope } from "@mcp_router/shared";
 
 // Consolidate everything into one contextBridge call
 
@@ -34,15 +33,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   removeMcpServer: (id: string) => ipcRenderer.invoke("mcp:remove", id),
   updateMcpServerConfig: (id: string, config: any) =>
     ipcRenderer.invoke("mcp:update-config", id, config),
-  fetchMcpServersFromIndex: (
-    page?: number,
-    limit?: number,
-    search?: string,
-    isVerified?: boolean,
-  ) =>
-    ipcRenderer.invoke("mcp:fetch-from-index", page, limit, search, isVerified),
-  fetchMcpServerVersionDetails: (displayId: string, version: string) =>
-    ipcRenderer.invoke("mcp:fetch-server-version-details", displayId, version),
 
   // Package Version Resolution
   resolvePackageVersionsInArgs: (
@@ -199,19 +189,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Command check
   checkCommandExists: (command: string) =>
-    ipcRenderer.invoke("command:exists", command),
-
-  // Token Scope Management
-  updateTokenScopes: (tokenId: string, scopes: TokenScope[]) =>
-    ipcRenderer.invoke("token:updateScopes", tokenId, scopes),
+    ipcRenderer.invoke("system:commandExists", command),
 
   // Feedback
   submitFeedback: (feedback: string) =>
-    ipcRenderer.invoke("feedback:submit", feedback),
+    ipcRenderer.invoke("system:submitFeedback", feedback),
 
   // Update Management
-  checkForUpdates: () => ipcRenderer.invoke("update:check"),
-  installUpdate: () => ipcRenderer.invoke("update:install"),
+  checkForUpdates: () => ipcRenderer.invoke("system:checkForUpdates"),
+  installUpdate: () => ipcRenderer.invoke("system:installUpdate"),
   onUpdateAvailable: (callback: (available: boolean) => void) => {
     const listener = (_: any, available: boolean) => callback(available);
     ipcRenderer.on("update:downloaded", listener);
@@ -223,7 +209,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Package Manager Management
   checkPackageManagers: () => ipcRenderer.invoke("packageManager:checkAll"),
   installPackageManagers: () => ipcRenderer.invoke("packageManager:installAll"),
-  restartApp: () => ipcRenderer.invoke("packageManager:restart"),
+  restartApp: () => ipcRenderer.invoke("system:restartApp"),
 
   // Protocol URL handling
   onProtocolUrl: (callback: (url: string) => void) => {
@@ -246,6 +232,40 @@ contextBridge.exposeInMainWorld("electronAPI", {
   deleteWorkspace: (id: string) => ipcRenderer.invoke("workspace:delete", id),
   switchWorkspace: (id: string) => ipcRenderer.invoke("workspace:switch", id),
   getCurrentWorkspace: () => ipcRenderer.invoke("workspace:current"),
+
+  // Workflow Management
+  listWorkflows: () => ipcRenderer.invoke("workflow:list"),
+  getWorkflow: (id: string) => ipcRenderer.invoke("workflow:get", id),
+  createWorkflow: (workflow: any) =>
+    ipcRenderer.invoke("workflow:create", workflow),
+  updateWorkflow: (id: string, updates: any) =>
+    ipcRenderer.invoke("workflow:update", id, updates),
+  deleteWorkflow: (id: string) => ipcRenderer.invoke("workflow:delete", id),
+  setActiveWorkflow: (id: string) =>
+    ipcRenderer.invoke("workflow:setActive", id),
+  disableWorkflow: (id: string) => ipcRenderer.invoke("workflow:disable", id),
+  executeWorkflow: (id: string, context?: any) =>
+    ipcRenderer.invoke("workflow:execute", id, context),
+  getEnabledWorkflows: () => ipcRenderer.invoke("workflow:listEnabled"),
+  getWorkflowsByType: (workflowType: string) =>
+    ipcRenderer.invoke("workflow:listByType", workflowType),
+
+  // Hook Module Management
+  listHookModules: () => ipcRenderer.invoke("hook-module:list"),
+  getHookModule: (id: string) => ipcRenderer.invoke("hook-module:get", id),
+  createHookModule: (module: any) =>
+    ipcRenderer.invoke("hook-module:create", module),
+  updateHookModule: (id: string, updates: any) =>
+    ipcRenderer.invoke("hook-module:update", id, updates),
+  deleteHookModule: (id: string) =>
+    ipcRenderer.invoke("hook-module:delete", id),
+  executeHookModule: (id: string, context: any) =>
+    ipcRenderer.invoke("hook-module:execute", id, context),
+  importHookModule: (module: any) =>
+    ipcRenderer.invoke("hook-module:import", module),
+  validateHookScript: (script: string) =>
+    ipcRenderer.invoke("hook-module:validate", script),
+
   getWorkspaceCredentials: (id: string) =>
     ipcRenderer.invoke("workspace:get-credentials", id),
   onWorkspaceSwitched: (callback: (workspace: any) => void) => {
@@ -255,16 +275,4 @@ contextBridge.exposeInMainWorld("electronAPI", {
       ipcRenderer.removeListener("workspace:switched", listener);
     };
   },
-
-  // Hook Management
-  listHooks: () => ipcRenderer.invoke("hook:list"),
-  getHook: (id: string) => ipcRenderer.invoke("hook:get", id),
-  createHook: (hookData: any) => ipcRenderer.invoke("hook:create", hookData),
-  updateHook: (id: string, updates: any) =>
-    ipcRenderer.invoke("hook:update", id, updates),
-  deleteHook: (id: string) => ipcRenderer.invoke("hook:delete", id),
-  setHookEnabled: (id: string, enabled: boolean) =>
-    ipcRenderer.invoke("hook:setEnabled", id, enabled),
-  reorderHooks: (hookIds: string[]) =>
-    ipcRenderer.invoke("hook:reorder", hookIds),
 });

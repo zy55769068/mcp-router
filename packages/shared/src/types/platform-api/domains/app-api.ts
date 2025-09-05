@@ -2,23 +2,17 @@
  * Application management domain API (includes token management)
  */
 
-import type {
-  McpApp,
-  McpAppsManagerResult,
-  TokenScope,
-} from "../../mcp-app-types";
+import type { McpApp, McpAppsManagerResult } from "../../mcp-app-types";
 
 interface Token {
   id: string;
   name: string;
-  scopes: TokenScope[];
   createdAt: Date;
   lastUsed?: Date;
 }
 
 interface TokenGenerateOptions {
   name: string;
-  scopes: TokenScope[];
   expiresIn?: number;
 }
 
@@ -35,10 +29,6 @@ export interface AppAPI {
 
   // Token management
   tokens: {
-    updateScopes(
-      tokenId: string,
-      scopes: TokenScope[],
-    ): Promise<McpAppsManagerResult>;
     generate(options: TokenGenerateOptions): Promise<string>;
     revoke(tokenId: string): Promise<void>;
     list(): Promise<Token[]>;

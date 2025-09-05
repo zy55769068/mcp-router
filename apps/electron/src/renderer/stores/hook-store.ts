@@ -1,197 +1,230 @@
 import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import { MCPHook, PlatformAPI } from "@mcp_router/shared";
+import type { HookModule, PlatformAPI } from "@mcp_router/shared";
+import { toast } from "sonner";
 
 export interface HookStoreState {
-  hooks: MCPHook[];
-  loading: boolean;
+  // Hook modules state
+  modules: HookModule[];
+  editingModule: HookModule | null;
+  isCreating: boolean;
+  formData: Partial<HookModule>;
+  moduleManagerOpen: boolean;
+
+  // Loading state
+  isLoading: boolean;
   error: string | null;
-  selectedHook: MCPHook | null;
 }
 
 export interface HookStoreActions {
-  // Data fetching
-  fetchHooks: () => Promise<void>;
+  // Module management actions
+  setModules: (modules: HookModule[]) => void;
+  setEditingModule: (module: HookModule | null) => void;
+  setIsCreating: (isCreating: boolean) => void;
+  setFormData: (formData: Partial<HookModule>) => void;
+  updateFormData: (updates: Partial<HookModule>) => void;
+  setModuleManagerOpen: (open: boolean) => void;
 
-  // CRUD operations
-  createHook: (
-    hookData: Omit<MCPHook, "id" | "createdAt" | "updatedAt">,
-  ) => Promise<MCPHook>;
-  updateHook: (
-    id: string,
-    updates: Partial<Omit<MCPHook, "id" | "createdAt" | "updatedAt">>,
-  ) => Promise<void>;
-  deleteHook: (id: string) => Promise<void>;
+  // API actions with platform API
+  loadModules: (platformAPI: PlatformAPI) => Promise<void>;
+  handleCreate: (platformAPI: PlatformAPI) => Promise<void>;
+  handleUpdate: (platformAPI: PlatformAPI) => Promise<void>;
+  handleDelete: (platformAPI: PlatformAPI, id: string) => Promise<void>;
 
-  // Hook management
-  setHookEnabled: (id: string, enabled: boolean) => Promise<void>;
-  reorderHooks: (hookIds: string[]) => Promise<void>;
+  // CRUD actions (local state)
+  addModule: (module: HookModule) => void;
+  updateModule: (id: string, updates: Partial<HookModule>) => void;
+  removeModule: (id: string) => void;
 
-  // UI state
-  setSelectedHook: (hook: MCPHook | null) => void;
-  clearError: () => void;
+  // Edit mode actions
+  startEdit: (module: HookModule) => void;
+  startCreate: () => void;
+  resetForm: () => void;
+
+  // Loading and error actions
+  setIsLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
+
+  // Utility actions
+  resetStore: () => void;
 }
 
 export type HookStore = HookStoreState & HookStoreActions;
 
-export const createHookStore = (getPlatformAPI: () => PlatformAPI) =>
-  create<HookStore>()(
-    immer((set, get) => ({
-      // Initial state
-      hooks: [],
-      loading: false,
-      error: null,
-      selectedHook: null,
+const initialFormData: Partial<HookModule> = {
+  name: "",
+  script: "",
+};
 
-      // Fetch all hooks
-      fetchHooks: async () => {
-        set((state) => {
-          state.loading = true;
-          state.error = null;
-        });
+const initialState: HookStoreState = {
+  modules: [],
+  editingModule: null,
+  isCreating: false,
+  formData: initialFormData,
+  moduleManagerOpen: false,
+  isLoading: false,
+  error: null,
+};
 
-        try {
-          const platformAPI = getPlatformAPI();
-          const hooks = await platformAPI.hooks.listHooks();
+export const useHookStore = create<HookStore>((set, get) => ({
+  ...initialState,
 
-          set((state) => {
-            state.hooks = hooks;
-            state.loading = false;
-          });
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error ? error.message : "Failed to fetch hooks";
-            state.loading = false;
-          });
-        }
-      },
-
-      // Create a new hook
-      createHook: async (hookData) => {
-        try {
-          const platformAPI = getPlatformAPI();
-          const newHook = await platformAPI.hooks.createHook(hookData);
-
-          set((state) => {
-            state.hooks.push(newHook);
-          });
-
-          return newHook;
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error ? error.message : "Failed to create hook";
-          });
-          throw error;
-        }
-      },
-
-      // Update an existing hook
-      updateHook: async (id, updates) => {
-        try {
-          const platformAPI = getPlatformAPI();
-          const updatedHook = await platformAPI.hooks.updateHook(id, updates);
-
-          set((state) => {
-            const index = state.hooks.findIndex((h: MCPHook) => h.id === id);
-            if (index !== -1) {
-              state.hooks[index] = updatedHook;
-            }
-            if (state.selectedHook?.id === id) {
-              state.selectedHook = updatedHook;
-            }
-          });
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error ? error.message : "Failed to update hook";
-          });
-          throw error;
-        }
-      },
-
-      // Delete a hook
-      deleteHook: async (id) => {
-        try {
-          const platformAPI = getPlatformAPI();
-          await platformAPI.hooks.deleteHook(id);
-
-          set((state) => {
-            state.hooks = state.hooks.filter((h: MCPHook) => h.id !== id);
-            if (state.selectedHook?.id === id) {
-              state.selectedHook = null;
-            }
-          });
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error ? error.message : "Failed to delete hook";
-          });
-          throw error;
-        }
-      },
-
-      // Enable/disable a hook
-      setHookEnabled: async (id, enabled) => {
-        try {
-          const platformAPI = getPlatformAPI();
-          const updatedHook = await platformAPI.hooks.setHookEnabled(
-            id,
-            enabled,
-          );
-
-          set((state) => {
-            const index = state.hooks.findIndex((h: MCPHook) => h.id === id);
-            if (index !== -1) {
-              state.hooks[index] = updatedHook;
-            }
-            if (state.selectedHook?.id === id) {
-              state.selectedHook = updatedHook;
-            }
-          });
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error
-                ? error.message
-                : "Failed to update hook status";
-          });
-          throw error;
-        }
-      },
-
-      // Reorder hooks
-      reorderHooks: async (hookIds) => {
-        try {
-          const platformAPI = getPlatformAPI();
-          const reorderedHooks = await platformAPI.hooks.reorderHooks(hookIds);
-
-          set((state) => {
-            state.hooks = reorderedHooks;
-          });
-        } catch (error) {
-          set((state) => {
-            state.error =
-              error instanceof Error
-                ? error.message
-                : "Failed to reorder hooks";
-          });
-          throw error;
-        }
-      },
-
-      // UI state management
-      setSelectedHook: (hook) => {
-        set((state) => {
-          state.selectedHook = hook;
-        });
-      },
-
-      clearError: () => {
-        set((state) => {
-          state.error = null;
-        });
-      },
+  // Module management actions
+  setModules: (modules) => set({ modules }),
+  setEditingModule: (module) => set({ editingModule: module }),
+  setIsCreating: (isCreating) => set({ isCreating }),
+  setFormData: (formData) => set({ formData }),
+  updateFormData: (updates) =>
+    set((state) => ({
+      formData: { ...state.formData, ...updates },
     })),
-  );
+  setModuleManagerOpen: (open) => set({ moduleManagerOpen: open }),
+
+  // API actions with platform API
+  loadModules: async (platformAPI: PlatformAPI) => {
+    set({ isLoading: true });
+    try {
+      const userModules = await platformAPI.workflows.hooks.list();
+      set({ modules: userModules, error: null });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to load modules";
+      set({ error: errorMessage });
+      console.error("Failed to load modules:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  handleCreate: async (platformAPI: PlatformAPI) => {
+    const { formData } = get();
+    if (!formData.name || !formData.script) return;
+
+    set({ isLoading: true });
+    try {
+      await platformAPI.workflows.hooks.create({
+        name: formData.name,
+        script: formData.script,
+      });
+      // Reload modules after creation
+      const updatedModules = await platformAPI.workflows.hooks.list();
+      set({
+        modules: updatedModules,
+        isCreating: false,
+        editingModule: null,
+        formData: initialFormData,
+        error: null,
+      });
+      toast.success("Module created successfully");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create module";
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+      console.error("Failed to create module:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  handleUpdate: async (platformAPI: PlatformAPI) => {
+    const { editingModule, formData } = get();
+    if (!editingModule || !formData.name || !formData.script) return;
+
+    set({ isLoading: true });
+    try {
+      await platformAPI.workflows.hooks.update(editingModule.id, formData);
+      // Reload modules after update
+      const updatedModules = await platformAPI.workflows.hooks.list();
+      set({
+        modules: updatedModules,
+        isCreating: false,
+        editingModule: null,
+        formData: initialFormData,
+        error: null,
+      });
+      toast.success("Module updated successfully");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update module";
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+      console.error("Failed to update module:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  handleDelete: async (platformAPI: PlatformAPI, id: string) => {
+    set({ isLoading: true });
+    try {
+      await platformAPI.workflows.hooks.delete(id);
+      // Reload modules after deletion
+      const updatedModules = await platformAPI.workflows.hooks.list();
+      set({ modules: updatedModules, error: null });
+      toast.success("Module deleted successfully");
+    } catch (error: any) {
+      const message = error?.message || "Failed to delete hook module";
+      set({ error: message });
+      toast.error(message);
+      console.error("Failed to delete module:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // CRUD actions (local state)
+  addModule: (module) =>
+    set((state) => ({
+      modules: [...state.modules, module],
+    })),
+
+  updateModule: (id, updates) =>
+    set((state) => ({
+      modules: state.modules.map((m) =>
+        m.id === id ? { ...m, ...updates } : m,
+      ),
+      editingModule:
+        state.editingModule?.id === id
+          ? { ...state.editingModule, ...updates }
+          : state.editingModule,
+    })),
+
+  removeModule: (id) =>
+    set((state) => ({
+      modules: state.modules.filter((m) => m.id !== id),
+      editingModule:
+        state.editingModule?.id === id ? null : state.editingModule,
+    })),
+
+  // Edit mode actions
+  startEdit: (module) =>
+    set({
+      editingModule: module,
+      formData: {
+        name: module.name,
+        script: module.script,
+      },
+      isCreating: false,
+    }),
+
+  startCreate: () =>
+    set({
+      isCreating: true,
+      editingModule: null,
+      formData: initialFormData,
+    }),
+
+  resetForm: () =>
+    set({
+      isCreating: false,
+      editingModule: null,
+      formData: initialFormData,
+    }),
+
+  // Loading and error actions
+  setIsLoading: (isLoading) => set({ isLoading }),
+  setError: (error) => set({ error }),
+
+  // Utility actions
+  resetStore: () => set(initialState),
+}));

@@ -16,7 +16,6 @@ import SidebarComponent from "./Sidebar";
 import { SidebarProvider } from "@mcp_router/ui";
 import McpAppsManager from "@/renderer/components/mcp/apps/McpAppsManager";
 import LogViewer from "@/renderer/components/mcp/log/LogViewer";
-import Rules from "@/renderer/components/mcp/rules/Rules";
 import AgentBuild from "@/renderer/components/agent/create/AgentBuild";
 import DeployedAgents from "./agent/use/DeployedAgents";
 import AgentCreate from "@/renderer/components/agent/create/AgentCreate";
@@ -36,8 +35,7 @@ import { usePlatformAPI } from "@/renderer/platform-api";
 import { IconProgress } from "@tabler/icons-react";
 import { postHogService } from "../services/posthog-service";
 import WorkspaceManagement from "./workspace/WorkspaceManagement";
-import HookManager from "./hook/HookManager";
-import HookEdit from "./hook/HookEdit";
+import WorkflowManager from "./workflow/WorkflowManager";
 
 // Main App component
 const App: React.FC = () => {
@@ -235,10 +233,15 @@ const App: React.FC = () => {
               <Route path="/servers/add" element={<DiscoverWrapper />} />
               <Route path="/clients" element={<McpAppsManager />} />
               <Route path="/logs" element={<LogViewer />} />
-              <Route path="/rules" element={<Rules />} />
-              <Route path="/hooks" element={<HookManager />} />
-              <Route path="/hooks/new" element={<HookEdit />} />
-              <Route path="/hooks/edit/:id" element={<HookEdit />} />
+              <Route
+                path="/hooks"
+                element={<Navigate to="/workflows" replace />}
+              />
+              <Route path="/workflows" element={<WorkflowManager />} />
+              <Route
+                path="/workflows/:workflowId"
+                element={<WorkflowManager />}
+              />
               <Route path="/settings" element={<Settings />} />
               <Route
                 path="/settings/workspaces"

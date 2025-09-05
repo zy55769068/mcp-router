@@ -49,7 +49,7 @@ packages/shared/src/types/
 ├── domains/          # Domain entities
 │   ├── mcp.ts       # MCP server, tool, resource types
 │   ├── agent.ts     # Agent configuration types
-│   ├── auth.ts      # Authentication types
+│   ├── auth.service.ts      # Authentication types
 │   └── workspace.ts # Workspace types
 ├── api/             # API-related types
 │   ├── requests.ts  # API request types
@@ -59,8 +59,8 @@ packages/shared/src/types/
 │   ├── props.ts     # Common prop interfaces
 │   └── state.ts     # Common state patterns
 ├── store/           # Store state types
-│   └── index.ts     # Store state interfaces
-└── index.ts         # Main export file
+│   └── ipc.ts     # Store state interfaces
+└── ipc.ts         # Main export file
 ```
 
 ## Type Definition Rules

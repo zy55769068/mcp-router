@@ -451,9 +451,7 @@
     "notAvailable": "Not Available",
     "serverAccess": "Access Control",
     "serverAccessTab": "Server Access",
-    "scopeSettingsTab": "API Scope Settings",
     "selectServers": "Select which servers this app can access:",
-    "selectScopes": "Configure access permissions for this app:",
     "accessControlSaved": "Access control settings saved successfully",
     "noTokenAvailable": "No token available for this app. Token scopes can only be configured for apps with active tokens.",
     "enterValidName": "Please enter a valid app name",
@@ -638,14 +636,6 @@
     "title": "Update Available",
     "installNow": "Install Now"
   },
-  "tokenScopes": {
-    "serverManagement": "Server Management",
-    "serverManagementDesc": "Allows managing MCP servers including connection, creation, modification, and deletion",
-    "logManagement": "Log Management",
-    "logManagementDesc": "Provides access to view and manage logs from MCP servers",
-    "application": "Application Access",
-    "applicationDesc": "Allows retrieving connected clients"
-  },
   "hooks": {
     "title": "Hooks",
     "description": "Scripts executed before/after MCP requests",
@@ -687,55 +677,6 @@
       "deleteFailed": "Failed to delete workspace",
       "switchFailed": "Failed to switch workspace",
       "fetchFailed": "Failed to fetch workspaces"
-    }
-  },
-  "rules": {
-    "title": "Tool Parameter Rules",
-    "sections": {
-      "toolDisplayRules": "Tool Display Rules",
-      "resourceDisplayRules": "Resource Display Rules",
-      "promptDisplayRules": "Prompt Display Rules",
-      "templateDisplayRules": "Template Display Rules",
-      "toolParameters": "Tool Parameter Rules",
-      "parameters": "Additional Parameters"
-    },
-    "fields": {
-      "nameRule": "Name Rule",
-      "descriptionRule": "Description Rule",
-      "preview": "Preview:",
-      "name": "Name",
-      "type": "Type",
-      "description": "Description",
-      "required": "Required",
-      "actions": "Actions"
-    },
-    "tooltip": {
-      "availableVariables": "Available variables:",
-      "entityName": "Entity name",
-      "entityDescription": "Entity description",
-      "serverName": "Server name"
-    },
-    "types": {
-      "string": "String",
-      "number": "Number",
-      "boolean": "Boolean",
-      "object": "Object",
-      "array": "Array"
-    },
-    "parameterDescription": "You can define additional parameters that will be added to all tools' input schemas. These parameters will be available for the model to input when using the tools.",
-    "noParametersAdded": "No additional parameters have been defined yet.",
-    "addNewParameter": "Add New Parameter",
-    "export": "Export",
-    "import": "Import",
-    "importDescription": "Paste rules JSON to import",
-    "importPlaceholder": "Paste rules here",
-    "errors": {
-      "requiredMustExist": "Required field must exist in properties",
-      "alreadyRequired": "Field is already required",
-      "importFailed": "Failed to import rules"
-    },
-    "success": {
-      "imported": "Rules imported"
     }
   }
 }

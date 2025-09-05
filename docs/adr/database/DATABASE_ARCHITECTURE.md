@@ -25,8 +25,8 @@ apps/electron/src/main/infrastructure/database/
 ├── factories/                 # ファクトリパターン実装
 │   └── repository-factory.ts  # リポジトリインスタンス管理
 ├── migrations/                # データベースマイグレーション
-│   ├── database-migration.ts  # 基本マイグレーション
-│   └── workspace-database-migration.ts
+│   ├── main-database-migration.ts  # 基本マイグレーション
+│   └── workspace-main-database-migration.ts
 ├── repositories/              # リポジトリ実装
 │   ├── agent/                # エージェントリポジトリ
 │   ├── deployed-agent/       # デプロイ済みエージェント
@@ -50,7 +50,7 @@ apps/electron/src/main/infrastructure/database/
 │       ├── settings.ts
 │       ├── tokens.ts
 │       └── workspaces.ts
-└── index.ts                  # パブリックAPI
+└── ipc.ts                  # パブリックAPI
 ```
 
 ### アーキテクチャパターン

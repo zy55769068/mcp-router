@@ -1,16 +1,17 @@
 import { app, BrowserWindow, session, shell } from "electron";
 import path from "node:path";
-import { MCPServerManager } from "@/main/application/mcp-core/mcp-manager";
-import { MCPHttpServer } from "@/main/application/mcp-core/mcp-manager/http/mcp-http-server";
+import { MCPServerManager } from "@/main/modules/mcp-server-manager/mcp-server-manager";
+import { AggregatorServer } from "@/main/modules/mcp-server-runtime/aggregator-server";
+import { MCPHttpServer } from "@/main/modules/mcp-server-runtime/http/mcp-http-server";
 import started from "electron-squirrel-startup";
 import { updateElectronApp } from "update-electron-app";
-import { setApplicationMenu } from "@/main/application/ui/menu";
-import { createTray, updateTrayContextMenu } from "@/main/application/ui/tray";
-import { importExistingServerConfigurations } from "@/main/application/mcp-core/apps/mcp-config-importer";
-import { getPlatformAPIManager } from "@/main/application/workspace/platform-api-manager";
-import { getWorkspaceService } from "./main/domain/workspace/workspace-service";
+import { setApplicationMenu } from "@/main/ui/menu";
+import { createTray, updateTrayContextMenu } from "@/main/ui/tray";
+import { importExistingServerConfigurations } from "@/main/modules/mcp-apps-manager/mcp-config-importer";
+import { getPlatformAPIManager } from "@/main/modules/workspace/platform-api-manager";
+import { getWorkspaceService } from "@/main/modules/workspace/workspace.service";
 import { setupIpcHandlers } from "./main/infrastructure/ipc";
-import { getIsAutoUpdateInProgress } from "./main/infrastructure/ipc/handlers/update-handler";
+import { getIsAutoUpdateInProgress } from "./main/modules/system/system-handler";
 import {
   initializeEnvironment,
   isDevelopment,
@@ -76,11 +77,14 @@ declare const BACKGROUND_WINDOW_PRELOAD_WEBPACK_ENTRY: string | undefined;
 declare const BACKGROUND_WINDOW_WEBPACK_ENTRY: string;
 
 // グローバル変数の宣言（初期化は後で行う）
-let mcpServerManager: MCPServerManager;
+let serverManager: MCPServerManager;
+let aggregatorServer: AggregatorServer;
 let mcpHttpServer: MCPHttpServer;
 
 // MCPServerManagerインスタンスを取得する関数をグローバルに公開
-(global as any).getMCPServerManager = () => mcpServerManager;
+(global as any).getMCPServerManager = () => serverManager;
+// AggregatorServerインスタンスを取得する関数をグローバルに公開
+(global as any).getAggregatorServer = () => aggregatorServer;
 
 const createWindow = () => {
   // Platform-specific window options
@@ -187,11 +191,11 @@ const createBackgroundWindow = () => {
 
 /**
  * Sets up a timer to periodically update the tray context menu
- * @param mcpServerManager The MCPServerManager instance
+ * @param serverManager The MCPServerManager instance
  * @param intervalMs Time between updates in milliseconds
  */
 function setupTrayUpdateTimer(
-  mcpServerManager: MCPServerManager,
+  serverManager: MCPServerManager,
   intervalMs = 5000,
 ) {
   if (trayUpdateTimer) {
@@ -199,7 +203,7 @@ function setupTrayUpdateTimer(
   }
 
   trayUpdateTimer = setInterval(() => {
-    updateTrayContextMenu(mcpServerManager);
+    updateTrayContextMenu(serverManager);
   }, intervalMs);
 }
 
@@ -235,14 +239,18 @@ async function initMCPServices(): Promise<void> {
   // Platform APIマネージャーの初期化（ワークスペースDBを設定）
   await getPlatformAPIManager().initialize();
 
-  // MCPサーバーマネージャーの初期化
-  mcpServerManager = new MCPServerManager();
+  // MCPServerManagerの初期化
+  serverManager = new MCPServerManager();
 
   // データベースからサーバーリストを読み込む
-  await mcpServerManager.initializeAsync();
+  await serverManager.initializeAsync();
+
+  // AggregatorServerの初期化
+  aggregatorServer = new AggregatorServer(serverManager);
+  aggregatorServer.initAgentToolsServer();
 
   // HTTPサーバーの初期化とスタート
-  mcpHttpServer = new MCPHttpServer(mcpServerManager, 3282);
+  mcpHttpServer = new MCPHttpServer(serverManager, 3282, aggregatorServer);
   try {
     await mcpHttpServer.start();
   } catch (error) {
@@ -269,10 +277,10 @@ function initUI(): void {
   createBackgroundWindow();
 
   // システムトレイ作成
-  createTray(mcpServerManager);
+  createTray(serverManager);
 
   // トレイコンテキストメニューの定期更新を設定
-  setupTrayUpdateTimer(mcpServerManager);
+  setupTrayUpdateTimer(serverManager);
 }
 
 /**
@@ -400,7 +408,8 @@ app.on("will-quit", async () => {
     console.error("Failed to stop MCP HTTP Server:", error);
   }
 
-  mcpServerManager.shutdown();
+  serverManager.shutdown();
+  aggregatorServer.shutdown();
 });
 
 // Override the default app.quit to set our isQuitting flag first
