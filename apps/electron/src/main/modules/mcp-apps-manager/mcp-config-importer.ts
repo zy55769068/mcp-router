@@ -192,25 +192,13 @@ export async function extractConfigInfo(
         config.mcp.servers["mcp-router"].command === "npx" &&
         Array.isArray(config.mcp.servers["mcp-router"].args) &&
         (config.mcp.servers["mcp-router"].args.includes("connect") ||
-          config.mcp.servers["mcp-router"].args.includes("mcp-remote"));
+          config.mcp.servers["mcp-router"].args.includes(
+            "@mcp_router/cli@latest",
+          ));
 
       // トークンを取得
       if (config.mcp?.servers?.["mcp-router"]?.env?.MCPR_TOKEN) {
         configToken = config.mcp.servers["mcp-router"].env.MCPR_TOKEN;
-      } else if (
-        config.mcp?.servers?.["mcp-router"]?.args &&
-        Array.isArray(config.mcp.servers["mcp-router"].args)
-      ) {
-        // mcp-remoteの場合、argsから--headerパラメータを探す
-        const args = config.mcp.servers["mcp-router"].args;
-        const headerIndex = args.indexOf("--header");
-        if (headerIndex !== -1 && args[headerIndex + 1]) {
-          const authHeader = args[headerIndex + 1];
-          const match = authHeader.match(/Authorization:\s*Bearer\s+(.+)/);
-          if (match) {
-            configToken = match[1];
-          }
-        }
       }
 
       // 他のMCPサーバ設定を抽出
@@ -228,25 +216,13 @@ export async function extractConfigInfo(
           (arg: string) => arg === "mcpr-cli" || arg === "mcpr-cli@latest",
         ) &&
           config.mcpServers["mcp-router"].args.includes("connect")) ||
-          config.mcpServers["mcp-router"].args.includes("mcp-remote"));
+          config.mcpServers["mcp-router"].args.includes(
+            "@mcp_router/cli@latest",
+          ));
 
       // トークンを取得
       if (config.mcpServers?.["mcp-router"]?.env?.MCPR_TOKEN) {
         configToken = config.mcpServers["mcp-router"].env.MCPR_TOKEN;
-      } else if (
-        config.mcpServers?.["mcp-router"]?.args &&
-        Array.isArray(config.mcpServers["mcp-router"].args)
-      ) {
-        // mcp-remoteの場合、argsから--headerパラメータを探す
-        const args = config.mcpServers["mcp-router"].args;
-        const headerIndex = args.indexOf("--header");
-        if (headerIndex !== -1 && args[headerIndex + 1]) {
-          const authHeader = args[headerIndex + 1];
-          const match = authHeader.match(/Authorization:\s*Bearer\s+(.+)/);
-          if (match) {
-            configToken = match[1];
-          }
-        }
       }
 
       // 他のMCPサーバ設定を抽出

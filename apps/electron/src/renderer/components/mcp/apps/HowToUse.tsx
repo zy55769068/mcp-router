@@ -28,13 +28,16 @@ const HowToUseEN: React.FC<HowToUseProps> = ({ token }) => {
         <p className="mb-3 text-muted-foreground">
           {token
             ? "Connect to the MCP Router server:"
-            : "Connect using mcp-remote:"}
+            : "Connect using @mcp_router/cli:"}
         </p>
         <div className="overflow-x-auto w-full">
           <pre className="bg-muted p-4 rounded-lg text-xs whitespace-pre min-w-min w-max">
             {token
-              ? `npx mcp-remote http://localhost:3282/mcp --header "Authorization: Bearer ${token}"`
-              : `npx mcp-remote http://localhost:3282/mcp`}
+              ? `# Export token as environment variable
+export MCPR_TOKEN="${token}"
+
+npx -y @mcp_router/cli@latest connect`
+              : `npx -y @mcp_router/cli@latest connect`}
           </pre>
         </div>
       </div>
@@ -49,28 +52,18 @@ const HowToUseEN: React.FC<HowToUseProps> = ({ token }) => {
         </p>
         <div className="overflow-x-auto w-full">
           <pre className="bg-muted p-4 rounded-lg text-xs whitespace-pre min-w-min w-max">
-            {token
-              ? `{
+            {`{
   "mcpServers": {
     "mcp-router": {
       "command": "npx",
       "args": [
-        "mcp-remote",
-        "http://localhost:3282/mcp",
-        "--header",
-        "Authorization: Bearer ${token}"
-      ]
-    }
-  }
-}`
-              : `{
-  "mcpServers": {
-    "mcp-router": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:3282/mcp"
-      ]
+        "-y",
+        "@mcp_router/cli@latest",
+        "connect"
+      ],
+      "env": {
+        "MCPR_TOKEN": "${token}"
+      }
     }
   }
 }`}
@@ -90,14 +83,19 @@ const HowToUseJA: React.FC<HowToUseProps> = ({ token }) => {
         <h4 className="text-md font-semibold mb-3">1. CLIでの使用方法</h4>
         <p className="mb-3 text-muted-foreground">
           {token
-            ? "MCPルーターサーバーに接続します："
-            : "mcp-remoteを使って接続します："}
+            ? "トークンを環境変数として設定して接続します："
+            : "@mcp_router/cliを使って接続します："}
         </p>
         <div className="overflow-x-auto w-full">
           <pre className="bg-muted p-4 rounded-lg text-xs whitespace-pre min-w-min w-max">
             {token
-              ? `npx mcp-remote http://localhost:3282/mcp --header "Authorization: Bearer ${token}"`
-              : `npx mcp-remote http://localhost:3282/mcp`}
+              ? `# トークンを環境変数としてエクスポート
+export MCPR_TOKEN="${token}"
+
+# mcpr-cliを使って接続
+npx -y @mcp_router/cli@latest connect`
+              : `# mcpr-cliを使って接続
+npx -y @mcp_router/cli@latest connect`}
           </pre>
         </div>
       </div>
@@ -112,28 +110,18 @@ const HowToUseJA: React.FC<HowToUseProps> = ({ token }) => {
         </p>
         <div className="overflow-x-auto w-full">
           <pre className="bg-muted p-4 rounded-lg text-xs whitespace-pre min-w-min w-max">
-            {token
-              ? `{
+            {`{
   "mcpServers": {
     "mcp-router": {
       "command": "npx",
       "args": [
-        "mcp-remote",
-        "http://localhost:3282/mcp",
-        "--header",
-        "Authorization: Bearer ${token}"
-      ]
-    }
-  }
-}`
-              : `{
-  "mcpServers": {
-    "mcp-router": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:3282/mcp"
-      ]
+        "-y",
+        "@mcp_router/cli@latest",
+        "connect"
+      ],
+      "env": {
+        "MCPR_TOKEN": "${token}"
+      }
     }
   }
 }`}
