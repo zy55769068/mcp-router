@@ -30,6 +30,7 @@ import ServerDetailsEnvironment from "./ServerDetailsEnvironment";
 import ServerDetailsAutoStart from "./ServerDetailsAutoStart";
 import ServerDetailsInputParams from "./ServerDetailsInputParams";
 import { useServerEditingStore } from "@/renderer/stores";
+import ServerDetailsTools from "./ServerDetailsTools";
 
 interface ServerDetailsAdvancedSheetProps {
   server: MCPServer;
@@ -132,13 +133,14 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
 
         {server.inputParams && Object.keys(server.inputParams).length > 0 ? (
           <Tabs defaultValue="params" className="mt-4">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="params">
                 {t("serverDetails.inputParameters")}
               </TabsTrigger>
               <TabsTrigger value="general">
                 {t("serverDetails.generalSettings")}
               </TabsTrigger>
+              <TabsTrigger value="tools">{t("serverDetails.tools")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="general" className="space-y-6 mt-4">
@@ -289,6 +291,9 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
                 updateInputParam={updateInputParam}
               />
             </TabsContent>
+            <TabsContent value="tools" className="space-y-6 mt-4">
+              <ServerDetailsTools server={server} />
+            </TabsContent>
           </Tabs>
         ) : (
           <div className="space-y-6 mt-4">
@@ -429,6 +434,14 @@ const ServerDetailsAdvancedSheet: React.FC<ServerDetailsAdvancedSheetProps> = ({
               ) : (
                 <ServerDetailsRemote server={server} isEditing={false} />
               )}
+            </div>
+            {/* Tools (when no input params) */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Terminal className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-medium text-primary">{t("serverDetails.tools")}</h3>
+              </div>
+              <ServerDetailsTools server={server} />
             </div>
           </div>
         )}

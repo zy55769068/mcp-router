@@ -17,8 +17,8 @@ import { SidebarProvider } from "@mcp_router/ui";
 import McpAppsManager from "@/renderer/components/mcp/apps/McpAppsManager";
 import LogViewer from "@/renderer/components/mcp/log/LogViewer";
 import AgentBuild from "@/renderer/components/agent/create/AgentBuild";
-import DeployedAgents from "./agent/use/DeployedAgents";
 import AgentCreate from "@/renderer/components/agent/create/AgentCreate";
+import DeployedAgents from "./agent/use/DeployedAgents";
 import AgentChat from "./agent/use/AgentChat";
 import AgentSettings from "./agent/use/AgentSettings";
 import AgentUse from "./agent/use/AgentUse";
@@ -233,6 +233,10 @@ const App: React.FC = () => {
               <Route path="/servers/add" element={<DiscoverWrapper />} />
               <Route path="/clients" element={<McpAppsManager />} />
               <Route path="/logs" element={<LogViewer />} />
+              {/* Feedback removed: redirect */}
+              <Route path="/feedback" element={<Navigate to="/servers" replace />} />
+              {/* Agents feature removed: redirect any /agents path */}
+              <Route path="/agents/*" element={<Navigate to="/servers" replace />} />
               <Route
                 path="/hooks"
                 element={<Navigate to="/workflows" replace />}

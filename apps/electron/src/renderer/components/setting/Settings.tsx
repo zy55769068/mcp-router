@@ -13,16 +13,14 @@ import { Badge } from "@mcp_router/ui";
 import { Switch } from "@mcp_router/ui";
 import { useThemeStore } from "@/renderer/stores";
 import { useAuthStore } from "../../stores";
-import { IconBrandDiscord } from "@tabler/icons-react";
 import { electronPlatformAPI as platformAPI } from "../../platform-api/electron-platform-api";
-import { postHogService } from "../../services/posthog-service";
+// Analytics UI removed from Settings; keep service wiring elsewhere (App)
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [isRefreshingCredits, setIsRefreshingCredits] = useState(false);
   const [loadExternalMCPConfigs, setLoadExternalMCPConfigs] =
     useState<boolean>(true);
-  const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean>(true);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   // Zustand stores
@@ -43,11 +41,10 @@ const Settings: React.FC = () => {
 
   // Get normalized language code for select
   const getCurrentLanguage = () => {
-    const currentLang = i18n.language;
-    // Handle cases like 'en-US' -> 'en', 'ja-JP' -> 'ja'
-    if (currentLang.startsWith("en")) return "en";
-    if (currentLang.startsWith("ja")) return "ja";
-    return "en"; // fallback
+    const lang = i18n.language || "en";
+    if (lang.startsWith("zh")) return "zh";
+    if (lang.startsWith("ja")) return "ja";
+    return "en";
   };
 
   // 認証状態の監視
@@ -69,7 +66,6 @@ const Settings: React.FC = () => {
       try {
         const settings = await platformAPI.settings.get();
         setLoadExternalMCPConfigs(settings.loadExternalMCPConfigs ?? true);
-        setAnalyticsEnabled(settings.analyticsEnabled ?? true);
       } catch {
         // Ignore error and use default value
         console.log("Failed to load settings, using defaults");
@@ -144,31 +140,7 @@ const Settings: React.FC = () => {
     }
   };
 
-  // Handle analytics toggle
-  const handleAnalyticsToggle = async (checked: boolean) => {
-    setAnalyticsEnabled(checked);
-    setIsSavingSettings(true);
-
-    try {
-      const currentSettings = await platformAPI.settings.get();
-      await platformAPI.settings.save({
-        ...currentSettings,
-        analyticsEnabled: checked,
-      });
-
-      // Update PostHog service
-      postHogService.updateConfig({
-        analyticsEnabled: checked,
-        userId: currentSettings.userId,
-      });
-    } catch (error) {
-      console.error("Failed to save analytics settings:", error);
-      // Revert on error
-      setAnalyticsEnabled(!checked);
-    } finally {
-      setIsSavingSettings(false);
-    }
-  };
+  // Analytics toggle removed from UI
 
   return (
     <div className="p-6 flex flex-col gap-6">
@@ -195,6 +167,7 @@ const Settings: React.FC = () => {
                 <SelectContent>
                   <SelectItem value="en">{t("languages.en")}</SelectItem>
                   <SelectItem value="ja">{t("languages.ja")}</SelectItem>
+                  <SelectItem value="zh">{t("languages.zh")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -228,7 +201,8 @@ const Settings: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Authentication Card - Optional Login */}
+      {/* Authentication removed */}
+      {false && (
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">
@@ -355,30 +329,9 @@ const Settings: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      )}
 
-      {/* Community Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">{t("settings.community")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {t("settings.communityDescription")}
-            </p>
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-              onClick={() =>
-                window.open("https://discord.gg/dwG9jPrhxB", "_blank")
-              }
-            >
-              <IconBrandDiscord className="h-5 w-5" />
-              {t("settings.joinDiscord")}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Community Card removed */}
 
       {/* External Applications Card */}
       <Card>
@@ -401,21 +354,7 @@ const Settings: React.FC = () => {
               disabled={isSavingSettings}
             />
           </div>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <label className="text-sm font-medium">
-                {t("settings.analytics")}
-              </label>
-              <p className="text-xs text-muted-foreground">
-                {t("settings.analyticsDescription")}
-              </p>
-            </div>
-            <Switch
-              checked={analyticsEnabled}
-              onCheckedChange={handleAnalyticsToggle}
-              disabled={isSavingSettings}
-            />
-          </div>
+          {/* Analytics toggle removed */}
         </CardContent>
       </Card>
     </div>

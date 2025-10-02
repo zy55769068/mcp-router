@@ -41,7 +41,8 @@
   },
   "languages": {
     "en": "English",
-    "ja": "日本語"
+    "ja": "日本語",
+    "zh": "Chinese"
   },
   "locale": "en-US",
   "login": {
@@ -546,7 +547,15 @@
     "serverStopped": "Server stopped",
     "commandNotFound": "Command is not installed. Server startup may fail.",
     "autoStart": "Auto Start",
-    "autoStartToggleLabel": "Enable auto-start"
+    "autoStartToggleLabel": "Enable auto-start",
+    "toolsPanel": {
+      "filterPlaceholder": "Filter tools",
+      "toolHeader": "Tool",
+      "enabledHeader": "Enabled",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "noTools": "No tools found"
+    }
   },
   "server": {
     "status": {

@@ -24,6 +24,7 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
       env TEXT,
       auto_start INTEGER NOT NULL,
       disabled INTEGER NOT NULL,
+      tool_permissions TEXT,
       auto_approve TEXT,
       context_path TEXT,
       server_type TEXT NOT NULL DEFAULT 'local',
@@ -133,6 +134,11 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
         "環境変数",
         {},
       );
+      const toolPermissions = this.safeParseJSON<Record<string, boolean>>(
+        row.tool_permissions,
+        "ツール権限",
+        undefined as unknown as Record<string, boolean>,
+      );
       const requiredParams: string[] = row.required_params
         ? JSON.parse(row.required_params)
         : [];
@@ -155,6 +161,7 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
         env: env,
         autoStart: !!row.auto_start,
         disabled: !!row.disabled,
+        toolPermissions: toolPermissions,
         serverType: row.server_type || "local",
         remoteUrl: remoteUrl || undefined,
         bearerToken: bearerToken || undefined,
@@ -182,6 +189,9 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
     return {
       bearerToken: entity.bearerToken || null,
       env: JSON.stringify(entity.env || {}),
+      toolPermissions: entity.toolPermissions
+        ? JSON.stringify(entity.toolPermissions)
+        : null,
       inputParams: entity.inputParams
         ? JSON.stringify(entity.inputParams)
         : null,
@@ -199,7 +209,15 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
       const now = Date.now();
 
       // データをシリアライズ
-      const { bearerToken, env, inputParams, command, args, remoteUrl } =
+      const {
+        bearerToken,
+        env,
+        toolPermissions,
+        inputParams,
+        command,
+        args,
+        remoteUrl,
+      } =
         this.serializeEntityData(entity);
 
       // DB行オブジェクトを構築
@@ -210,6 +228,7 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
         command: command,
         args: args,
         env: env,
+        tool_permissions: toolPermissions,
         auto_start: entity.autoStart ? 1 : 0,
         disabled: entity.disabled ? 1 : 0,
         server_type: entity.serverType,
@@ -296,8 +315,15 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
   ): Record<string, any> {
     try {
       // データをシリアライズ
-      const { bearerToken, env, inputParams, command, args, remoteUrl } =
-        this.serializeEntityData(entity);
+      const {
+        bearerToken,
+        env,
+        inputParams,
+        command,
+        args,
+        remoteUrl,
+        toolPermissions,
+      } = this.serializeEntityData(entity);
 
       // DB行オブジェクトを構築
       return {
@@ -307,6 +333,7 @@ export class McpServerManagerRepository extends BaseRepository<MCPServer> {
         command: command,
         args: args,
         env: env,
+        tool_permissions: toolPermissions,
         auto_start: entity.autoStart ? 1 : 0,
         disabled: entity.disabled ? 1 : 0,
         server_type: entity.serverType,

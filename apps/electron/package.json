@@ -1,12 +1,12 @@
 {
   "name": "@mcp_router/electron",
   "productName": "MCP Router",
-  "version": "0.5.5",
+  "version": "0.5.5-fork.1",
   "private": true,
   "main": ".webpack/main",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcp-router/mcp-router.git"
+    "url": "https://github.com/zy55769068/mcp-router.git"
   },
   "scripts": {
     "start": "electron-forge start",

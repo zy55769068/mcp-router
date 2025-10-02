@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import BackgroundComponent from "@/renderer/components/agent/BackgroundComponent";
+// Agents removed
+const BackgroundComponent: React.FC<any> = () => null;
 import { PlatformAPIProvider } from "@/renderer/platform-api";
 import { electronPlatformAPI } from "@/renderer/platform-api/electron-platform-api";
 import "@mcp_router/tailwind-config/base.css";

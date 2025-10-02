@@ -113,6 +113,18 @@ export class RequestHandlers extends RequestHandlerBase {
       serverName,
       "CallTool",
       async () => {
+        // Check server-level permission before call
+        const serverObj = this.servers.get(serverId);
+        const allowed =
+          serverObj?.toolPermissions?.[originalToolName] !== undefined
+            ? !!serverObj?.toolPermissions?.[originalToolName]
+            : true;
+        if (!allowed) {
+          throw new McpError(
+            ErrorCode.InvalidRequest,
+            `Tool ${originalToolName} is disabled on server ${serverName}`,
+          );
+        }
         // Call the tool on the server
         return await client.callTool({
           name: originalToolName,
@@ -131,7 +143,8 @@ export class RequestHandlers extends RequestHandlerBase {
 
     // Add tools from running servers
     for (const [serverId, client] of this.clients.entries()) {
-      const serverName = this.servers.get(serverId)?.name || serverId;
+      const serverObj = this.servers.get(serverId);
+      const serverName = serverObj?.name || serverId;
       const isRunning = this.serverStatusMap.get(serverName);
 
       if (!isRunning || !client) {
@@ -147,6 +160,11 @@ export class RequestHandlers extends RequestHandlerBase {
         }
 
         for (const tool of tools.tools) {
+          const allowed =
+            serverObj?.toolPermissions?.[tool.name] !== undefined
+              ? !!serverObj?.toolPermissions?.[tool.name]
+              : true;
+          if (!allowed) continue;
           const toolWithSource = {
             ...tool,
             name: tool.name,

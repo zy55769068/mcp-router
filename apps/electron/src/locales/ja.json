@@ -550,11 +550,20 @@
     "serverStopped": "サーバを停止しました",
     "commandNotFound": "コマンドがインストールされていません。サーバの起動に失敗する可能性があります。",
     "autoStart": "自動起動",
-    "autoStartToggleLabel": "自動起動を有効にする"
+    "autoStartToggleLabel": "自動起動を有効にする",
+    "toolsPanel": {
+      "filterPlaceholder": "ツールをフィルター",
+      "toolHeader": "ツール",
+      "enabledHeader": "有効",
+      "expand": "展開",
+      "collapse": "折りたたむ",
+      "noTools": "ツールが見つかりません"
+    }
   },
   "languages": {
     "en": "英語",
-    "ja": "日本語"
+    "ja": "日本語",
+    "zh": "中国語"
   },
   "locale": "ja-JP",
   "importFromJson": {

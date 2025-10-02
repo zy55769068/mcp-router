@@ -4,7 +4,6 @@ import { MCPServerManager } from "@/main/modules/mcp-server-manager/mcp-server-m
 import { AggregatorServer } from "@/main/modules/mcp-server-runtime/aggregator-server";
 import { MCPHttpServer } from "@/main/modules/mcp-server-runtime/http/mcp-http-server";
 import started from "electron-squirrel-startup";
-import { updateElectronApp } from "update-electron-app";
 import { setApplicationMenu } from "@/main/ui/menu";
 import { createTray, updateTrayContextMenu } from "@/main/ui/tray";
 import { importExistingServerConfigurations } from "@/main/modules/mcp-apps-manager/mcp-config-importer";
@@ -65,11 +64,7 @@ export const BASE_URL = "https://mcp-router.net/";
 // export const BASE_URL = 'http://localhost:3001/';
 export const API_BASE_URL = `${BASE_URL}api`;
 
-// Configure auto update
-updateElectronApp({
-  notifyUser: false,
-  updateInterval: "1 hour",
-});
+// Auto update disabled
 
 // Declare global variables defined by Electron Forge
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string | undefined;

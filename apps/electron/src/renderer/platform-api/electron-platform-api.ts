@@ -31,8 +31,9 @@ class ElectronPlatformAPI implements PlatformAPI {
   constructor() {
     // Initialize auth domain
     this.auth = {
-      signIn: (provider) => window.electronAPI.login(provider),
-      signOut: () => window.electronAPI.logout(),
+      // Auth removed: no-ops
+      signIn: async (_provider) => false,
+      signOut: async () => false,
       getStatus: (forceRefresh) =>
         window.electronAPI.getAuthStatus(forceRefresh).then((status) => ({
           authenticated: status.authenticated ?? false,
@@ -40,8 +41,7 @@ class ElectronPlatformAPI implements PlatformAPI {
           user: status.user,
           token: status.token,
         })),
-      handleToken: (token, state) =>
-        window.electronAPI.handleAuthToken(token, state),
+      handleToken: async (_token, _state) => false,
       onChange: (callback) =>
         window.electronAPI.onAuthStatusChanged((status) =>
           callback({
@@ -71,6 +71,17 @@ class ElectronPlatformAPI implements PlatformAPI {
         return server?.status || { type: "stopped" };
       },
       selectFile: (options) => window.electronAPI.serverSelectFile(options),
+      tools: {
+        list: (serverId) => window.electronAPI.listMcpServerTools(serverId),
+        updatePermissions: async (serverId, permissions) => {
+          const updated = await window.electronAPI.setMcpServerToolPermissions(
+            serverId,
+            permissions,
+          );
+          if (!updated) throw new Error("Failed to update tool permissions");
+          return updated;
+        },
+      },
     };
 
     // Initialize agents domain (with chat functionality)

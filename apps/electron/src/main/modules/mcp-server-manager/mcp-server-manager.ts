@@ -12,6 +12,7 @@ import {
   substituteArgsParameters,
 } from "../mcp-apps-manager/mcp-apps-manager.service";
 import { getLogService } from "@/main/modules/mcp-logger/mcp-logger.service";
+import { MCPTool } from "@mcp_router/shared";
 
 /**
  * Core server lifecycle management
@@ -341,6 +342,47 @@ export class MCPServerManager {
 
     server.toolPermissions = toolPermissions;
     return server;
+  }
+
+  /**
+   * Get tool list for a specific server with enabled flags.
+   * If the server is not running, attempts a temporary connection.
+   */
+  public async getServerTools(id: string): Promise<MCPTool[]> {
+    const server = this.servers.get(id);
+    if (!server) {
+      throw new Error("Server not found");
+    }
+
+    const toMcpTool = (tool: any): MCPTool => ({
+      name: tool.name,
+      description: tool.description || "",
+      inputSchema: tool.parameters || tool.inputSchema || undefined,
+      enabled:
+        server.toolPermissions?.[tool.name] !== undefined
+          ? !!server.toolPermissions?.[tool.name]
+          : true,
+    });
+
+    const existingClient = this.clients.get(id);
+    if (existingClient) {
+      const tools = await existingClient.listTools();
+      return (tools.tools || []).map(toMcpTool);
+    }
+
+    // Attempt temporary connection
+    const result = await this.connectToServerWithResult(id);
+    if (result.status === "error") {
+      throw new Error(result.error);
+    }
+    try {
+      const tools = await result.client.listTools();
+      return (tools.tools || []).map(toMcpTool);
+    } finally {
+      try {
+        result.client.close();
+      } catch {}
+    }
   }
 
   /**

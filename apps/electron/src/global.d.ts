@@ -26,7 +26,8 @@ declare global {
         user?: any;
         token?: string;
       }>;
-      handleAuthToken: (token: string, state?: string) => Promise<boolean>;
+      // Auth removed
+      // handleAuthToken: (token: string, state?: string) => Promise<boolean>;
       onAuthStatusChanged: (
         callback: (status: {
           loggedIn: boolean;

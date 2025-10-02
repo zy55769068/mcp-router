@@ -1,10 +1,10 @@
 {
   "name": "mcp-router",
-  "version": "0.5.5",
+  "version": "0.5.5-fork.1",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcp-router/mcp-router"
+    "url": "https://github.com/zy55769068/mcp-router"
   },
   "engines": {
     "node": ">=20.0.0",

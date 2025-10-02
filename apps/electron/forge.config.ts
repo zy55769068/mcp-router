@@ -12,18 +12,28 @@ import { MakerDMG } from "@electron-forge/maker-dmg";
 import * as path from "path";
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
+// Derive repository owner/name from GitHub Actions env when available
+const repoEnv = process.env.GITHUB_REPOSITORY;
+const [repoOwner, repoName] = repoEnv ? repoEnv.split("/") : ["mcp-router", "mcp-router"];
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: "./public/images/icon/icon",
-    osxSign: {
-      identity: process.env.PUBLIC_IDENTIFIER,
-    },
-    osxNotarize: {
-      appleApiKey: process.env.APPLE_API_KEY || "",
-      appleApiKeyId: process.env.APPLE_API_KEY_ID || "",
-      appleApiIssuer: process.env.APPLE_API_ISSUER || "",
-    },
+    // Only sign/notarize when credentials are provided; otherwise disabled for CI builds
+    osxSign: process.env.PUBLIC_IDENTIFIER
+      ? {
+          identity: process.env.PUBLIC_IDENTIFIER,
+        }
+      : undefined,
+    osxNotarize:
+      process.env.APPLE_API_KEY && process.env.APPLE_API_KEY_ID && process.env.APPLE_API_ISSUER
+        ? {
+            appleApiKey: process.env.APPLE_API_KEY,
+            appleApiKeyId: process.env.APPLE_API_KEY_ID,
+            appleApiIssuer: process.env.APPLE_API_ISSUER,
+          }
+        : undefined,
   },
   rebuildConfig: {},
   makers: [
@@ -88,11 +98,11 @@ const config: ForgeConfig = {
       config: {
         authToken: process.env.GITHUB_TOKEN,
         repository: {
-          owner: "mcp-router",
-          name: "mcp-router",
+          owner: repoOwner,
+          name: repoName,
         },
-        prerelease: true,
-        draft: true,
+        prerelease: false,
+        draft: false,
       },
     },
   ],

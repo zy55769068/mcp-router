@@ -140,6 +140,13 @@ export class MainDatabaseMigration {
       description: "Add hooks table for MCP request/response hooks",
       execute: (db) => this.migrateAddHooksTable(db),
     });
+
+    // Server tool permissions column
+    this.migrations.push({
+      id: "20250810_add_tool_permissions_to_servers",
+      description: "Add tool_permissions column to servers table",
+      execute: (db) => this.migrateAddToolPermissionsToServers(db),
+    });
   }
 
   /**
@@ -257,6 +264,49 @@ export class MainDatabaseMigration {
       }
     } catch (error) {
       console.error("remote_url列の追加中にエラーが発生しました:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * tool_permissions列を追加するマイグレーション
+   */
+  private migrateAddToolPermissionsToServers(db: SqliteManager): void {
+    try {
+      // テーブルが存在するか確認
+      const tableExists = db.get(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name = 'servers'",
+        {},
+      );
+
+      if (!tableExists) {
+        console.log(
+          "serversテーブルが存在しないため、このマイグレーションをスキップします",
+        );
+        return;
+      }
+
+      // テーブル情報を取得
+      const tableInfo = db.all("PRAGMA table_info(servers)");
+      const columnNames = tableInfo.map((col: any) => col.name);
+
+      // tool_permissions列が存在しない場合は追加
+      if (!columnNames.includes("tool_permissions")) {
+        console.log("serversテーブルにtool_permissions列を追加します");
+        db.execute(
+          "ALTER TABLE servers ADD COLUMN tool_permissions TEXT",
+        );
+        console.log("tool_permissions列の追加が完了しました");
+      } else {
+        console.log(
+          "tool_permissions列は既に存在するため、追加をスキップします",
+        );
+      }
+    } catch (error) {
+      console.error(
+        "tool_permissions列の追加中にエラーが発生しました:",
+        error,
+      );
       throw error;
     }
   }

@@ -12,8 +12,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   logout: () => ipcRenderer.invoke("auth:logout"),
   getAuthStatus: (forceRefresh?: boolean) =>
     ipcRenderer.invoke("auth:status", forceRefresh),
-  handleAuthToken: (token: string, state?: string) =>
-    ipcRenderer.invoke("auth:handle-token", token, state),
+    // Auth removed
+    // handleAuthToken: (token: string, state?: string) =>
+    //   ipcRenderer.invoke("auth:handle-token", token, state),
   onAuthStatusChanged: (callback: (status: any) => void) => {
     const listener = (_: any, status: any) => callback(status);
     ipcRenderer.on("auth:status-changed", listener);
@@ -33,6 +34,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
   removeMcpServer: (id: string) => ipcRenderer.invoke("mcp:remove", id),
   updateMcpServerConfig: (id: string, config: any) =>
     ipcRenderer.invoke("mcp:update-config", id, config),
+
+  // MCP Server Tools
+  listMcpServerTools: (id: string) => ipcRenderer.invoke("mcp:tools:list", id),
+  setMcpServerToolPermissions: (
+    id: string,
+    permissions: Record<string, boolean>,
+  ) => ipcRenderer.invoke("mcp:tools:set", id, permissions),
 
   // Package Version Resolution
   resolvePackageVersionsInArgs: (

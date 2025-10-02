@@ -2,7 +2,7 @@
  * Server management domain API
  */
 
-import type { MCPServerConfig, MCPServer } from "../../mcp-types";
+import type { MCPServerConfig, MCPServer, MCPTool } from "../../mcp-types";
 
 export interface ServerStatus {
   type: "stopped" | "starting" | "running" | "stopping" | "error";
@@ -42,4 +42,13 @@ export interface ServerAPI {
     canceled?: boolean;
     error?: string;
   }>;
+
+  // Tools management for MCP servers
+  tools: {
+    list(serverId: string): Promise<MCPTool[]>;
+    updatePermissions(
+      serverId: string,
+      permissions: Record<string, boolean>,
+    ): Promise<MCPServer>;
+  };
 }

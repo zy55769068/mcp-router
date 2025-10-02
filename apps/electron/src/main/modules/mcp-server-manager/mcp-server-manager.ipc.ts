@@ -73,6 +73,26 @@ export function setupMcpServerHandlers(): void {
     },
   );
 
+  // Tools list for a server
+  ipcMain.handle("mcp:tools:list", async (_event, id: string) => {
+    const mcpServerManager = getMCPServerManager();
+    const tools = await mcpServerManager.getServerTools(id);
+    return tools;
+  });
+
+  // Update tool permissions for a server
+  ipcMain.handle(
+    "mcp:tools:set",
+    (_event, id: string, toolPermissions: Record<string, boolean>) => {
+      const mcpServerManager = getMCPServerManager();
+      const updated = mcpServerManager.updateServerToolPermissions(
+        id,
+        toolPermissions,
+      );
+      return updated;
+    },
+  );
+
   // ファイル/ディレクトリ選択ダイアログ
   ipcMain.handle(
     "server:selectFile",

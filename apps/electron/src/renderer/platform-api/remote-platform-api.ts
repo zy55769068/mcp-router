@@ -3,7 +3,7 @@ import {
   createRemoteAPIClient,
   type RemoteAPIClient,
 } from "@mcp_router/remote-api-types";
-import { MCPServer, MCPServerConfig } from "@mcp_router/shared";
+import { MCPServer, MCPServerConfig, MCPTool } from "@mcp_router/shared";
 import type {
   ServerStatus,
   CreateServerInput,
@@ -134,6 +134,23 @@ export class RemotePlatformAPI implements PlatformAPI {
     }) => {
       // File selection is a local operation
       return this.localPlatformAPI.servers.selectFile(options);
+    },
+
+    // Tools management - Not available via remote API yet
+    tools: {
+      list: async (_serverId: string): Promise<MCPTool[]> => {
+        throw new Error(
+          "Tools management is not available for remote workspaces",
+        );
+      },
+      updatePermissions: async (
+        _serverId: string,
+        _permissions: Record<string, boolean>,
+      ): Promise<MCPServer> => {
+        throw new Error(
+          "Tools management is not available for remote workspaces",
+        );
+      },
     },
   };
 

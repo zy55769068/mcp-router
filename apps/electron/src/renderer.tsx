@@ -15,7 +15,8 @@ root.render(
       <div className="h-screen flex flex-col">
         <TitleBar />
         <div className="flex-1 overflow-hidden">
-          <div className="h-2" />
+          {/* Spacer to account for fixed TitleBar height */}
+          <div className="h-[50px]" />
           <App />
         </div>
       </div>
