@@ -361,7 +361,7 @@ export class MCPServerManager {
       enabled:
         server.toolPermissions?.[tool.name] !== undefined
           ? !!server.toolPermissions?.[tool.name]
-          : true,
+          : false,
     });
 
     const existingClient = this.clients.get(id);

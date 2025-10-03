@@ -607,7 +607,7 @@ export class DeployedAgent extends AgentBase {
                   existingPermission?.description ||
                   tool.name ||
                   "",
-                enabled: existingPermission ? existingPermission.enabled : true,
+                enabled: existingPermission ? existingPermission.enabled : false,
               };
             });
 

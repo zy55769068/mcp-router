@@ -118,7 +118,7 @@ export class RequestHandlers extends RequestHandlerBase {
         const allowed =
           serverObj?.toolPermissions?.[originalToolName] !== undefined
             ? !!serverObj?.toolPermissions?.[originalToolName]
-            : true;
+            : false;
         if (!allowed) {
           throw new McpError(
             ErrorCode.InvalidRequest,
@@ -163,7 +163,7 @@ export class RequestHandlers extends RequestHandlerBase {
           const allowed =
             serverObj?.toolPermissions?.[tool.name] !== undefined
               ? !!serverObj?.toolPermissions?.[tool.name]
-              : true;
+              : false;
           if (!allowed) continue;
           const toolWithSource = {
             ...tool,

@@ -469,7 +469,7 @@ export class DevelopmentAgent extends AgentBase {
       );
       return {
         ...tool,
-        enabled: existingPermission ? existingPermission.enabled : true,
+        enabled: existingPermission ? existingPermission.enabled : false,
       };
     });
 
@@ -553,7 +553,7 @@ export class DevelopmentAgent extends AgentBase {
                   existingPermission?.description ||
                   tool.name ||
                   "",
-                enabled: existingPermission ? existingPermission.enabled : true,
+                enabled: existingPermission ? existingPermission.enabled : false,
               };
             });
 
@@ -636,7 +636,7 @@ export class DevelopmentAgent extends AgentBase {
                   ? permission.enabled
                   : existingPermission?.enabled !== undefined
                     ? existingPermission.enabled
-                    : true,
+                    : false,
             };
           });
 

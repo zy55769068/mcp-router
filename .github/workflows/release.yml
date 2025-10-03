@@ -43,3 +43,104 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
         run: pnpm run publish
+
+  polish-release-notes:
+    name: Polish Release Notes
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate and update release notes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const currentTag = context.ref.replace('refs/tags/','');
+            // List tags and find previous semver tag
+            const tags = await github.paginate(github.rest.repos.listTags, { owner, repo, per_page: 100 });
+            const semver = (s) => {
+              const m = s && s.match(/^v?(\d+)\.(\d+)\.(\d+)(?:[-+].*)?$/);
+              if (!m) return null;
+              return { major: +m[1], minor: +m[2], patch: +m[3] };
+            };
+            const currentSem = semver(currentTag);
+            let prevTag = null;
+            if (currentSem) {
+              const candidates = tags.map(t => t.name).filter(n => !!semver(n)).filter(n => {
+                const s = semver(n);
+                if (!s) return false;
+                if (n === currentTag) return false;
+                if (s.major !== currentSem.major) return s.major < currentSem.major;
+                if (s.minor !== currentSem.minor) return s.minor < currentSem.minor;
+                return s.patch < currentSem.patch;
+              }).sort((a,b) => {
+                const sa = semver(a), sb = semver(b);
+                if (sa.major !== sb.major) return sb.major - sa.major;
+                if (sa.minor !== sb.minor) return sb.minor - sa.minor;
+                return sb.patch - sa.patch;
+              });
+              prevTag = candidates[0] || null;
+            }
+            // Compare commit range
+            let commits = [];
+            if (prevTag) {
+              const cmp = await github.rest.repos.compareCommitsWithBasehead({ owner, repo, basehead: `${prevTag}...${currentTag}` });
+              commits = cmp.data.commits || [];
+            } else {
+              // Fallback: use recent commits (best-effort)
+              const commitResp = await github.rest.repos.listCommits({ owner, repo, per_page: 200 });
+              commits = commitResp.data || [];
+            }
+            const parseConventional = (msg) => {
+              const lines = (msg || '').split(/\r?\n/);
+              const first = lines[0] || '';
+              const m = first.match(/^(\w+)(?:\(([^)]+)\))?(!)?:\s*(.+)$/);
+              const breaking = lines.some(l => /^BREAKING CHANGES?:/i.test(l)) || (m && !!m[3]);
+              if (!m) return { type: 'other', scope: null, subject: first.trim(), breaking };
+              return { type: m[1].toLowerCase(), scope: m[2] || null, subject: m[4].trim(), breaking };
+            };
+            const groups = { feat: [], fix: [], perf: [], refactor: [], docs: [], style: [], test: [], build: [], ci: [], chore: [], other: [] };
+            const breakingNotes = [];
+            for (const c of commits) {
+              const msg = c.commit?.message || '';
+              const { type, scope, subject, breaking } = parseConventional(msg);
+              const shortSha = (c.sha || '').substring(0,7);
+              const author = c.author?.login || c.commit?.author?.name || 'unknown';
+              const scopeStr = scope ? `**${scope}**: ` : '';
+              const line = `- ${scopeStr}${subject} (${shortSha}) by @${author}`;
+              if (breaking) breakingNotes.push(`- ${scopeStr}${subject} (${shortSha})`);
+              if (groups[type]) groups[type].push(line); else groups.other.push(line);
+            }
+            const sections = [];
+            const pushSection = (title, items) => { if (items.length) sections.push(`### ${title}\n` + items.join('\n')); };
+            let body = `## ${currentTag} 发布说明\n`;
+            if (breakingNotes.length) sections.push(`### 破坏性变更\n` + breakingNotes.join('\n'));
+            pushSection('新功能', groups.feat);
+            pushSection('修复', groups.fix);
+            pushSection('性能', groups.perf);
+            pushSection('重构', groups.refactor);
+            pushSection('文档', groups.docs);
+            pushSection('样式', groups.style);
+            pushSection('测试', groups.test);
+            pushSection('构建/CI', groups.build.concat(groups.ci));
+            pushSection('杂务', groups.chore);
+            pushSection('其他', groups.other);
+            body += sections.join('\n\n') || '\n(暂无变更条目)\n';
+            // Update release body
+            let rel;
+            try {
+              rel = await github.rest.repos.getReleaseByTag({ owner, repo, tag: currentTag });
+            } catch (e) {
+              core.warning(`Release for ${currentTag} not found. Creating new release.`);
+              await github.rest.repos.createRelease({ owner, repo, tag_name: currentTag, name: currentTag, draft: false, prerelease: false, body });
+              return;
+            }
+            await github.rest.repos.updateRelease({ owner, repo, release_id: rel.data.id, body });
+            core.info('Release notes polished successfully.');

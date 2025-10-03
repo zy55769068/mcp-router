@@ -42,7 +42,7 @@ export abstract class AgentBase {
    */
   protected getToolPermission(serverId: string, toolName: string): boolean {
     if (!this.config.toolPermissions) {
-      return true; // デフォルトで有効
+      return false; // 明示的に有効化されていない場合は無効
     }
 
     const serverTools = this.config.toolPermissions[serverId];
@@ -55,7 +55,7 @@ export abstract class AgentBase {
       }
     }
 
-    return true; // 権限が明示的に設定されていない場合はデフォルトで有効
+    return false; // 不明な場合は無効（UI設定と整合）
   }
 
   /**
